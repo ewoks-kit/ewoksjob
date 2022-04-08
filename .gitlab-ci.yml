@@ -1,0 +1,39 @@
+stages:
+  - style
+  - test
+
+### Job templates ###
+
+.base:
+  only:
+    refs:
+      - main
+      - merge_requests
+  timeout: 10m
+
+.base-linux:
+  extends: .base
+  image: "docker-registry.esrf.fr/dau/ewoks:miniconda3"
+  tags:
+    - linux
+
+### Jobs ###
+
+style:
+  stage: style
+  extends: .base-linux
+  before_script:
+    - conda install flake8 black
+  script:
+    - LC_ALL=C.UTF-8 black --check --safe .
+    - flake8
+
+test-linux:
+  stage: test
+  extends: .base-linux
+  before_script:
+    - conda install pytest-cov
+    - conda install -c conda-forge redis-server
+    - python -m pip install .[test]
+  script:
+    - python -m pytest --cov=./ . -v
