@@ -16,8 +16,7 @@ class EwoksRedisEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
     # TODO: https://redisql.redbeardlab.com/blog/python/using-redisql-with-python/
 
     def __init__(self, url: str):
-        """An example is "redis://localhost:10003?db=2".
-        """
+        """An example is "redis://localhost:10003?db=2"."""
         self._redis_url = url
         super().__init__()
 
@@ -49,4 +48,4 @@ class EwoksRedisEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
         job_id, value = srecord
         n = self._connection.incrby("ewoks_events_count")
         key = f"ewoks:{job_id}:{n}"
-        self._connection.hmset(key, value)
+        self._connection.hset(key, mapping=value)
