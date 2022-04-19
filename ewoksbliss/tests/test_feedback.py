@@ -1,5 +1,5 @@
+import pytest
 from ewokscore import Task
-from ewokscore.variable import Variable, VariableContainer
 from ewokscore.utils import qualname
 from ewoks import execute_graph
 
@@ -22,14 +22,15 @@ def generate_graph():
     }
 
 
-def test_redis_feedback(ewoksevents, tmpdir):
+@pytest.mark.parametrize("scheme", ("nexus", "json"))
+def test_redis_feedback(scheme, ewoksevents, tmpdir):
     reader, execinfo = ewoksevents
     graph = generate_graph()
 
     result = execute_graph(
         graph,
         execinfo=execinfo,
-        varinfo={"root_uri": str(tmpdir)},
+        varinfo={"root_uri": str(tmpdir), "scheme": scheme},
         inputs=[
             {"id": "task", "name": "a", "value": 1},
             {"id": "task", "name": "b", "value": 2},
@@ -38,12 +39,12 @@ def test_redis_feedback(ewoksevents, tmpdir):
     )
     assert result == {"sum": 3}
 
-    result_event = list(reader.get_events(node_id="task", type="start"))
+    result_event = list(reader.get_events_with_variables(node_id="task", type="start"))
     assert len(result_event) == 1
 
-    assert len(result_event[0]["output_uris"]) == 1
-    result = Variable(data_uri=result_event[0]["output_uris"][0]["value"])
+    assert len(result_event[0]["output_variables"]) == 1
+    result = result_event[0]["output_variables"]["sum"]
     assert result.value == 3
 
-    results = VariableContainer(data_uri=result_event[0]["task_uri"])
+    results = result_event[0]["outputs"]
     assert results.variable_values == {"sum": 3}
