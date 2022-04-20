@@ -1,5 +1,5 @@
 import pytest
-from ewoksbliss.events.reader import RedisEwoksEventReader
+from ewoksjob.events.reader import RedisEwoksEventReader
 
 
 @pytest.fixture()
@@ -12,7 +12,7 @@ def ewoksevents(redisdb):
         "job_id": job_id,
         "handlers": [
             {
-                "class": "ewoksbliss.events.handlers.EwoksRedisEventHandler",
+                "class": "ewoksjob.events.handlers.EwoksRedisEventHandler",
                 "arguments": [{"name": "url", "value": url}],
             }
         ],

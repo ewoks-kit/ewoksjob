@@ -5,7 +5,7 @@ intermediate results (ewoks events) or final result (job return value)
 import os
 from time import time
 from celery.execute import send_task
-from ewoksbliss.events.reader import RedisEwoksEventReader
+from ewoksjob.events.reader import RedisEwoksEventReader
 
 
 # Configure celery in case celeryconfig.py is missing
@@ -33,7 +33,7 @@ execinfo = {
     "job_id": job_id,
     "handlers": [
         {
-            "class": "ewoksbliss.events.handlers.EwoksRedisEventHandler",
+            "class": "ewoksjob.events.handlers.EwoksRedisEventHandler",
             "arguments": [{"name": "url", "value": events_url}],
         }
     ],
@@ -50,7 +50,7 @@ kwargs = {
 
 # Execute workflow and get results
 reader = RedisEwoksEventReader(events_url)
-future = send_task("ewoksbliss.apps.ewoks.execute_graph", args=args, kwargs=kwargs)
+future = send_task("ewoksjob.apps.ewoks.execute_graph", args=args, kwargs=kwargs)
 workflow_results = future.get(
     timeout=3
 )  # events could be received in the mean time (see below)
