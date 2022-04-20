@@ -1,13 +1,24 @@
-# ewoksbliss
+# ewoksjob
 
-Utilities for [Ewoks](https://gitlab.esrf.fr/workflow/ewoks/ewoks) workflows in [Bliss](https://gitlab.esrf.fr/bliss/bliss)
+Utilities for job scheduling of [Ewoks](https://gitlab.esrf.fr/workflow/ewoks/ewoks) workflows.
+
+Ewoks has different interfaces to execute and ewoks workflow: python API, CLI, REST API, Qt GUI, Web GUI.
+
+Ewoksjob provides another ewoks interface: asynchronous and distributed scheduling of ewoks workflows from python.
+
+Note that Ewoksjob distributes the execution of workflows while [ewoksdask](https://gitlab.esrf.fr/workflow/ewoks/ewoksdask) distributes the execution of tasks in a workflow.
+
+The primary clients that need to schedule workflows are
+* [Ewoksserver](https://gitlab.esrf.fr/workflow/ewoks/ewoksserver): web backend for ewoks.
+* [Bliss](https://gitlab.esrf.fr/bliss/bliss): the ESRF beamline control system.
+* [Dauiquiri](https://gitlab.esrf.fr/ui/daiquiri): web backend for Bliss.
 
 ## Installation
 
 Install on the client side
 
 ```bash
-pip install ewoksbliss[events]
+pip install ewoksjob[events]
 ```
 
 The optional `events` install option should be used if you want the receive
@@ -16,18 +27,18 @@ ewoks events during workflow execution.
 Install on the worker side
 
 ```bash
-pip install ewoksbliss[worker]
+pip install ewoksjob[worker]
 ```
 
 ## Getting started
 
-Start a worker that can execute an ewoks graph
+Start a worker pool that can execute ewoks graphs
 
 ```bash
 examples/worker.sh
 ```
 
-On the client side
+Start a workflow on the client side
 
 ```bash
 python examples/job.py
