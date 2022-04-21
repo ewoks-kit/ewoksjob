@@ -3,9 +3,8 @@ intermediate results (ewoks events) or final result (job return value)
 """
 
 import os
-from time import time
 from celery.execute import send_task
-from ewoksjob.events.reader import RedisEwoksEventReader
+from ewoksjob.events.readers import RedisEwoksEventReader
 
 
 # Configure celery in case celeryconfig.py is missing
@@ -18,25 +17,34 @@ from ewoksjob.events.reader import RedisEwoksEventReader
 
 
 # Job arguments
-job_id = time()
 events_url = "redis://localhost:10003/2"
 workflow = {
     "graph": {"id": "mygraph"},
-    "nodes": [{"id": "task1", "task_type": "method", "task_identifier": "numpy.add"}],
+    "nodes": [
+        {"id": "task1", "task_type": "method", "task_identifier": "numpy.add"},
+        {"id": "task2", "task_type": "method", "task_identifier": "numpy.add"},
+    ],
+    "links": [
+        {
+            "source": "task1",
+            "target": "task2",
+            "data_mapping": [{"source_output": "return_value", "target_input": 0}],
+        }
+    ],
 }
 varinfo = {"root_uri": os.path.join(os.getcwd(), "results"), "scheme": "nexus"}
 inputs = [
     {"id": "task1", "name": 0, "value": 1},
     {"id": "task1", "name": 1, "value": 2},
+    {"id": "task2", "name": 1, "value": 3},
 ]
 execinfo = {
-    "job_id": job_id,
     "handlers": [
         {
-            "class": "ewoksjob.events.handlers.EwoksRedisEventHandler",
+            "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
             "arguments": [{"name": "url", "value": events_url}],
         }
-    ],
+    ]
 }
 args = (workflow,)
 kwargs = {
@@ -51,14 +59,15 @@ kwargs = {
 # Execute workflow and get results
 reader = RedisEwoksEventReader(events_url)
 future = send_task("ewoksjob.apps.ewoks.execute_graph", args=args, kwargs=kwargs)
+job_id = future.task_id
 workflow_results = future.get(
     timeout=3
 )  # events could be received in the mean time (see below)
-assert workflow_results == {"return_value": 3}
+assert workflow_results == {"return_value": 6}
 
 # Get intermediate results from ewoks events
 results_during_execution = list(reader.get_events(job_id=job_id))
-assert len(results_during_execution) == 6  # start/stop for job, workflow and node
+assert len(results_during_execution) == 8  # start/stop for job, workflow and node
 
 # Get start event of node "task1"
 result_event = list(
@@ -66,10 +75,6 @@ result_event = list(
 )
 assert len(result_event) == 1
 result_event = result_event[0]
-
-# Get the value of the first output variable of "task1"
-result = result_event["output_variables"]["return_value"]
-assert result.value == 3
 
 # Get access to all output variables of "task1"
 results = result_event["outputs"]

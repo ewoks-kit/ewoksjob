@@ -30,6 +30,14 @@ Install on the worker side
 pip install ewoksjob[worker]
 ```
 
+## Tests
+
+```bash
+pytest --pyargs ewoksjob
+```
+
+The test environment needs `redis-server` (e.g. `conda install redis-server`).
+
 ## Getting started
 
 Start a worker pool that can execute ewoks graphs

@@ -23,8 +23,9 @@ def generate_graph():
 
 
 @pytest.mark.parametrize("scheme", ("nexus", "json"))
-def test_redis_feedback(scheme, ewoksevents, tmpdir):
-    reader, execinfo = ewoksevents
+def test_redis(scheme, redis_ewoks_events, tmpdir):
+    handlers, reader = redis_ewoks_events
+    execinfo = {"handlers": handlers}
     graph = generate_graph()
 
     result = execute_graph(
@@ -41,10 +42,6 @@ def test_redis_feedback(scheme, ewoksevents, tmpdir):
 
     result_event = list(reader.get_events_with_variables(node_id="task", type="start"))
     assert len(result_event) == 1
-
-    assert len(result_event[0]["output_variables"]) == 1
-    result = result_event[0]["output_variables"]["sum"]
-    assert result.value == 3
 
     results = result_event[0]["outputs"]
     assert results.variable_values == {"sum": 3}

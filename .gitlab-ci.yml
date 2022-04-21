@@ -34,6 +34,10 @@ test-linux:
   before_script:
     - conda install pytest-cov
     - conda install -c conda-forge redis-server
+    - KEEP_HTTPS_PROXY=$HTTPS_PROXY
+    - unset HTTPS_PROXY
+    - python -m pip install git+https://gitlab.esrf.fr/workflow/ewoks/ewokscore.git@event_readers
+    - HTTPS_PROXY=$KEEP_HTTPS_PROXY
     - python -m pip install .[test]
   script:
     - python -m pytest --cov=./ . -v

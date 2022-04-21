@@ -1,21 +1,15 @@
 import pytest
-from ewoksjob.events.reader import RedisEwoksEventReader
+from ewoksjob.events.readers import RedisEwoksEventReader
 
 
 @pytest.fixture()
-def ewoksevents(redisdb):
-    job_id = 1234
+def redis_ewoks_events(redisdb):
     url = f"unix://{redisdb.connection_pool.connection_kwargs['path']}"
+    handlers = [
+        {
+            "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
+            "arguments": [{"name": "url", "value": url}],
+        }
+    ]
     reader = RedisEwoksEventReader(url)
-
-    execinfo = {
-        "job_id": job_id,
-        "handlers": [
-            {
-                "class": "ewoksjob.events.handlers.EwoksRedisEventHandler",
-                "arguments": [{"name": "url", "value": url}],
-            }
-        ],
-    }
-
-    return reader, execinfo
+    return handlers, reader
