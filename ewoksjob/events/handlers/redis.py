@@ -12,7 +12,7 @@ from ewokscore.events.handlers import EwoksEventHandlerMixIn
 RedisRecordType = Tuple[str, Dict[str, str]]
 
 
-class EwoksRedisEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
+class RedisEwoksEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
     # TODO: https://redisql.redbeardlab.com/blog/python/using-redisql-with-python/
 
     def __init__(self, url: str):
@@ -44,7 +44,6 @@ class EwoksRedisEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
 
     def _send_serialized_record(self, srecord: RedisRecordType):
         """Send the output from `_serialize_record` to the connection."""
-        # TODO: needs to be atomic
         job_id, value = srecord
         n = self._connection.incrby("ewoks_events_count")
         key = f"ewoks:{job_id}:{n}"
