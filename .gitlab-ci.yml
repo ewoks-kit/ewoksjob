@@ -3,19 +3,19 @@ include:
 
 test-3.6:
   extends: .test-3.6
-  image: "docker-registry.esrf.fr/dau/ewoks:miniconda3"
   script:   # before_script cannot be referenced
-    - conda install -c conda-forge redis-server
+    - apt update
+    - apt install -y redis-server
     - !reference [.test-3.6, script]
 
 build_sdist:
   extends: .build_sdist
 
 test_sdist-3.8:
-  image: "docker-registry.esrf.fr/dau/ewoks:miniconda3"
   extends: .test_sdist-3.8
   before_script:
-    - conda install -c conda-forge redis-server
+    - apt update
+    - apt install -y redis-server
     - !reference [.test_sdist-3.8, before_script]
 
 build_doc:
@@ -26,3 +26,4 @@ pages:
 
 assets:
   extends: .assets
+
