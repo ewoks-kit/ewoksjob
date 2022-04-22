@@ -11,7 +11,7 @@ Note that ewoksjob distributes the execution of workflows while [ewoksdask](http
 The primary clients that need to schedule workflows are
 * [Ewoksserver](https://gitlab.esrf.fr/workflow/ewoks/ewoksserver): web backend for ewoks.
 * [Bliss](https://gitlab.esrf.fr/bliss/bliss): the ESRF beamline control system.
-* [Dauiquiri](https://gitlab.esrf.fr/ui/daiquiri): web backend for Bliss.
+* [Daiquiri](https://gitlab.esrf.fr/ui/daiquiri): web backend for Bliss.
 
 ## Installation
 
@@ -53,3 +53,7 @@ python examples/job.py
 ```
 
 Adapt the three URL's as needed (ewoks events, celery message broker, celery job result storage).
+
+## Documentation
+
+https://ewoksjob.readthedocs.io/
