@@ -1,43 +1,28 @@
-stages:
-  - style
-  - test
+include:
+  - remote: https://gitlab.esrf.fr/workflow/ewoks/ewoks/raw/main/.gitlab-ci-template.yml
 
-### Job templates ###
-
-.base:
-  only:
-    refs:
-      - main
-      - merge_requests
-  timeout: 10m
-
-.base-linux:
-  extends: .base
+test-3.6:
+  extends: .test-3.6
   image: "docker-registry.esrf.fr/dau/ewoks:miniconda3"
-  tags:
-    - linux
-
-### Jobs ###
-
-style:
-  stage: style
-  extends: .base-linux
-  before_script:
-    - conda install flake8 black
-  script:
-    - LC_ALL=C.UTF-8 black --check --safe .
-    - flake8
-
-test-linux:
-  stage: test
-  extends: .base-linux
-  before_script:
-    - conda install pytest-cov
+  script:   # before_script cannot be referenced
     - conda install -c conda-forge redis-server
-    - KEEP_HTTPS_PROXY=$HTTPS_PROXY
-    - unset HTTPS_PROXY
-    - python -m pip install git+https://gitlab.esrf.fr/workflow/ewoks/ewokscore.git@event_readers
-    - HTTPS_PROXY=$KEEP_HTTPS_PROXY
-    - python -m pip install .[test]
-  script:
-    - python -m pytest --cov=./ . -v
+    - !reference [.test-3.6, script]
+
+build_sdist:
+  extends: .build_sdist
+
+test_sdist-3.8:
+  image: "docker-registry.esrf.fr/dau/ewoks:miniconda3"
+  extends: .test_sdist-3.8
+  before_script:
+    - conda install -c conda-forge redis-server
+    - !reference [.test_sdist-3.8, before_script]
+
+build_doc:
+  extends: .build_doc
+
+pages:
+  extends: .pages
+
+assets:
+  extends: .assets
