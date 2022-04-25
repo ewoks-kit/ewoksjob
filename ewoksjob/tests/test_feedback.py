@@ -3,6 +3,7 @@ from ewokscore import Task
 from ewokscore.utils import qualname
 from ewoks import execute_graph
 from .utils import has_redis_server
+from ewokscore import events
 
 
 class AddNumbers(Task, input_names=["a", "b"], output_names=["sum"]):
@@ -30,24 +31,36 @@ def test_redis(scheme, redis_ewoks_events, tmpdir):
     assert_feedback(scheme, handlers, reader, tmpdir)
 
 
+@pytest.mark.parametrize("scheme", ("nexus", "json"))
+def test_sqlite3(scheme, sqlite3_ewoks_events, tmpdir):
+    handlers, reader = sqlite3_ewoks_events
+    assert_feedback(scheme, handlers, reader, tmpdir)
+
+
 def assert_feedback(scheme, handlers, reader, tmpdir):
-    execinfo = {"handlers": handlers}
-    graph = generate_graph()
+    try:
+        execinfo = {"handlers": handlers}
+        graph = generate_graph()
 
-    result = execute_graph(
-        graph,
-        execinfo=execinfo,
-        varinfo={"root_uri": str(tmpdir), "scheme": scheme},
-        inputs=[
-            {"id": "task", "name": "a", "value": 1},
-            {"id": "task", "name": "b", "value": 2},
-        ],
-        outputs=[{"id": "task", "name": "sum"}],
-    )
-    assert result == {"sum": 3}
+        return_value = execute_graph(
+            graph,
+            execinfo=execinfo,
+            varinfo={"root_uri": str(tmpdir), "scheme": scheme},
+            inputs=[
+                {"id": "task", "name": "a", "value": 1},
+                {"id": "task", "name": "b", "value": 2},
+            ],
+            outputs=[{"id": "task", "name": "sum"}],
+        )
+        assert return_value == {"sum": 3}
 
-    result_event = list(reader.get_events_with_variables(node_id="task", type="start"))
-    assert len(result_event) == 1
+        assert len(list(reader.get_events_with_variables())) == 6
 
-    results = result_event[0]["outputs"]
-    assert results.variable_values == {"sum": 3}
+        evts = list(reader.get_events_with_variables(node_id="task", type="start"))
+        assert len(evts) == 1
+
+        event_values = evts[0]["outputs"]
+        assert event_values.variable_values == {"sum": 3}
+    finally:
+        reader.close()
+        events.cleanup()
