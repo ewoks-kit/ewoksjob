@@ -14,8 +14,4 @@ html_theme = "alabaster"
 html_static_path = []
 
 autosummary_generate = True
-autodoc_default_flags = [
-    "members",
-    "undoc-members",
-    "show-inheritance",
-]
+autodoc_default_flags = ["members", "undoc-members", "show-inheritance"]

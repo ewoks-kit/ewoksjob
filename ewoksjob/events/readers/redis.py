@@ -3,7 +3,7 @@ import json
 import socket
 from typing import Iterable
 import redis
-from ewokscore.events.readers import EwoksEventReader, EventType
+from .base import EwoksEventReader, EventType
 
 
 class RedisEwoksEventReader(EwoksEventReader):

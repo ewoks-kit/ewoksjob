@@ -3,7 +3,7 @@ intermediate results (ewoks events) or final result (job return value)
 """
 
 import os
-from celery.execute import send_task
+from ewoksjob.client import submit
 from ewoksjob.events.readers import RedisEwoksEventReader
 
 
@@ -58,7 +58,7 @@ kwargs = {
 
 # Execute workflow and get results
 reader = RedisEwoksEventReader(events_url)
-future = send_task("ewoksjob.apps.ewoks.execute_graph", args=args, kwargs=kwargs)
+future = submit(*args, **kwargs)
 job_id = future.task_id
 workflow_results = future.get(
     timeout=3
