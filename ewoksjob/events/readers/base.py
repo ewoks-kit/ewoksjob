@@ -1,6 +1,7 @@
 import time
-from typing import Dict, Iterable, Tuple
+from typing import Dict, Iterable, Optional, Tuple
 import json
+from threading import Event
 from ...utils import fromisoformat
 
 try:
@@ -22,11 +23,15 @@ class EwoksEventReader:
     def close(self):
         pass
 
-    def wait_events(self, timeout=None, **filters) -> Iterable[EventType]:
+    def wait_events(
+        self, timeout=None, stop_event: Optional[Event] = None, **filters
+    ) -> Iterable[EventType]:
         """Yield events matching the filter until timeout is reached."""
         raise NotImplementedError
 
-    def poll_events(self, timeout=None, interval=0.1, **filters) -> Iterable[EventType]:
+    def poll_events(
+        self, timeout=None, stop_event: Optional[Event] = None, interval=0.1, **filters
+    ) -> Iterable[EventType]:
         """Yield events matching the filter until timeout is reached."""
         start = time.time()
         n = 0
@@ -41,6 +46,8 @@ class EwoksEventReader:
                 n += len(events)
                 yield from events
             if timeout is not None and (time.time() - start) > timeout:
+                return
+            if stop_event is not None and stop_event.is_set():
                 return
             time.sleep(interval)
 
