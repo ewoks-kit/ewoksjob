@@ -26,7 +26,7 @@ class EwoksEventReader:
         """Yield events matching the filter until timeout is reached."""
         raise NotImplementedError
 
-    def poll_events(self, timeout=None, period=0.1, **filters) -> Iterable[EventType]:
+    def poll_events(self, timeout=None, interval=0.1, **filters) -> Iterable[EventType]:
         """Yield events matching the filter until timeout is reached."""
         start = time.time()
         n = 0
@@ -42,7 +42,7 @@ class EwoksEventReader:
                 yield from events
             if timeout is not None and (time.time() - start) > timeout:
                 return
-            time.sleep(period)
+            time.sleep(interval)
 
     def get_events(self, **filters) -> Iterable[EventType]:
         """Returns all currently available events matching the filter."""
