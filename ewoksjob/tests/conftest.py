@@ -1,5 +1,6 @@
 import pytest
 from ewoksjob.events.readers import instantiate_reader
+from ewokscore.events import cleanup
 
 
 @pytest.fixture(scope="session")
@@ -29,7 +30,9 @@ def sqlite3_ewoks_events(tmpdir):
         }
     ]
     reader = instantiate_reader(uri)
-    return handlers, reader
+    yield handlers, reader
+    reader.close()
+    cleanup()
 
 
 @pytest.fixture()
@@ -42,4 +45,6 @@ def redis_ewoks_events(redisdb):
         }
     ]
     reader = instantiate_reader(url)
-    return handlers, reader
+    yield handlers, reader
+    reader.close()
+    cleanup()
