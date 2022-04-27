@@ -8,4 +8,5 @@ ewoksjob has been developed by the `Software group <http://www.esrf.eu/Instrumen
 .. toctree::
     :maxdepth: 2
 
+    getting_started
     api
