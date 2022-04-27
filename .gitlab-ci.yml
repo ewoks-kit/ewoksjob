@@ -18,6 +18,9 @@ test_sdist-3.8:
     - apt install -y redis-server
     - !reference [.test_sdist-3.8, before_script]
 
+test_sdist-3.8-win:
+  extends: .test_sdist-3.8-win
+
 build_doc:
   extends: .build_doc
 
