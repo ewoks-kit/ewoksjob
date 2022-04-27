@@ -4,20 +4,41 @@ intermediate results (ewoks events) or final result (job return value)
 
 import os
 from ewoksjob.client import submit
-from ewoksjob.events.readers import RedisEwoksEventReader
+from ewoksjob.events.readers import instantiate_reader
+from celery import current_app
+
+# Results directory
+SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
+DATA_DIR = os.path.join(SCRIPT_DIR, "results")
+os.makedirs(DATA_DIR, exist_ok=True)
+
+# Load configuration
+current_app.config_from_object("celeryconfig")
+
+# Events during execution
+if False:
+    # Redis backend
+    events_url = "redis://localhost:10003/2"
+    handlers = [
+        {
+            "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
+            "arguments": [{"name": "url", "value": events_url}],
+        }
+    ]
+else:
+    # SQLite backend
+    events_url = f"file://{os.path.join(DATA_DIR, 'ewoks_events.db')}"
+    handlers = [
+        {
+            "class": "ewoksjob.events.handlers.Sqlite3EwoksEventHandler",
+            "arguments": [{"name": "uri", "value": events_url}],
+        }
+    ]
 
 
-# Configure celery in case celeryconfig.py is missing
-#
-# from celery import current_app
-# current_app.conf.broker_url = "redis://localhost:10003/3"
-# current_app.conf.result_backend = "redis://localhost:10003/4"
-# current_app.conf.result_serializer = "pickle"
-# current_app.conf.accept_content = ["application/json", "application/x-python-serialize"]
-
+reader = instantiate_reader(events_url)
 
 # Job arguments
-events_url = "redis://localhost:10003/2"
 workflow = {
     "graph": {"id": "mygraph"},
     "nodes": [
@@ -32,20 +53,13 @@ workflow = {
         }
     ],
 }
-varinfo = {"root_uri": os.path.join(os.getcwd(), "results"), "scheme": "nexus"}
+varinfo = {"root_uri": DATA_DIR, "scheme": "nexus"}
 inputs = [
     {"id": "task1", "name": 0, "value": 1},
     {"id": "task1", "name": 1, "value": 2},
     {"id": "task2", "name": 1, "value": 3},
 ]
-execinfo = {
-    "handlers": [
-        {
-            "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
-            "arguments": [{"name": "url", "value": events_url}],
-        }
-    ]
-}
+execinfo = {"handlers": handlers}
 args = (workflow,)
 kwargs = {
     "binding": None,
@@ -57,12 +71,10 @@ kwargs = {
 
 
 # Execute workflow and get results
-reader = RedisEwoksEventReader(events_url)
 future = submit(*args, **kwargs)
 job_id = future.task_id
-workflow_results = future.get(
-    timeout=3
-)  # events could be received in the mean time (see below)
+# events could be received in the mean time (see below)
+workflow_results = future.get(timeout=3, interval=0.1)
 assert workflow_results == {"return_value": 6}
 
 # Get intermediate results from ewoks events

@@ -6,7 +6,8 @@ Ewoks has different interfaces to execute an ewoks workflow: python API, CLI, RE
 
 Ewoksjob provides an ewoks interface for asynchronous and distributed scheduling of ewoks workflows from python.
 
-Note that ewoksjob distributes the execution of workflows while [ewoksdask](https://gitlab.esrf.fr/workflow/ewoks/ewoksdask) distributes the execution of tasks in a workflow. So in the context of workflows, job scheduling exists on two levels.
+Note that ewoksjob distributes the execution of workflows while [ewoksdask](https://gitlab.esrf.fr/workflow/ewoks/ewoksdask)
+distributes the execution of tasks in a workflow. So in the context of workflows, job scheduling exists on two levels.
 
 The primary clients that need to schedule workflows are
 * [Ewoksserver](https://gitlab.esrf.fr/workflow/ewoks/ewoksserver): web backend for ewoks.
@@ -18,11 +19,11 @@ The primary clients that need to schedule workflows are
 Install on the client side
 
 ```bash
-pip install ewoksjob[events]
+pip install ewoksjob[fullclient]
 ```
 
-The optional `events` install option should be used if you want the receive
-ewoks events during workflow execution.
+The optional `fullclient` install option should be used when you want full client-side capabilities,
+for exampe dereference URL's of ewoks task results.
 
 Install on the worker side
 
