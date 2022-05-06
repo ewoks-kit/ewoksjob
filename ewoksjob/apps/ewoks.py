@@ -4,8 +4,13 @@ import ewoks
 
 
 app = celery.Celery("ewoks")
-if os.environ.get("CELERY_CONFIG_MODULE"):
+
+# Celery does this automatically on the client side but not on the worker side:
+_module = os.environ.get("CELERY_CONFIG_MODULE")
+if _module:
     app.config_from_envvar("CELERY_CONFIG_MODULE", force=True)
+else:
+    app.config_from_object("celeryconfig", force=True, silent=True)
 
 
 @app.task(bind=True)

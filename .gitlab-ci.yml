@@ -8,6 +8,13 @@ test-3.6:
     - apt install -y redis-server
     - !reference [.test-3.6, script]
 
+test-3.8-examples:
+  extends: .test-3.8
+  script:
+    - python -m pip install --pre .[test]
+    - ./examples/worker.sh &
+    - python examples/job.py
+
 build_sdist:
   extends: .build_sdist
 
