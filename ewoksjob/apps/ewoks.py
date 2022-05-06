@@ -1,16 +1,9 @@
-import os
 import celery
 import ewoks
-
+from .config import configure_app
 
 app = celery.Celery("ewoks")
-
-# Celery does this automatically on the client side but not on the worker side:
-_module = os.environ.get("CELERY_CONFIG_MODULE")
-if _module:
-    app.config_from_envvar("CELERY_CONFIG_MODULE", force=True)
-else:
-    app.config_from_object("celeryconfig", force=True, silent=True)
+configure_app(app)
 
 
 @app.task(bind=True)
