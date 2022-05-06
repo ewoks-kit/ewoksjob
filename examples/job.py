@@ -5,15 +5,15 @@ intermediate results (ewoks events) or final result (job return value)
 import os
 from ewoksjob.client import submit
 from ewoksjob.events.readers import instantiate_reader
-from celery import current_app
 
 # Results directory
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, "results")
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# Load configuration
-current_app.config_from_object("celeryconfig")
+# Load configuration ("celeryconfig" is the default)
+# from celery import current_app
+# current_app.config_from_object("celeryconfig")
 
 # Events during execution
 if False:
@@ -38,7 +38,7 @@ else:
 
 reader = instantiate_reader(events_url)
 
-# Job arguments
+# Test workflow
 workflow = {
     "graph": {"id": "mygraph"},
     "nodes": [
@@ -53,6 +53,8 @@ workflow = {
         }
     ],
 }
+
+# Job arguments
 varinfo = {"root_uri": DATA_DIR, "scheme": "nexus"}
 inputs = [
     {"id": "task1", "name": 0, "value": 1},
