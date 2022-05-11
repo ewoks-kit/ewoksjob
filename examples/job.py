@@ -26,7 +26,7 @@ if False:
         }
     ]
 else:
-    # SQLite backend
+    # SQLite backend (flower will not work)
     events_url = f"file://{os.path.join(DATA_DIR, 'ewoks_events.db')}"
     handlers = [
         {
