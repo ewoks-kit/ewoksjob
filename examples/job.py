@@ -68,7 +68,6 @@ kwargs = {
     "execinfo": execinfo,
     "inputs": inputs,
     "varinfo": varinfo,
-    "outputs": [{"all": False}],
 }
 
 
