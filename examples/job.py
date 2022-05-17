@@ -3,92 +3,126 @@ intermediate results (ewoks events) or final result (job return value)
 """
 
 import os
+import argparse
+from typing import Optional
 from ewoksjob.client import submit
+from ewoksjob.client import submit_local
+from ewoksjob.server import workflow_worker_pool
 from ewoksjob.events.readers import instantiate_reader
 
 # Results directory
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, "results")
-os.makedirs(DATA_DIR, exist_ok=True)
 
-# Load configuration ("celeryconfig" is the default)
-# from celery import current_app
-# current_app.config_from_object("celeryconfig")
 
-# Events during execution
-if False:
-    # Redis backend
-    events_url = "redis://localhost:10003/2"
-    handlers = [
-        {
-            "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
-            "arguments": [{"name": "url", "value": events_url}],
-        }
+def ewoks_event(celery: Optional[bool] = None):
+    # Events during execution
+    if celery:
+        # Load configuration ("celeryconfig" is the default)
+        # from celery import current_app
+        # current_app.config_from_object("celeryconfig")
+
+        # Redis backend
+        events_url = "redis://localhost:10003/2"
+        handlers = [
+            {
+                "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
+                "arguments": [{"name": "url", "value": events_url}],
+            }
+        ]
+    else:
+        # SQLite backend (flower will not work)
+        events_url = f"file://{os.path.join(DATA_DIR, 'ewoks_events.db')}"
+        handlers = [
+            {
+                "class": "ewoksjob.events.handlers.Sqlite3EwoksEventHandler",
+                "arguments": [{"name": "uri", "value": events_url}],
+            }
+        ]
+
+    reader = instantiate_reader(events_url)
+    execinfo = {"handlers": handlers}
+    return reader, execinfo
+
+
+def test_workflow():
+    return {
+        "graph": {"id": "mygraph", "version": "1.0"},
+        "nodes": [
+            {"id": "task1", "task_type": "method", "task_identifier": "numpy.add"},
+            {"id": "task2", "task_type": "method", "task_identifier": "numpy.add"},
+        ],
+        "links": [
+            {
+                "source": "task1",
+                "target": "task2",
+                "data_mapping": [{"source_output": "return_value", "target_input": 0}],
+            }
+        ],
+    }
+
+
+def job_argument():
+    reader, execinfo = ewoks_event()
+    varinfo = {"root_uri": DATA_DIR, "scheme": "nexus"}
+    inputs = [
+        {"id": "task1", "name": 0, "value": 1},
+        {"id": "task1", "name": 1, "value": 2},
+        {"id": "task2", "name": 1, "value": 3},
     ]
-else:
-    # SQLite backend (flower will not work)
-    events_url = f"file://{os.path.join(DATA_DIR, 'ewoks_events.db')}"
-    handlers = [
-        {
-            "class": "ewoksjob.events.handlers.Sqlite3EwoksEventHandler",
-            "arguments": [{"name": "uri", "value": events_url}],
-        }
-    ]
+    workflow = test_workflow()
+    args = (workflow,)
+    kwargs = {
+        "binding": None,
+        "execinfo": execinfo,
+        "inputs": inputs,
+        "varinfo": varinfo,
+    }
+    return reader, args, kwargs
 
 
-reader = instantiate_reader(events_url)
+def assert_results(workflow_results, reader, job_id):
+    # events could be received in the mean time (see below)
+    assert workflow_results == {"return_value": 6}
 
-# Test workflow
-workflow = {
-    "graph": {"id": "mygraph"},
-    "nodes": [
-        {"id": "task1", "task_type": "method", "task_identifier": "numpy.add"},
-        {"id": "task2", "task_type": "method", "task_identifier": "numpy.add"},
-    ],
-    "links": [
-        {
-            "source": "task1",
-            "target": "task2",
-            "data_mapping": [{"source_output": "return_value", "target_input": 0}],
-        }
-    ],
-}
+    # Get intermediate results from ewoks events
+    results_during_execution = list(reader.get_events(job_id=job_id))
+    assert len(results_during_execution) == 8  # start/stop for job, workflow and node
 
-# Job arguments
-varinfo = {"root_uri": DATA_DIR, "scheme": "nexus"}
-inputs = [
-    {"id": "task1", "name": 0, "value": 1},
-    {"id": "task1", "name": 1, "value": 2},
-    {"id": "task2", "name": 1, "value": 3},
-]
-execinfo = {"handlers": handlers}
-args = (workflow,)
-kwargs = {
-    "binding": None,
-    "execinfo": execinfo,
-    "inputs": inputs,
-    "varinfo": varinfo,
-}
+    # Get start event of node "task1"
+    result_event = list(
+        reader.get_events_with_variables(job_id=job_id, node_id="task1", type="start")
+    )
+    assert len(result_event) == 1
+    result_event = result_event[0]
+
+    # Get access to all output variables of "task1"
+    results = result_event["outputs"]
+    assert results.variable_values["return_value"] == 3
 
 
-# Execute workflow and get results
-future = submit(*args, **kwargs)
-job_id = future.task_id
-# events could be received in the mean time (see below)
-workflow_results = future.get(timeout=3, interval=0.1)
-assert workflow_results == {"return_value": 6}
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Launch XRPD workflow")
+    parser.add_argument(
+        "--celery",
+        dest="celery",
+        action="store_true",
+        help="Use celery worker",
+    )
+    options = parser.parse_args()
 
-# Get intermediate results from ewoks events
-results_during_execution = list(reader.get_events(job_id=job_id))
-assert len(results_during_execution) == 8  # start/stop for job, workflow and node
+    os.makedirs(DATA_DIR, exist_ok=True)
 
-# Get start event of node "task1"
-result_event = list(
-    reader.get_events_with_variables(job_id=job_id, node_id="task1", type="start")
-)
-assert len(result_event) == 1
-result_event = result_event[0]
+    reader, args, kwargs = job_argument()
 
-# Get access to all output variables of "task1"
-results = result_event["outputs"]
-assert results.variable_values["return_value"] == 3
+    if options.celery:
+        future = submit(*args, **kwargs)
+        job_id = future.task_id
+        workflow_results = future.get(timeout=3, interval=0.1)
+    else:
+        with workflow_worker_pool():
+            future = submit_local(*args, **kwargs)
+            job_id = future.job_id
+            workflow_results = future.result(timeout=3)
+
+    assert_results(workflow_results, reader, job_id)

@@ -26,7 +26,7 @@ def submit_local(*args, **kwargs) -> Tuple[Future, int]:
     pool = server.active_workflow_worker_pool()
     if pool is None:
         raise RuntimeError("No worker pool is available")
-    return server._EWOKS_WORKER_POOL.submit(*args, **kwargs)
+    return pool.submit(*args, **kwargs)
 
 
 def get_future(job_id) -> Optional[AsyncResult]:
