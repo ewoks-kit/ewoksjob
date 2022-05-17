@@ -3,7 +3,7 @@
 
 project = "ewoksjob"
 release = "0.1"
-copyright = "2021, ESRF"
+copyright = "2021, ESRF"  # noqa A001
 author = "ESRF"
 
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.autosummary"]
