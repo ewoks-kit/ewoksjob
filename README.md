@@ -31,14 +31,6 @@ Install on the worker side
 pip install ewoksjob[worker]
 ```
 
-## Tests
-
-```bash
-pytest --pyargs ewoksjob
-```
-
-The test environment needs `redis-server` (e.g. `conda install redis-server`).
-
 ## Getting started
 
 Start a worker pool that can execute ewoks graphs
@@ -49,7 +41,7 @@ celery -A ewoksjob.apps.ewoks worker
 
 Start a workflow on the client side
 
-```bash
+```python
 from ewoksjob.client import submit
 
 workflow = {"graph": {"id": "mygraph"}}
@@ -59,6 +51,14 @@ result = future.get()
 
 Note that both environements need to be able to import `celeryconfig` which
 contains celery configuration (mainly the message broker and result backend URL's).
+
+## Tests
+
+```bash
+pytest --pyargs ewoksjob
+```
+
+To run the redis tests you need `redis-server` (e.g. `conda install redis-server`).
 
 ## Documentation
 

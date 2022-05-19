@@ -7,19 +7,19 @@ ewoksjob has been developed by the `Software group <http://www.esrf.eu/Instrumen
 
 Start a worker pool that can execute ewoks graphs
 
-```bash
-celery -A ewoksjob.apps.ewoks worker
-```
+.. code:: bash
+
+    celery -A ewoksjob.apps.ewoks worker
 
 Start a workflow on the client side
 
-```bash
-from ewoksjob.client import submit
+.. code:: python
 
-workflow = {"graph": {"id": "mygraph"}}
-future = submit(args=(workflow,))
-result = future.get()
-```
+    from ewoksjob.client import submit
+
+    workflow = {"graph": {"id": "mygraph"}}
+    future = submit(args=(workflow,))
+    result = future.get()
 
 Note that both environements need to be able to import `celeryconfig` which
 contains celery configuration (mainly the message broker and result backend URL's).
