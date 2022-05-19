@@ -7,8 +7,8 @@ with specific hardware
 .. code:: bash
 
     celery -A ewoksjob.apps.ewoks worker -Q cpuworker
-    celery -A ewoksjob.apps.ewoks worker -Q gpuworker
-    celery -A ewoksjob.apps.ewoks worker -Q slurmworker
+    celery -A ewoksjob.apps.ewoks worker -Q gpuworker --pool=solo
+    celery -A ewoksjob.apps.ewoks worker -Q slurmworker --pool=slurm
 
 Or you can have workers with different environments
 
