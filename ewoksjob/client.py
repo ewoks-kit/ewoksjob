@@ -13,11 +13,11 @@ except ImportError as e:
 _EWOKS_TASK = "ewoksjob.apps.ewoks.execute_graph"
 
 
-def submit(*args, **kwargs) -> Tuple[AsyncResult, int]:
-    return send_task(_EWOKS_TASK, args=args, kwargs=kwargs)
+def submit(**kwargs) -> Tuple[AsyncResult, int]:
+    return send_task(_EWOKS_TASK, **kwargs)
 
 
-def submit_local(*args, **kwargs) -> Tuple[Future, int]:
+def submit_local(**kwargs) -> Tuple[Future, int]:
     """'Local' means that the worker pool runs in the same
     process as the client.
     """
@@ -26,7 +26,7 @@ def submit_local(*args, **kwargs) -> Tuple[Future, int]:
     pool = server.active_workflow_worker_pool()
     if pool is None:
         raise RuntimeError("No worker pool is available")
-    return pool.submit(*args, **kwargs)
+    return pool.submit(**kwargs)
 
 
 def get_future(job_id) -> Optional[AsyncResult]:

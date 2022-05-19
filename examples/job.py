@@ -116,13 +116,11 @@ if __name__ == "__main__":
     reader, args, kwargs = job_argument()
 
     if options.celery:
-        future = submit(*args, **kwargs)
-        job_id = future.task_id
+        future = submit(args=args, kwargs=kwargs)
         workflow_results = future.get(timeout=3, interval=0.1)
     else:
         with workflow_worker_pool():
-            future = submit_local(*args, **kwargs)
-            job_id = future.job_id
+            future = submit_local(args=args, kwargs=kwargs)
             workflow_results = future.result(timeout=3)
 
-    assert_results(workflow_results, reader, job_id)
+    assert_results(workflow_results, reader, future.task_id)

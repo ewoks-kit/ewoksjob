@@ -129,7 +129,7 @@ Execute workflow and get results
 
 .. code:: python
 
-    future = submit(*args, **kwargs)
+    future = submit(args=args, kwargs=kwargs)
     job_id = future.task_id
     # events could be received in the mean time (see below)
     workflow_results = future.get(timeout=3, interval=0.1)
