@@ -29,4 +29,5 @@ contains celery configuration (mainly the message broker and result backend URL'
 
     getting_started
     routing
+    bliss
     api
