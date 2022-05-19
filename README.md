@@ -55,6 +55,59 @@ python examples/job.py
 
 Adapt the three URL's as needed (ewoks events, celery message broker, celery job result storage).
 
+## Usage with Bliss at the ESRF
+
+Assume you have a project called `ewoksxrpd` which implements some tasks for data processing.
+
+### Create a worker environment
+
+```bash
+conda create --prefix /users/blissadm/conda/miniconda/envs/xrpdworker python=3.7
+```
+
+```bash
+. blissenv -e xrpdworker
+```
+
+Basic worker dependencies
+
+```bash
+python -m pip install ewoksjob[worker,sqlalchemy,redis,monitor]
+```
+
+The project that implements that actual worker tasks
+
+```bash
+python -m pip install ewoksxrpd
+```
+
+To read lima data
+
+```bash
+conda install hdf5plugin
+```
+
+If you need a Qt workflow GUI
+
+```bash
+python -m pip install ewoksorange[orange]
+```
+
+### Create a client environment
+
+Activate the Bliss environment
+
+```bash
+. blissenv -d
+```
+
+Install the client dependencies
+
+```bash
+conda install celery[sqlalchemy]
+python -m pip install ewoksjob
+```
+
 ## Documentation
 
 https://ewoksjob.readthedocs.io/
