@@ -44,69 +44,21 @@ The test environment needs `redis-server` (e.g. `conda install redis-server`).
 Start a worker pool that can execute ewoks graphs
 
 ```bash
-examples/worker.sh
+celery -A ewoksjob.apps.ewoks worker
 ```
 
 Start a workflow on the client side
 
 ```bash
-python examples/job.py
+from ewoksjob.client import submit
+
+workflow = {"graph": {"id": "mygraph"}}
+future = submit(args=(workflow,))
+result = future.get()
 ```
 
-Adapt the three URL's as needed (ewoks events, celery message broker, celery job result storage).
-
-## Usage with Bliss at the ESRF
-
-Assume you have a project called `ewoksxrpd` which implements some tasks for data processing.
-
-### Create a worker environment
-
-```bash
-conda create --prefix /users/blissadm/conda/miniconda/envs/xrpdworker python=3.7
-```
-
-```bash
-. blissenv -e xrpdworker
-```
-
-Basic worker dependencies
-
-```bash
-python -m pip install ewoksjob[worker,sqlalchemy,redis,monitor]
-```
-
-The project that implements that actual worker tasks
-
-```bash
-python -m pip install ewoksxrpd
-```
-
-To read lima data
-
-```bash
-conda install hdf5plugin
-```
-
-If you need a Qt workflow GUI
-
-```bash
-python -m pip install ewoksorange[orange]
-```
-
-### Create a client environment
-
-Activate the Bliss environment
-
-```bash
-. blissenv -d
-```
-
-Install the client dependencies
-
-```bash
-conda install celery[sqlalchemy]
-python -m pip install ewoksjob
-```
+Note that both environements need to be able to import `celeryconfig` which
+contains celery configuration (mainly the message broker and result backend URL's).
 
 ## Documentation
 
