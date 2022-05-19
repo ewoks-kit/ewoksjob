@@ -21,21 +21,22 @@ class WorkflowWorkerPool(ProcessPoolExecutor):
         self._jobs = weakref.WeakValueDictionary()
         super().__init__(*args, **kwargs)
 
-    def submit(self, *args, execinfo=None, **kwargs) -> Tuple[Future, int]:
-        if execinfo is None:
-            execinfo = dict()
-        job_id = execinfo.get("job_id")
+    def submit(self, args=tuple(), kwargs=None) -> Tuple[Future, int]:
+        if kwargs is None:
+            kwargs = dict()
+        execinfo = kwargs.setdefault("execinfo", dict())
+        task_id = execinfo.get("job_id")
         if "job_id" not in execinfo:
-            execinfo["job_id"] = job_id = str(uuid4())
-        if job_id in self._jobs:
-            raise RuntimeError(f"Job '{job_id}' already exists")
-        future = super().submit(execute_graph, *args, execinfo=execinfo, **kwargs)
-        future.job_id = job_id
-        self._jobs[job_id] = future
+            execinfo["job_id"] = task_id = str(uuid4())
+        if task_id in self._jobs:
+            raise RuntimeError(f"Job '{task_id}' already exists")
+        future = super().submit(execute_graph, *args, **kwargs)
+        future.task_id = task_id
+        self._jobs[task_id] = future
         return future
 
-    def get_future(self, job_id) -> Optional[Future]:
-        return self._jobs.get(job_id)
+    def get_future(self, task_id) -> Optional[Future]:
+        return self._jobs.get(task_id)
 
 
 @contextmanager

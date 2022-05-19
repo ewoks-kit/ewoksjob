@@ -9,4 +9,5 @@ ewoksjob has been developed by the `Software group <http://www.esrf.eu/Instrumen
     :maxdepth: 2
 
     getting_started
+    routing
     api
