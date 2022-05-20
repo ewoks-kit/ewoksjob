@@ -59,7 +59,7 @@ def assert_event_reader(handlers, reader):
     events.send_workflow_event(execinfo=execinfo, event="start")
     events.send_workflow_event(execinfo=execinfo, event="end")
 
-    evts = list(reader.wait_events(timeout=0))
+    evts = list(reader.wait_events(timeout=1))
     assert len(evts) == 2
 
     evts = list(reader.get_events(type="end"))
