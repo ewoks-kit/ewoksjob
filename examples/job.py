@@ -3,11 +3,12 @@ intermediate results (ewoks events) or final result (job return value)
 """
 
 import os
+import sys
 import argparse
 from typing import Optional
 from ewoksjob.client import submit
-from ewoksjob.client import submit_local
-from ewoksjob.server import workflow_worker_pool
+from ewoksjob.client.process import submit as submit_local
+from ewoksjob.client.process import pool_context
 from ewoksjob.events.readers import instantiate_reader
 
 # Results directory
@@ -18,10 +19,6 @@ DATA_DIR = os.path.join(SCRIPT_DIR, "results")
 def ewoks_event(celery: Optional[bool] = None):
     # Events during execution
     if celery:
-        # Load configuration ("celeryconfig" is the default)
-        # from celery import current_app
-        # current_app.config_from_object("celeryconfig")
-
         # Redis backend
         events_url = "redis://localhost:10003/2"
         handlers = [
@@ -46,7 +43,7 @@ def ewoks_event(celery: Optional[bool] = None):
 
 
 def test_workflow():
-    return {
+    workflow = {
         "graph": {"id": "mygraph", "version": "1.0"},
         "nodes": [
             {"id": "task1", "task_type": "method", "task_identifier": "numpy.add"},
@@ -60,17 +57,18 @@ def test_workflow():
             }
         ],
     }
-
-
-def job_argument():
-    reader, execinfo = ewoks_event()
-    varinfo = {"root_uri": DATA_DIR, "scheme": "nexus"}
     inputs = [
         {"id": "task1", "name": 0, "value": 1},
         {"id": "task1", "name": 1, "value": 2},
         {"id": "task2", "name": 1, "value": 3},
     ]
-    workflow = test_workflow()
+    varinfo = {"root_uri": DATA_DIR, "scheme": "nexus"}
+    return workflow, inputs, varinfo
+
+
+def job_argument():
+    reader, execinfo = ewoks_event()
+    workflow, inputs, varinfo = test_workflow()
     args = (workflow,)
     kwargs = {
         "binding": None,
@@ -116,10 +114,11 @@ if __name__ == "__main__":
     reader, args, kwargs = job_argument()
 
     if options.celery:
+        sys.path.append(SCRIPT_DIR)  # so the celery configuration can be loaded
         future = submit(args=args, kwargs=kwargs)
         workflow_results = future.get(timeout=3, interval=0.1)
     else:
-        with workflow_worker_pool():
+        with pool_context():
             future = submit_local(args=args, kwargs=kwargs)
             workflow_results = future.result(timeout=3)
 
