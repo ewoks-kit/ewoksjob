@@ -4,19 +4,19 @@ from ..client import process
 from .utils import wait_not_finished
 
 
-def test_normal(celery_session_worker):
+def test_normal(ewoks_session_worker):
     assert_normal(celery)
 
 
-def test_normal_local(local_session_worker):
+def test_normal_local(local_ewoks_session_worker):
     assert_normal(process)
 
 
-def test_cancel(celery_session_worker):
+def test_cancel(ewoks_session_worker):
     assert_cancel(celery)
 
 
-def test_cancel_local(local_session_worker):
+def test_cancel_local(local_ewoks_session_worker):
     assert_cancel(process)
 
 

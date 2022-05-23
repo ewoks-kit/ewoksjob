@@ -1,5 +1,7 @@
 import gc
+import os
 import pytest
+from ewokscore import events
 from ewoksjob.events.readers import instantiate_reader
 from ewokscore.events import cleanup
 from .utils import has_redis_server
@@ -44,11 +46,28 @@ def celery_worker_parameters():
 
 @pytest.fixture(scope="session")
 def celery_worker_pool():
-    return "prefork"
+    if os.name == "nt":
+        return "solo"  # thread in the current process
+    else:
+        return "prefork"
 
 
 @pytest.fixture()
-def local_worker():
+def ewoks_worker(celery_worker, celery_worker_pool):
+    yield celery_worker
+    if celery_worker_pool == "solo":
+        events.cleanup()
+
+
+@pytest.fixture(scope="session")
+def ewoks_session_worker(celery_session_worker):
+    yield celery_session_worker
+    if os.name == "nt":
+        events.cleanup()
+
+
+@pytest.fixture()
+def local_ewoks_worker():
     with process.pool_context(max_worker=8) as pool:
         yield
         while gc.collect():
@@ -57,7 +76,7 @@ def local_worker():
 
 
 @pytest.fixture(scope="session")
-def local_session_worker():
+def local_ewoks_session_worker():
     with process.pool_context(max_worker=8) as pool:
         yield
         while gc.collect():

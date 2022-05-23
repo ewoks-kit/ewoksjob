@@ -4,12 +4,12 @@ from ..client import process
 from .utils import get_result
 
 
-def test_submit(celery_session_worker):
+def test_submit(ewoks_session_worker):
     assert_submit(celery)
     assert_submit_test(celery)
 
 
-def test_submit_local(local_session_worker):
+def test_submit_local(local_ewoks_session_worker):
     assert_submit(process)
     assert_submit_test(process)
 
