@@ -3,11 +3,11 @@ from ..client import process
 from .utils import get_result
 
 
-def test_submit(ewoks_session_worker):
+def test_submit(ewoks_worker):
     assert_submit(celery)
 
 
-def test_submit_local(local_ewoks_session_worker):
+def test_submit_local(local_ewoks_worker):
     assert_submit(process)
 
 
