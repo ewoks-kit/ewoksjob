@@ -47,36 +47,22 @@ def celery_worker_parameters():
 @pytest.fixture(scope="session")
 def celery_worker_pool():
     if os.name == "nt":
-        return "solo"  # thread in the current process
+        # "prefork" doesn't work on windows
+        return "solo"
     else:
+        # some tests may require more than one worker
         return "prefork"
 
 
 @pytest.fixture()
-def ewoks_worker(celery_worker, celery_worker_pool):
-    yield celery_worker
+def ewoks_worker(celery_session_worker, celery_worker_pool):
+    yield celery_session_worker
     if celery_worker_pool == "solo":
         events.cleanup()
 
 
 @pytest.fixture(scope="session")
-def ewoks_session_worker(celery_session_worker):
-    yield celery_session_worker
-    if os.name == "nt":
-        events.cleanup()
-
-
-@pytest.fixture()
 def local_ewoks_worker():
-    with process.pool_context(max_worker=8) as pool:
-        yield
-        while gc.collect():
-            pass
-        assert len(pool._jobs) == 0
-
-
-@pytest.fixture(scope="session")
-def local_ewoks_session_worker():
     with process.pool_context(max_worker=8) as pool:
         yield
         while gc.collect():
