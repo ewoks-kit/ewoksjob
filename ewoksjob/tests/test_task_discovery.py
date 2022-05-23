@@ -7,9 +7,8 @@ def test_submit(celery_session_worker):
     assert_submit(celery)
 
 
-def test_submit_local():
-    with process.pool_context():
-        assert_submit(process)
+def test_submit_local(local_session_worker):
+    assert_submit(process)
 
 
 def assert_submit(mod):

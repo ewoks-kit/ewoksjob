@@ -4,9 +4,10 @@ include:
 test-3.6:
   extends: .test-3.6
   script:   # before_script cannot be referenced
+    - !reference [.test-3.6, script]  # test without Redis
     - apt update
     - apt install -y redis-server
-    - !reference [.test-3.6, script]
+    - !reference [.test-3.6, script]  # test with Redis
 
 test-3.8-examples:
   extends: .test-3.8

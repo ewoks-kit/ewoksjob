@@ -1,9 +1,9 @@
 if False:
     # Redis backend
-    broker_url = "redis://localhost:10003/3"
-    result_backend = "redis://localhost:10003/4"
+    broker_url = "redis://localhost:6379/3"
+    result_backend = "redis://localhost:6379/4"
 else:
-    # SQLite backend
+    # SQLite backend (does not support task monitoring or cancelling)
     import os
 
     SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))

@@ -75,8 +75,8 @@ class _LocalPool(ProcessPoolExecutor):
             self._patch_future(future, task_id)
         return future
 
-    def get_running(self):
-        return list(self._jobs)
+    def get_not_finished(self) -> list:
+        return [task_id for task_id, future in self._jobs.items() if not future.done()]
 
     def _patch_future(self, future: Future, task_id):
         future.task_id = self.check_task_id(task_id)

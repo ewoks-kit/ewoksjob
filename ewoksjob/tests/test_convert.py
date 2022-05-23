@@ -7,9 +7,8 @@ def test_convert(celery_session_worker, tmpdir):
     assert_convert(celery, tmpdir)
 
 
-def test_convert_local(tmpdir):
-    with process.pool_context():
-        assert_convert(process, tmpdir)
+def test_convert_local(local_session_worker, tmpdir):
+    assert_convert(process, tmpdir)
 
 
 def assert_convert(mod, tmpdir):
