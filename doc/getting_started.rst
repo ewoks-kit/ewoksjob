@@ -74,7 +74,7 @@ Prepare for sending/receiving ewoks events
         }
     ]
 
-    # SQLite backend
+    # SQLite backend (does not support task monitoring or cancelling)
     events_url = f"file://{os.path.join(..., 'ewoks_events.db')}"
     handlers = [
         {

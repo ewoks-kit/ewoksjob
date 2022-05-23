@@ -1,72 +1,56 @@
-import time
-import logging
 import pytest
-from concurrent.futures import CancelledError
-from celery.exceptions import TaskRevokedError
-from ewokscore import events
 from ..client import celery
 from ..client import process
+from .utils import wait_not_finished
 
-logger = logging.getLogger(__name__)
+
+def test_normal(celery_session_worker):
+    assert_normal(celery)
+
+
+def test_normal_local(local_session_worker):
+    assert_normal(process)
 
 
 def test_cancel(celery_session_worker):
-    try:
-        assert_normal(celery)
-    finally:
-        events.cleanup()
-    try:
-        assert_cancel(celery)
-    finally:
-        events.cleanup()
+    assert_cancel(celery)
 
 
-def test_cancel_local():
-    with process.pool_context():
-        assert_normal(process)
-        assert_cancel(process)
+def test_cancel_local(local_session_worker):
+    assert_cancel(process)
 
 
 def assert_normal(mod):
-    future = mod.submit_test(1)
-    if mod is process:
-        wait_running(mod, {future.task_id})
-    else:
-        logger.warning("memory and sqlite does not allow task monitoring")
-    results = mod.get_result(future.task_id)
+    seconds = 1
+    timeout = 3
+    future = mod.submit_test(seconds)
+    wait_not_finished(mod, {future.task_id}, timeout=timeout)
+    results = mod.get_result(future.task_id, timeout=timeout)
     assert results == {"return_value": None}
-    if mod is process:
-        del future
-    wait_running(mod, set())
+    wait_not_finished(mod, set(), timeout=timeout)
 
 
 def assert_cancel(mod):
-    future = mod.submit_test(1)
-    mod.cancel(future.task_id)
+    seconds = 3
+    timeout = seconds * 2
+    future = mod.submit_test(seconds)
+
     if mod is process:
-        with pytest.raises(CancelledError):
-            future.result(timeout=2)
-        del future
-    else:
+        # The current implementation does not allow cancelling running tasks
+        mod.cancel(future.task_id)
         try:
-            future.get(timeout=2)
-        except TaskRevokedError:
+            results = mod.get_result(future.task_id, timeout=timeout)
+        except mod.CancelledError:
+            # cancelled before it started
             pass
-        except Exception as e:
-            if future.status == "SUCCESS":
-                pytest.xfail("the task sometimes finishes")
-            raise AssertionError(f"Task {future.task_id} {future.status}") from e
+        else:
+            # ran until completion
+            assert results == {"return_value": None}
+    else:
+        wait_not_finished(mod, {future.task_id}, timeout=timeout)
+        mod.cancel(future.task_id)
 
-    wait_running(mod, set())
+        with pytest.raises(mod.CancelledError):
+            mod.get_result(future.task_id, timeout=timeout)
 
-
-def wait_running(mod, expected, timeout=3):
-    t0 = time.time()
-    while True:
-        task_ids = set(mod.get_running())
-        if task_ids == expected:
-            return
-        dt = time.time() - t0
-        if dt > timeout:
-            assert task_ids == expected
-        time.sleep(0.2)
+    wait_not_finished(mod, set(), timeout=timeout)

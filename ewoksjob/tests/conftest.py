@@ -1,23 +1,68 @@
+import gc
 import pytest
 from ewoksjob.events.readers import instantiate_reader
 from ewokscore.events import cleanup
+from .utils import has_redis_server
+from ..client import process
 
+if has_redis_server():
 
-@pytest.fixture(scope="session")
-def celery_config(tmpdir_factory):
-    tmpdir = tmpdir_factory.mktemp("celery")
-    return {
-        "broker_url": "memory://",
-        # "broker_url": f"sqla+sqlite:///{tmpdir / 'celery.db'}",
-        "result_backend": f"db+sqlite:///{tmpdir / 'celery_results.db'}",
-        "result_serializer": "pickle",
-        "accept_content": ["application/json", "application/x-python-serialize"],
-    }
+    @pytest.fixture(scope="session")
+    def celery_config(redis_proc):
+        url = f"redis://{redis_proc.host}:{redis_proc.port}"
+        # celery -A ewoksjob.apps.ewoks --broker={url}/0 --result-backend={url}/1 inspect stats -t 5
+        return {
+            "broker_url": f"{url}/0",
+            "result_backend": f"{url}/1",
+            "result_serializer": "pickle",
+            "accept_content": ["application/json", "application/x-python-serialize"],
+        }
+
+else:
+
+    @pytest.fixture(scope="session")
+    def celery_config(tmpdir_factory):
+        tmpdir = tmpdir_factory.mktemp("celery")
+        return {
+            "broker_url": "memory://",
+            # "broker_url": f"sqla+sqlite:///{tmpdir / 'celery.db'}",
+            "result_backend": f"db+sqlite:///{tmpdir / 'celery_results.db'}",
+            "result_serializer": "pickle",
+            "accept_content": ["application/json", "application/x-python-serialize"],
+        }
 
 
 @pytest.fixture(scope="session")
 def celery_includes():
     return ("ewoksjob.apps.ewoks",)
+
+
+@pytest.fixture(scope="session")
+def celery_worker_parameters():
+    return {"loglevel": "debug"}
+
+
+@pytest.fixture(scope="session")
+def celery_worker_pool():
+    return "prefork"
+
+
+@pytest.fixture()
+def local_worker():
+    with process.pool_context(max_worker=8) as pool:
+        yield
+        while gc.collect():
+            pass
+        assert len(pool._jobs) == 0
+
+
+@pytest.fixture(scope="session")
+def local_session_worker():
+    with process.pool_context(max_worker=8) as pool:
+        yield
+        while gc.collect():
+            pass
+        assert len(pool._jobs) == 0
 
 
 @pytest.fixture()

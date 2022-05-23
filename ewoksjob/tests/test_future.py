@@ -13,9 +13,8 @@ def test_task_discovery(celery_session_worker):
         future.get(timeout=1e-8)
 
 
-def test_task_discovery_local():
-    with process.pool_context():
-        future = process.get_future("abc")
-        assert not future.running()
-        with pytest.raises(ProcessTimeoutError):
-            get_result(future, timeout=0)
+def test_task_discovery_local(local_session_worker):
+    future = process.get_future("abc")
+    assert not future.running()
+    with pytest.raises(ProcessTimeoutError):
+        get_result(future, timeout=0)
