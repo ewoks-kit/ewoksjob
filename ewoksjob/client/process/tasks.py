@@ -7,13 +7,19 @@ from ..test_workflow import test_workflow
 
 try:
     from ewoks import execute_graph
+    from ewoks import convert_graph
     from ewokscore import task_discovery
 except ImportError as e:
     execute_graph = None
     ewoks_import_error = e
 
 
-__all__ = ["trigger_workflow", "trigger_test_workflow", "discover_tasks_from_modules"]
+__all__ = [
+    "trigger_workflow",
+    "trigger_test_workflow",
+    "convert_workflow",
+    "discover_tasks_from_modules",
+]
 
 
 def _requires_ewoks(method):
@@ -37,6 +43,16 @@ def trigger_workflow(
     task_id = pool.check_task_id(execinfo.get("job_id"))
     execinfo["job_id"] = task_id
     return pool.submit(execute_graph, task_id=task_id, args=args, kwargs=kwargs)
+
+
+@_requires_ewoks
+def convert_workflow(
+    args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
+) -> Future:
+    pool = get_active_pool()
+    if kwargs is None:
+        kwargs = dict()
+    return pool.submit(convert_graph, args=args, kwargs=kwargs)
 
 
 def trigger_test_workflow(seconds=0) -> Future:

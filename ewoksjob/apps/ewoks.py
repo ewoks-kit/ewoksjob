@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Optional, Dict, List, Union
 import celery
 import ewoks
 from ewokscore import task_discovery
@@ -15,6 +15,11 @@ def execute_workflow(self, *args, execinfo=None, **kwargs) -> Dict:
     if "job_id" not in execinfo:
         execinfo["job_id"] = self.request.id
     return ewoks.execute_graph(*args, execinfo=execinfo, **kwargs)
+
+
+@app.task()
+def convert_workflow(*args, **kwargs) -> Optional[Union[str, dict]]:
+    return ewoks.convert_graph(*args, **kwargs)
 
 
 @app.task()
