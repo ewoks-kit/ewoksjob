@@ -6,14 +6,14 @@ from ..client import process
 from .utils import get_result
 
 
-def test_task_discovery(celery_session_worker):
+def test_task_discovery(ewoks_session_worker):
     future = celery.get_future("abc")
     assert future.status == "PENDING"
     with pytest.raises(CeleryTimeoutError):
         future.get(timeout=1e-8)
 
 
-def test_task_discovery_local(local_session_worker):
+def test_task_discovery_local(local_ewoks_session_worker):
     future = process.get_future("abc")
     assert not future.running()
     with pytest.raises(ProcessTimeoutError):

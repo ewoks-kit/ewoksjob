@@ -9,11 +9,11 @@ from .utils import has_redis_server
 @pytest.mark.skipif(
     not has_redis_server(), reason="memory and sqlite do not support task monitoring"
 )
-def test_futures(celery_session_worker):
+def test_futures(ewoks_session_worker):
     assert_futures(celery)
 
 
-def test_futures_local(local_session_worker):
+def test_futures_local(local_ewoks_session_worker):
     assert_futures(process)
 
 

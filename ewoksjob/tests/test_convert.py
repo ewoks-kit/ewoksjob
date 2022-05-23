@@ -3,11 +3,11 @@ from ..client import process
 from .utils import get_result
 
 
-def test_convert(celery_session_worker, tmpdir):
+def test_convert(ewoks_session_worker, tmpdir):
     assert_convert(celery, tmpdir)
 
 
-def test_convert_local(local_session_worker, tmpdir):
+def test_convert_local(local_ewoks_session_worker, tmpdir):
     assert_convert(process, tmpdir)
 
 
