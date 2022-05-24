@@ -20,9 +20,9 @@ Basic worker dependencies
 
 .. code:: bash
 
-    python -m pip install ewoksjob[worker,sqlalchemy,redis,monitor]
+    python -m pip install ewoksjob[worker,redis,monitor]
 
-The project that implements that actual worker tasks
+The project that implements that actual worker tasks (`ewoksxrpd` is just an example)
 
 .. code:: bash
 
@@ -53,7 +53,7 @@ Install the client dependencies
 
 .. code:: bash
 
-    conda install celery[sqlalchemy]
+    conda install celery
     python -m pip install ewoksjob
 
 Supervisor
@@ -86,3 +86,15 @@ Supervisor
     stdout_logfile_maxbytes=1MB
     stdout_logfile_backups=10
     stdout_capture_maxbytes=1MB
+
+The celery configuration must be in a file called `celeryconfig.py` in the working directory, for example
+
+.. code:: python
+
+    # /users/opid31/xrpd/config/celeryconfig.py
+
+    broker_url = "redis://localhost:25001/2"
+    result_backend = "redis://localhost:25001/3"
+
+    result_serializer = "pickle"
+    accept_content = ["application/json", "application/x-python-serialize"]
