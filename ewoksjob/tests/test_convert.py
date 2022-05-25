@@ -17,5 +17,5 @@ def assert_convert(mod, tmpdir):
     kwargs = {"save_options": {"indent": 2}}
     future = mod.convert_workflow(args=args, kwargs=kwargs)
     results = get_result(future, timeout=3)
-    assert results is None
+    assert results == str(filename) or results is None  # TODO: None is deprecated
     assert filename.exists()
