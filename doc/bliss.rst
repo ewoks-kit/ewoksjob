@@ -22,13 +22,13 @@ Basic worker dependencies
 
     python -m pip install ewoksjob[worker,redis,monitor]
 
-The project that implements that actual worker tasks (`ewoksxrpd` is just an example)
+The project that implements the actual worker tasks (`ewoksxrpd` in this example)
 
 .. code:: bash
 
     python -m pip install ewoksxrpd
 
-To read lima data
+To read lima data you also need `hdf5plugin`
 
 .. code:: bash
 
@@ -63,7 +63,7 @@ Supervisor
 
     [program:xrpdworker]
     command=bash -c "source /users/blissadm/bin/blissenv -e xrpdworker && exec celery -A ewoksjob.apps.ewoks worker"
-    directory=/users/opid31/xrpd/config  # needs to contain celeryconfig.py
+    directory=/users/opid31/xrpd/config
     user=opid31
     startsecs=2
     autostart=true
@@ -77,7 +77,7 @@ Supervisor
 
     [program:xrpdmonitor]
     command=bash -c "source /users/blissadm/bin/blissenv -e xrpdworker && exec celery flower"
-    directory=/users/opid31/xrpd/config  # needs to contain celeryconfig.py
+    directory=/users/opid31/xrpd/config
     user=opid31
     startsecs=2
     autostart=true
