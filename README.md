@@ -49,8 +49,22 @@ future = submit(args=(workflow,))
 result = future.get()
 ```
 
-Note that both environements need to be able to import `celeryconfig` which
+Note that both environments need to be able to import `celeryconfig` which
 contains celery configuration (mainly the message broker and result backend URL's).
+
+## Hello world example
+
+Clone the git repository and start a worker pool
+
+```bash
+./examples/worker.sh
+```
+
+Submit the hello world workflow
+
+```bash
+python examples/helloworld.py
+```
 
 ## Tests
 
