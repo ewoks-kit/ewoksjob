@@ -13,9 +13,10 @@ test-3.8-examples:
   extends: .test-3.8
   script:
     - python -m pip install --pre .[test]
-    - python examples/job.py
+    - python examples/example_with_events.py
     - ./examples/worker.sh &
-    - python examples/job.py --celery
+    - python examples/example_with_events.py --celery
+    - python examples/hello_world.py
 
 build_sdist:
   extends: .build_sdist
