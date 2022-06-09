@@ -93,15 +93,17 @@ In this example we register a job monitor and only one worker
     stdout_logfile_backups=10
     stdout_capture_maxbytes=1MB
 
-
 The celery configuration must be in a file called `celeryconfig.py` in the working directory, for example
 
 .. code:: python
 
     # /users/opid31/ewoks/celeryconfig.py
 
-    broker_url = "redis://localhost:25001/2"
-    result_backend = "redis://localhost:25001/3"
+    broker_url = "redis://hostname:25001/2"
+    result_backend = "redis://hostname:25001/3"
 
     result_serializer = "pickle"
     accept_content = ["application/json", "application/x-python-serialize"]
+
+
+Note that `hostname` must be the host where the Redis database is running.
