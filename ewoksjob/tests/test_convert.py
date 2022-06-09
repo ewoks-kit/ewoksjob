@@ -13,7 +13,7 @@ def test_convert_local(local_ewoks_worker, tmpdir):
 
 def assert_convert(mod, tmpdir):
     filename = tmpdir / "test.json"
-    args = {"graph": {"idd": "testgraph", "version": "1.0"}}, str(filename)
+    args = {"graph": {"id": "testgraph", "schema_version": "1.0"}}, str(filename)
     kwargs = {"save_options": {"indent": 2}}
     future = mod.convert_workflow(args=args, kwargs=kwargs)
     results = get_result(future, timeout=3)
