@@ -1,6 +1,6 @@
 def test_workflow():
     return {
-        "graph": {"id": "sleepgraph", "version": "1.0"},
+        "graph": {"id": "sleepgraph", "schema_version": "1.0"},
         "nodes": [
             {
                 "id": "sleepnode",
