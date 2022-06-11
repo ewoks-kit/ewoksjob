@@ -6,17 +6,17 @@ Assume you have a project called `ewoksxrpd` which implements some tasks for dat
 Worker environment
 ------------------
 
-Create a conda environment for the worker, in this example called `xrpdworker`
+Create a conda environment for the worker, in this example called `ewoksworker`
 
 .. code:: bash
 
-    conda create --prefix /users/blissadm/conda/miniconda/envs/xrpdworker python=3.7
+    conda create --prefix /users/blissadm/conda/miniconda/envs/ewoksworker python=3.7
 
 Activate the environment
 
 .. code:: bash
 
-    . blissenv -e xrpdworker
+    . blissenv -e ewoksworker
 
 Basic worker dependencies
 
@@ -30,7 +30,7 @@ Install the project that implements the actual worker tasks (`ewoksxrpd` in this
 
     python -m pip install ewoksxrpd
 
-Install `hdf5plugin` if you need to read lima data
+Install `hdf5plugin` if you need to read Lima data
 
 .. code:: bash
 
@@ -61,18 +61,18 @@ Install the client dependencies
 Supervisor
 ----------
 
-In this example we register a job monitor and only one worker
+In this example we register a job monitor (you only ever need one) and one worker (you may need more than one)
 
 .. code::
 
     [group:ewoks]
-    programs=xrpdworker, xrpdmonitor
+    programs=ewoksmonitor, ewoksworker
     priority=900
 
-    [program:xrpdworker]
-    command=bash -c "source /users/blissadm/bin/blissenv -e xrpdworker && exec celery -A ewoksjob.apps.ewoks worker"
-    directory=/users/opid31/ewoks/
-    user=opid31
+    [program:ewoksmonitor]
+    command=bash -c "source /users/blissadm/bin/blissenv -e ewoksworker && exec celery flower"
+    directory=/users/opid00/ewoks/
+    user=opid00
     startsecs=2
     autostart=true
     redirect_stderr=true
@@ -81,10 +81,10 @@ In this example we register a job monitor and only one worker
     stdout_logfile_backups=10
     stdout_capture_maxbytes=1MB
 
-    [program:xrpdmonitor]
-    command=bash -c "source /users/blissadm/bin/blissenv -e xrpdworker && exec celery flower"
-    directory=/users/opid31/ewoks/
-    user=opid31
+    [program:ewoksworker]
+    command=bash -c "source /users/blissadm/bin/blissenv -e ewoksworker && exec celery -A ewoksjob.apps.ewoks worker"
+    directory=/users/opid00/ewoks/
+    user=opid00
     startsecs=2
     autostart=true
     redirect_stderr=true
@@ -97,13 +97,12 @@ The celery configuration must be in a file called `celeryconfig.py` in the worki
 
 .. code:: python
 
-    # /users/opid31/ewoks/celeryconfig.py
+    # /users/opid00/ewoks/celeryconfig.py
 
     broker_url = "redis://hostname:25001/2"
     result_backend = "redis://hostname:25001/3"
 
     result_serializer = "pickle"
     accept_content = ["application/json", "application/x-python-serialize"]
-
 
 Note that `hostname` must be the host where the Redis database is running.
