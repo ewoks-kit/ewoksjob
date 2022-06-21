@@ -36,7 +36,7 @@ def assert_submit_test(mod, tmpdir):
     future1 = mod.convert_and_trigger_test_workflow(args=args, kwargs=kwargs)
     future2 = mod.get_future(future1.task_id)
     results = get_result(future1, timeout=3)
-    assert results == {"return_value": None}
+    assert results == {"return_value": True}
     results = get_result(future2, timeout=0)
-    assert results == {"return_value": None}
+    assert results == {"return_value": True}
     assert filename.exists()
