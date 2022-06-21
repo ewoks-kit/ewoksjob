@@ -106,3 +106,16 @@ The celery configuration must be in a file called `celeryconfig.py` in the worki
     accept_content = ["application/json", "application/x-python-serialize"]
 
 Note that `hostname` must be the host where the Redis database is running.
+
+Test installation
+-----------------
+
+Run a test workflow in a Bliss session
+
+```python
+DEMO_SESSION [1]: import os
+DEMO_SESSION [2]: from ewoksjob.client import submit_test
+DEMO_SESSION [3]: os.environ["CELERY_CONFIG_MODULE"]="/users/opid00/ewoks/celeryconfig.py"
+DEMO_SESSION [4]: submit_test().get()
+         Out [4]: {'return_value': True}
+```
