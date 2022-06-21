@@ -26,7 +26,7 @@ def assert_normal(mod):
     future = mod.submit_test(seconds)
     wait_not_finished(mod, {future.task_id}, timeout=timeout)
     results = mod.get_result(future.task_id, timeout=timeout)
-    assert results == {"return_value": None}
+    assert results == {"return_value": True}
     wait_not_finished(mod, set(), timeout=timeout)
 
 
@@ -44,7 +44,7 @@ def assert_cancel(mod):
             # cancelled before it started
             pass
         else:
-            assert results == {"return_value": None}
+            assert results == {"return_value": True}
             pytest.xfail("ran until completion")
     else:
         wait_not_finished(mod, {future.task_id}, timeout=timeout)
@@ -54,7 +54,7 @@ def assert_cancel(mod):
         except mod.CancelledError:
             pass
         else:
-            assert results == {"return_value": None}
+            assert results == {"return_value": True}
             pytest.xfail("ran until completion")
 
     wait_not_finished(mod, set(), timeout=timeout)

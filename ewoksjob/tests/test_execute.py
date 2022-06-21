@@ -29,6 +29,6 @@ def assert_submit_test(mod):
     future1 = mod.submit_test()
     future2 = mod.get_future(future1.task_id)
     results = get_result(future1, timeout=3)
-    assert results == {"return_value": None}
+    assert results == {"return_value": True}
     results = get_result(future2, timeout=0)
-    assert results == {"return_value": None}
+    assert results == {"return_value": True}
