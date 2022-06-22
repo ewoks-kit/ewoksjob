@@ -15,9 +15,10 @@ RedisRecordType = Tuple[str, Dict[str, str]]
 class RedisEwoksEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
     # TODO: https://redisql.redbeardlab.com/blog/python/using-redisql-with-python/
 
-    def __init__(self, url: str):
-        """An example is "redis://localhost:10003?db=2"."""
+    def __init__(self, url: str, ttl=None):
+        """An example url is "redis://localhost:10003?db=2"."""
         self._redis_url = url
+        self._ttl = ttl
         super().__init__()
 
     def _connect(self, timeout=1) -> None:
@@ -48,3 +49,5 @@ class RedisEwoksEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
         n = self._connection.incrby("ewoks_events_count")
         key = f"ewoks:{job_id}:{n}"
         self._connection.hset(key, mapping=value)
+        if self._ttl:
+            self._connection.expire(key, self._ttl)

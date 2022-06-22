@@ -7,9 +7,10 @@ from .base import EwoksEventReader, EventType
 
 
 class RedisEwoksEventReader(EwoksEventReader):
-    def __init__(self, url: str):
+    def __init__(self, url: str, **_):
         client_name = f"ewoks:reader:{socket.gethostname()}:{os.getpid()}"
         self._proxy = redis.Redis.from_url(url, client_name=client_name)
+        super().__init__()
 
     def wait_events(self, **kwargs) -> Iterable[EventType]:
         yield from self.poll_events(**kwargs)

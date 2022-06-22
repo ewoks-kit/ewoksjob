@@ -91,7 +91,10 @@ def redis_ewoks_events(redisdb):
     handlers = [
         {
             "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
-            "arguments": [{"name": "url", "value": url}],
+            "arguments": [
+                {"name": "url", "value": url},
+                {"name": "ttl", "value": 3600},
+            ],
         }
     ]
     reader = instantiate_reader(url)

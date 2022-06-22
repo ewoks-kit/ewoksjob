@@ -4,7 +4,7 @@ from .base import EwoksEventReader, EventType
 
 
 class Sqlite3EwoksEventReader(EwoksEventReader):
-    def __init__(self, uri: str) -> None:
+    def __init__(self, uri: str, **_) -> None:
         super().__init__()
         self._uri = uri
         self.__connection = None
