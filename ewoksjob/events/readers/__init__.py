@@ -7,11 +7,11 @@ except ImportError:
     pass
 
 
-def instantiate_reader(url: str) -> EwoksEventReader:  # noqa F405
+def instantiate_reader(url: str, **kw) -> EwoksEventReader:  # noqa F405
     s = url.lower()
     if any(s.startswith(scheme) for scheme in ("redis:", "rediss:", "unix:")):
-        return RedisEwoksEventReader(url)
+        return RedisEwoksEventReader(url, **kw)
     elif s.startswith("file:"):
-        return Sqlite3EwoksEventReader(url)
+        return Sqlite3EwoksEventReader(url, **kw)
     else:
         raise ValueError(f"unknown scheme for '{url}'")

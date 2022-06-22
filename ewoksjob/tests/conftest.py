@@ -8,6 +8,7 @@ from .utils import has_redis_server
 from ..client import process
 
 if has_redis_server():
+    import redis
 
     @pytest.fixture(scope="session")
     def celery_config(redis_proc):
@@ -91,10 +92,18 @@ def redis_ewoks_events(redisdb):
     handlers = [
         {
             "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
-            "arguments": [{"name": "url", "value": url}],
+            "arguments": [
+                {"name": "url", "value": url},
+                {"name": "ttl", "value": 3600},
+            ],
         }
     ]
     reader = instantiate_reader(url)
     yield handlers, reader
+
+    connection = redis.Redis.from_url(url)
+    for key in connection.keys("ewoks:*"):
+        assert connection.ttl(key) >= 0, key
+
     reader.close()
     cleanup()

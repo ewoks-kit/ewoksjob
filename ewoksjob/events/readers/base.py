@@ -1,6 +1,7 @@
 import time
 from typing import Dict, Iterable, Optional, Tuple
 import json
+from datetime import datetime
 from threading import Event
 from ...utils import fromisoformat
 
@@ -113,7 +114,11 @@ class EwoksEventReader:
             event["outputs"] = VariableContainer(data_uri=task_uri)
 
     @staticmethod
-    def match_indirect_filter(event: EventType, starttime=None, endtime=None) -> bool:
+    def event_passes_filter(
+        event: EventType,
+        starttime: Optional[datetime] = None,
+        endtime: Optional[datetime] = None,
+    ) -> bool:
         if not (starttime or endtime):
             return True
         time = fromisoformat(event["time"])
@@ -130,5 +135,18 @@ class EwoksEventReader:
         return True
 
     @staticmethod
-    def split_filter(starttime=None, endtime=None, **direct_filter):
-        return direct_filter, {"starttime": starttime, "endtime": endtime}
+    def split_filter(
+        starttime: Optional[datetime] = None,
+        endtime: Optional[datetime] = None,
+        **is_equal_filter
+    ) -> Tuple[dict, dict]:
+        """Splits the filter
+
+        to be applied on the list of events fetched from the database
+        """
+        if starttime and not isinstance(starttime, datetime):
+            raise TypeError("starttime needs to be a datetime object")
+        if endtime and not isinstance(endtime, datetime):
+            raise TypeError("starttime needs to be a datetime object")
+        post_filter = {"starttime": starttime, "endtime": endtime}
+        return is_equal_filter, post_filter

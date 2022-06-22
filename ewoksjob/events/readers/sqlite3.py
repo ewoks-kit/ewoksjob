@@ -1,10 +1,10 @@
 import sqlite3
-from typing import Iterable
+from typing import Iterator
 from .base import EwoksEventReader, EventType
 
 
 class Sqlite3EwoksEventReader(EwoksEventReader):
-    def __init__(self, uri: str) -> None:
+    def __init__(self, uri: str, **_) -> None:
         super().__init__()
         self._uri = uri
         self.__connection = None
@@ -21,22 +21,32 @@ class Sqlite3EwoksEventReader(EwoksEventReader):
             self.__connection = sqlite3.connect(self._uri, uri=True)
         return self.__connection
 
-    def wait_events(self, **kwargs) -> Iterable[EventType]:
+    def wait_events(self, **kwargs) -> Iterator[EventType]:
         yield from self.poll_events(**kwargs)
 
-    def get_events(self, **filters) -> Iterable[EventType]:
-        direct_filter, indirect_filter = self.split_filter(**filters)
+    def get_events(self, **filters) -> Iterator[EventType]:
+        is_equal_filter, post_filter = self.split_filter(**filters)
 
         conn = self._connection
         cursor = conn.cursor()
 
-        if direct_filter:
-            conditions = " AND ".join(
-                [
-                    f"{k} = '{v}'" if isinstance(v, str) else f"{k} = {v}"
-                    for k, v in direct_filter.items()
-                ]
-            )
+        if is_equal_filter:
+            conditions = [
+                f"{k} = '{v}'" if isinstance(v, str) else f"{k} = {v}"
+                for k, v in is_equal_filter.items()
+            ]
+        else:
+            conditions = list()
+
+        starttime = post_filter.pop("starttime", None)
+        if starttime:
+            conditions.append(f"time >= '{starttime.isoformat()}'")
+        endtime = post_filter.pop("endtime", None)
+        if endtime:
+            conditions.append(f"time <= '{endtime.isoformat()}'")
+
+        if conditions:
+            conditions = " AND ".join(conditions)
             query = f"SELECT * FROM ewoks_events WHERE {conditions}"
         else:
             query = "SELECT * FROM ewoks_events"
@@ -48,8 +58,11 @@ class Sqlite3EwoksEventReader(EwoksEventReader):
         rows = cursor.fetchall()
         self._connection.commit()
 
+        if not cursor.description:
+            return
+
         fields = [col[0] for col in cursor.description]
         for values in rows:
             event = dict(zip(fields, values))
-            if self.match_indirect_filter(event, **indirect_filter):
+            if self.event_passes_filter(event, **post_filter):
                 yield event
