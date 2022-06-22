@@ -19,32 +19,12 @@ def test_sqlite3(sqlite3_ewoks_events):
 @pytest.mark.skipif(not has_redis_server(), reason="redis-server not installed")
 def test_redis_stop_wait_events(redis_ewoks_events):
     _, reader = redis_ewoks_events
-
-    stop_event = threading.Event()
-
-    thread = threading.Thread(
-        target=reader.wait_events, kwargs={"stop_event": stop_event}, daemon=True
-    )
-    thread.start()
-
-    stop_event.set()
-    thread.join(timeout=3)
-    assert not thread.is_alive()
+    assert_stop_event(reader)
 
 
 def test_sqlite3_stop_wait_events(sqlite3_ewoks_events):
     _, reader = sqlite3_ewoks_events
-
-    stop_event = threading.Event()
-
-    thread = threading.Thread(
-        target=reader.wait_events, kwargs={"stop_event": stop_event}, daemon=True
-    )
-    thread.start()
-
-    stop_event.set()
-    thread.join(timeout=3)
-    assert not thread.is_alive()
+    assert_stop_event(reader)
 
 
 def assert_event_reader(handlers, reader):
@@ -93,3 +73,16 @@ def assert_event_reader(handlers, reader):
     assert len(evts) == 0
     evts = list(reader.get_full_job_events(endtime=starttime))
     assert len(evts) == 0
+
+
+def assert_stop_event(reader):
+    stop_event = threading.Event()
+
+    thread = threading.Thread(
+        target=reader.wait_events, kwargs={"stop_event": stop_event}, daemon=True
+    )
+    thread.start()
+
+    stop_event.set()
+    thread.join(timeout=3)
+    assert not thread.is_alive()
