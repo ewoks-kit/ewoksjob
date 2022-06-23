@@ -1,12 +1,10 @@
 # ewoksjob
 
-Utilities for job scheduling of [Ewoks](https://gitlab.esrf.fr/workflow/ewoks/ewoks) workflows.
+Utilities for job scheduling of [ewoks](https://ewoks.readthedocs.io/) workflows.
 
-Ewoks has different interfaces to execute an ewoks workflow: python API, CLI, REST API, Qt GUI, Web GUI.
+Ewoksjob provides an ewoks interface for asynchronous and distributed scheduling of [ewoks](https://ewoks.readthedocs.io/) from python.
 
-Ewoksjob provides an ewoks interface for asynchronous and distributed scheduling of ewoks workflows from python.
-
-Note that ewoksjob distributes the execution of workflows while [ewoksdask](https://gitlab.esrf.fr/workflow/ewoks/ewoksdask)
+Note that *ewoksjob* distributes the execution of workflows while [ewoksdask](https://ewoks.readthedocs.io/)
 distributes the execution of tasks in a workflow. So in the context of workflows, job scheduling exists on two levels.
 
 The primary clients that need to schedule workflows are

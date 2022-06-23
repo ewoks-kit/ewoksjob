@@ -1,17 +1,36 @@
 ewoksjob |release|
 ===================
 
-ewoksjob provides utilities for job scheduling of `Ewoks <https://gitlab.esrf.fr/workflow/ewoks/ewoks>`_ workflows.
+ewoksjob provides utilities for job scheduling of `ewoks <https://ewoks.readthedocs.io/>`_ workflows.
 
 ewoksjob has been developed by the `Software group <http://www.esrf.eu/Instrumentation/software>`_ of the `European Synchrotron <https://www.esrf.eu/>`_.
 
-Start a worker pool that can execute ewoks graphs
+Getting started
+---------------
+
+Install on the client side
+
+.. code:: bash
+
+    python -m pip install ewoksjob[redis]
+
+Install on the worker side
+
+.. code:: bash
+
+    python -m pip install ewoksjob[worker,redis,monitor]
+
+The communication between client and worker goes through *Redis*, *RabbitMQ* or *Sqlite3*.
+Depending on which one you need, the `redis` installation option may vary. Both client and
+worker need access to a configuration that specifies the URL of the database and/or broker.
+
+Start a worker that can execute *ewoks* graphs
 
 .. code:: bash
 
     celery -A ewoksjob.apps.ewoks worker
 
-Start a workflow on the client side
+Start a workflow from python, possible from another machine
 
 .. code:: python
 
@@ -21,8 +40,21 @@ Start a workflow on the client side
     future = submit(args=(workflow,))
     result = future.get()
 
-Note that both environements need to be able to import `celeryconfig` which
-contains celery configuration (mainly the message broker and result backend URL's).
+Start a web server for monitoring jobs
+
+.. code:: bash
+
+    flower
+
+Run the tests
+
+.. code:: bash
+
+    python -m pip install ewoksjob[test]
+    pytest --pyargs ewoksjob.tests
+
+Documentation
+-------------
 
 .. toctree::
     :maxdepth: 2

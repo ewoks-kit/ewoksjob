@@ -19,7 +19,7 @@ def test_workflow():
             {
                 "source": "sleepnode",
                 "target": "checknode",
-                "data_mapping": [{"target_input": 1, "source_output": "return_value"}],
+                "data_mapping": [{"source_output": "return_value", "target_input": 1}],
             },
         ],
     }
