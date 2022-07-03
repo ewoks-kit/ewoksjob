@@ -29,8 +29,8 @@ def test_sqlite3_stop_wait_events(sqlite3_ewoks_events):
 
 def assert_event_reader(handlers, reader):
     execinfo = {
-        "job_id": 123,
-        "workflow_id": 456,
+        "job_id": "123",
+        "workflow_id": "456",
         "host_name": None,
         "user_name": None,
         "process_id": None,
@@ -52,9 +52,9 @@ def assert_event_reader(handlers, reader):
     evts = list(reader.get_full_job_events(type="progress"))
     assert len(evts) == 0
 
-    evts = list(reader.get_events(job_id=123))
+    evts = list(reader.get_events(job_id="123"))
     assert len(evts) == 2
-    evts = list(reader.get_full_job_events(job_id=123))
+    evts = list(reader.get_full_job_events(job_id="123"))
     assert len(evts) == 1
     assert len(evts[0]) == 2
 

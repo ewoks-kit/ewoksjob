@@ -4,8 +4,8 @@ import socket
 import logging
 import redis
 from typing import Dict, Optional, Tuple
-from ewokscore.events import send_events
-from ewokscore.logging_utils.handlers.connection import ConnectionHandler
+
+from ewoksutils.logging_utils.connection import ConnectionHandler
 from ewokscore.events.handlers import EwoksEventHandlerMixIn
 
 
@@ -32,19 +32,19 @@ class RedisEwoksEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
         """This is called when a connection exists and is connected."""
         self._connection.close()
 
-    def _serialize_record(self, record: logging.LogRecord) -> RedisRecordType:
+    def _serialize_record(self, record: logging.LogRecord) -> Optional[RedisRecordType]:
         """Convert a record to something that can be given to the connection."""
         job_id = getattr(record, "job_id", None)
-        value = {field: self.get_value(record, field) for field in send_events.FIELDS}
-        return job_id, value
+        adict = dict()
+        for field in self.FIELD_TYPES:
+            value = getattr(record, field, None)
+            adict[field] = json.dumps(value)
+        return job_id, adict
 
-    @staticmethod
-    def get_value(record, field) -> Optional[str]:
-        value = getattr(record, field, None)
-        return json.dumps(value)
-
-    def _send_serialized_record(self, srecord: RedisRecordType):
+    def _send_serialized_record(self, srecord: Optional[RedisRecordType]):
         """Send the output from `_serialize_record` to the connection."""
+        if not srecord:
+            return
         job_id, value = srecord
         n = self._connection.incrby("ewoks_events_count")
         key = f"ewoks:{job_id}:{n}"

@@ -17,11 +17,8 @@ The primary clients that need to schedule workflows are
 Install on the client side
 
 ```bash
-pip install ewoksjob[fullclient]
+pip install ewoksjob
 ```
-
-The optional `fullclient` install option should be used when you want full client-side capabilities,
-for exampe dereference URL's of ewoks task results.
 
 Install on the worker side
 
