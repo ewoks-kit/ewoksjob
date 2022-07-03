@@ -3,7 +3,7 @@ from typing import Dict, Iterable, Optional, Tuple
 import json
 from datetime import datetime
 from threading import Event
-from ...utils import fromisoformat
+from ewoksutils.datetime_utils import fromisoformat
 
 try:
     from ewokscore.variable import Variable, VariableContainer

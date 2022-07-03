@@ -1,6 +1,6 @@
 import pytest
 from ewokscore import Task
-from ewokscore.utils import qualname
+from ewoksutils.import_utils import qualname
 from ewoks import execute_graph
 from .utils import has_redis_server
 

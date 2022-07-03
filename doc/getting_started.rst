@@ -8,10 +8,7 @@ Install on the client side
 
 .. code:: bash
 
-    pip install ewoksjob[fullclient,redis]
-
-The optional `fullclient` install option should be used when you want full client-side capabilities,
-for exampe dereference URL's of ewoks task results.
+    pip install ewoksjob[redis]
 
 Install on the worker side
 
