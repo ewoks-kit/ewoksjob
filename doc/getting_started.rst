@@ -40,6 +40,7 @@ Other configurations as available, like the serialization of results (json by de
 
     result_serializer = "pickle"
     accept_content = ["application/json", "application/x-python-serialize"]
+    result_expires = 600
 
 Worker side
 -----------
