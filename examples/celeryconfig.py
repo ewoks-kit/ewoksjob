@@ -14,3 +14,4 @@ else:
 
 result_serializer = "pickle"
 accept_content = ["application/json", "application/x-python-serialize"]
+result_expires = 600
