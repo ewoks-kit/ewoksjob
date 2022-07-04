@@ -40,7 +40,8 @@ Install `ewoksorange` if you need a Qt GUI to create workflows
 
 .. code:: bash
 
-    python -m pip install ewoksorange[orange]
+    conda install orange3 -c conda-forge
+    python -m pip install ewoksorange
 
 Client environment
 ------------------
