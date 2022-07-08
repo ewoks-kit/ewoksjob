@@ -22,13 +22,13 @@ Basic worker dependencies
 
 .. code:: bash
 
-    python -m pip install ewoksjob[worker,redis,monitor]
+    python3 -m pip install ewoksjob[worker,redis,monitor]
 
 Install the project that implements the actual worker tasks (`ewoksxrpd` is just an example)
 
 .. code:: bash
 
-    python -m pip install ewoksxrpd
+    python3 -m pip install ewoksxrpd
 
 Install `hdf5plugin` if you need to read Lima data
 
@@ -41,7 +41,7 @@ Install `ewoksorange` if you need a Qt GUI to create workflows
 .. code:: bash
 
     conda install orange3 -c conda-forge
-    python -m pip install ewoksorange
+    python3 -m pip install ewoksorange
 
 Client environment
 ------------------
@@ -57,7 +57,7 @@ Install the client dependencies
 .. code:: bash
 
     conda install celery
-    python -m pip install ewoksjob
+    python3 -m pip install ewoksjob
 
 Supervisor
 ----------
