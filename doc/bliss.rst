@@ -72,7 +72,7 @@ In this example we register a job monitor (you only ever need one) and one worke
 
     [program:ewoksmonitor]
     command=bash -c "source /users/blissadm/bin/blissenv -e ewoksworker && exec celery flower"
-    directory=/users/opid00/
+    directory=/users/opid00/ewoks/
     user=opid00
     startsecs=2
     autostart=true
@@ -84,7 +84,7 @@ In this example we register a job monitor (you only ever need one) and one worke
 
     [program:ewoksworker]
     command=bash -c "source /users/blissadm/bin/blissenv -e ewoksworker && exec celery -A ewoksjob.apps.ewoks worker"
-    directory=/users/opid00/
+    directory=/users/opid00/ewoks/
     user=opid00
     startsecs=2
     autostart=true
@@ -94,11 +94,11 @@ In this example we register a job monitor (you only ever need one) and one worke
     stdout_logfile_backups=10
     stdout_capture_maxbytes=1MB
 
-The celery configuration must be in a file called `celeryconfig.py` in the home directory, for example
+The celery configuration must be in a file called `celeryconfig.py` in the working directory, for example
 
 .. code:: python
 
-    # /users/opid00/celeryconfig.py
+    # /users/opid00/ewoks/celeryconfig.py
 
     broker_url = "redis://hostname:25001/2"
     result_backend = "redis://hostname:25001/3"
@@ -117,6 +117,8 @@ Run a test workflow in a Bliss session
 
 .. code:: python
 
-    DEMO_SESSION [1]: from ewoksjob.client import submit_test
-    DEMO_SESSION [2]: submit_test().get()
-            Out [2]: {'return_value': True}
+    DEMO_SESSION [1]: import os
+    DEMO_SESSION [2]: from ewoksjob.client import submit_test
+    DEMO_SESSION [3]: os.environ["CELERY_CONFIG_MODULE"]="/users/opid00/ewoks/celeryconfig.py"
+    DEMO_SESSION [4]: submit_test().get()
+             Out [4]: {'return_value': True}
