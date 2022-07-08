@@ -3,8 +3,17 @@ Usage with Bliss at the ESRF
 
 Assume you have a project called `ewoksxrpd` which implements some tasks for data processing.
 
+You need to create a worker environment, install *ewoksjob* in the bliss conda environment
+and create a celery configuration file.
+
 Worker environment
 ------------------
+
+Decide first whether the code needs to be managed and edited by the beamline staff or BCU staff.
+When the data processing code is not well established, most likely the beamline staff will manage it.
+
+Managed by *blissadm*
+^^^^^^^^^^^^^^^^^^^^^
 
 Create a conda environment for the worker, in this example called `ewoksworker`
 
@@ -30,21 +39,105 @@ Install the project that implements the actual worker tasks (`ewoksxrpd` is just
 
     python3 -m pip install ewoksxrpd
 
-Install `hdf5plugin` if you need to read Lima data
+Supervisor
+++++++++++
+
+In this example we register a job monitor (you only ever need one) and one worker (you may need more than one)
+
+.. code::
+
+    [group:ewoks]
+    programs=ewoksmonitor, ewoksworker
+    priority=900
+
+    [program:ewoksmonitor]
+    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker &&& exec celery flower"
+    directory=/users/opid00/ewoks/
+    user=opid00
+    startsecs=2
+    autostart=true
+    redirect_stderr=true
+    stdout_logfile=/var/log/%(program_name)s.log
+    stdout_logfile_maxbytes=1MB
+    stdout_logfile_backups=10
+    stdout_capture_maxbytes=1MB
+
+    [program:ewoksworker]
+    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker &&& exec celery -A ewoksjob.apps.ewoks worker"
+    directory=/users/opid00/ewoks/
+    user=opid00
+    startsecs=2
+    autostart=true
+    redirect_stderr=true
+    stdout_logfile=/var/log/%(program_name)s.log
+    stdout_logfile_maxbytes=1MB
+    stdout_logfile_backups=10
+    stdout_capture_maxbytes=1MB
+
+Managed by *opid00*
+^^^^^^^^^^^^^^^^^^^
+
+Create a conda environment for the worker, in this example called `ewoksworker`
 
 .. code:: bash
 
-    conda install hdf5plugin
+    conda create --name ewoksworker python=3.7
 
-Install `ewoksorange` if you need a Qt GUI to create workflows
+Activate the environment
 
 .. code:: bash
 
-    conda install orange3 -c conda-forge
-    python3 -m pip install ewoksorange
+    conda activate ewoksworker
 
-Client environment
-------------------
+Basic worker dependencies
+
+.. code:: bash
+
+    python3 -m pip install ewoksjob[worker,redis,monitor]
+
+Install the project that implements the actual worker tasks (`ewoksxrpd` is just an example)
+
+.. code:: bash
+
+    python3 -m pip install ewoksxrpd
+
+Supervisor
+++++++++++
+
+In this example we register a job monitor (you only ever need one) and one worker (you may need more than one)
+
+.. code::
+
+    [group:ewoks]
+    programs=ewoksmonitor, ewoksworker
+    priority=900
+
+    [program:ewoksmonitor]
+    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker &&& exec celery flower"
+    directory=/users/opid00/ewoks/
+    user=opid00
+    startsecs=2
+    autostart=true
+    redirect_stderr=true
+    stdout_logfile=/var/log/%(program_name)s.log
+    stdout_logfile_maxbytes=1MB
+    stdout_logfile_backups=10
+    stdout_capture_maxbytes=1MB
+
+    [program:ewoksworker]
+    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker &&& exec celery -A ewoksjob.apps.ewoks worker"
+    directory=/users/opid00/ewoks/
+    user=opid00
+    startsecs=2
+    autostart=true
+    redirect_stderr=true
+    stdout_logfile=/var/log/%(program_name)s.log
+    stdout_logfile_maxbytes=1MB
+    stdout_logfile_backups=10
+    stdout_capture_maxbytes=1MB
+
+Bliss environment
+-----------------
 
 Activate the Bliss environment
 
@@ -59,42 +152,11 @@ Install the client dependencies
     conda install celery
     python3 -m pip install ewoksjob
 
-Supervisor
-----------
+Celery configuration
+--------------------
 
-In this example we register a job monitor (you only ever need one) and one worker (you may need more than one)
-
-.. code::
-
-    [group:ewoks]
-    programs=ewoksmonitor, ewoksworker
-    priority=900
-
-    [program:ewoksmonitor]
-    command=bash -c "source /users/blissadm/bin/blissenv -e ewoksworker && exec celery flower"
-    directory=/users/opid00/ewoks/
-    user=opid00
-    startsecs=2
-    autostart=true
-    redirect_stderr=true
-    stdout_logfile=/var/log/%(program_name)s.log
-    stdout_logfile_maxbytes=1MB
-    stdout_logfile_backups=10
-    stdout_capture_maxbytes=1MB
-
-    [program:ewoksworker]
-    command=bash -c "source /users/blissadm/bin/blissenv -e ewoksworker && exec celery -A ewoksjob.apps.ewoks worker"
-    directory=/users/opid00/ewoks/
-    user=opid00
-    startsecs=2
-    autostart=true
-    redirect_stderr=true
-    stdout_logfile=/var/log/%(program_name)s.log
-    stdout_logfile_maxbytes=1MB
-    stdout_logfile_backups=10
-    stdout_capture_maxbytes=1MB
-
-The celery configuration must be in a file called `celeryconfig.py` in the working directory, for example
+The celery configuration must be in a file called `celeryconfig.py` in the working directory
+as specified in the supervisor configuration. For example
 
 .. code:: python
 
