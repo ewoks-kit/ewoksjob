@@ -64,7 +64,7 @@ python examples/helloworld.py
 ## Tests
 
 ```bash
-pytest --pyargs ewoksjob
+python3 -m pytest --pyargs ewoksjob
 ```
 
 To run the redis tests you need `redis-server` (e.g. `conda install redis-server`).
