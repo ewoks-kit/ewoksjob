@@ -9,6 +9,7 @@ __all__ = [
     "convert_workflow",
     "convert_and_trigger_workflow",
     "convert_and_trigger_test_workflow",
+    "trigger_and_upload_workflow",
     "discover_tasks_from_modules",
 ]
 
@@ -37,6 +38,11 @@ def convert_workflow(**kwargs) -> AsyncResult:
 @requires_config
 def convert_and_trigger_workflow(**kwargs) -> AsyncResult:
     return send_task("ewoksjob.apps.ewoks.convert_and_execute_workflow", **kwargs)
+
+
+@requires_config
+def trigger_and_upload_workflow(**kwargs) -> AsyncResult:
+    return send_task("ewoksjob.apps.ewoks.execute_and_upload_workflow", **kwargs)
 
 
 def convert_and_trigger_test_workflow(seconds=0, args=None, **kwargs) -> AsyncResult:
