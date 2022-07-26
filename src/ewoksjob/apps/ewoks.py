@@ -52,6 +52,13 @@ def convert_and_execute_workflow(self, *args, **kwargs) -> Dict:
     return tasks.convert_and_execute_graph(*args, **kwargs)
 
 
+@app.task(bind=True)
+@_add_job_id
+@_add_working_directory
+def execute_and_upload_workflow(self, *args, **kwargs) -> Dict:
+    return tasks.execute_and_upload_graph(*args, **kwargs)
+
+
 @app.task()
 @_add_working_directory
 def discover_tasks_from_modules(*args, **kwargs) -> List[dict]:

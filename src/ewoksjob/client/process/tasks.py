@@ -20,6 +20,7 @@ __all__ = [
     "convert_workflow",
     "convert_and_trigger_workflow",
     "convert_and_trigger_test_workflow",
+    "trigger_and_upload_workflow",
     "discover_tasks_from_modules",
 ]
 
@@ -56,6 +57,13 @@ def convert_and_trigger_workflow(
     args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
 ) -> Future:
     return _submit_with_jobid(tasks.convert_and_execute_graph, args=args, kwargs=kwargs)
+
+
+@_requires_ewoks
+def trigger_and_upload_workflow(
+    args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
+) -> Future:
+    return _submit_with_jobid(tasks.execute_and_upload_graph, args=args, kwargs=kwargs)
 
 
 def trigger_test_workflow(seconds=0, kwargs: Optional[Mapping] = None) -> Future:
