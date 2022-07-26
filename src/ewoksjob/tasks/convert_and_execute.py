@@ -19,6 +19,4 @@ def convert_and_execute_graph(
         load_options=load_options,
         save_options=save_options,
     )
-    if workflow is None:  # TODO: deprecated, never returns None
-        workflow = destination
     return ewoks.execute_graph(workflow, **kwargs)
