@@ -5,10 +5,8 @@ import celery
 import ewoks
 from ewokscore import task_discovery
 from .. import tasks
-from ..config import configure_app
 
 app = celery.Celery("ewoks")
-configure_app(app)
 
 
 def _add_job_id(method):
