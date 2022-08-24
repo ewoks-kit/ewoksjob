@@ -1,7 +1,9 @@
+import os
 from ewokscore import Task
 
+SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 
-# Implement a workflow task
+
 class SumTask(
     Task, input_names=["a"], optional_input_names=["b"], output_names=["result"]
 ):
@@ -14,6 +16,9 @@ class SumTask(
 
 if __name__ == "__main__":
     from ewoksjob.client import submit
+
+    os.environ["CELERY_LOADER"] = "ewoksjob.config.EwoksLoader"
+    os.environ["CELERY_CONFIG_URI"] = os.path.join(SCRIPT_DIR, "celeryconfig.py")
 
     # Define a workflow with default inputs
     nodes = [
@@ -56,4 +61,4 @@ if __name__ == "__main__":
     # Execute a workflow (use a proper Ewoks task scheduler in production)
     varinfo = {"root_uri": "/tmp/myresults"}  # optionally save all task outputs
     future = submit(args=(workflow,), kwargs={"varinfo": varinfo, "inputs": inputs})
-    print(future.get())
+    print(future.get(timeout=3))

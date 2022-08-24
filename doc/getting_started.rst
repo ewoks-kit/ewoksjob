@@ -21,7 +21,7 @@ The `redis` option may vary, depending on which database/broker is choosen for m
 Configuration
 -------------
 
-Both the client and the worker(s) need to know where the celery messages
+Both the client and the worker(s) need to know where the *celery* messages
 and results are stored
 
 .. code:: python
@@ -42,6 +42,40 @@ Other configurations as available, like the serialization of results (json by de
     accept_content = ["application/json", "application/x-python-serialize"]
     result_expires = 600
 
+The configuration can be specified in as a
+
+- Python module:
+    - myproject.config
+- Python file:
+    - /tmp/ewoks/config.py
+- Yaml file:
+    - /tmp/ewoks/config.yml
+- Beacon URL:
+    - beacon:///ewoks/config.yml
+    - beacon://id22:25000/ewoks/config.yml
+
+If the *celery* configuration is a python module, you can select the configuration with this environment variable
+
+.. code:: bash
+
+    export CELERY_CONFIG_MODULE=myproject.celeryconfig
+
+By default `CELERY_CONFIG_MODULE=celeryconfig`.
+
+If the *celery* configuration is not a python module, you can select the configuration with these environment variables
+
+.. code:: bash
+
+    export CELERY_LOADER=ewoksjob.config.EwoksLoader
+    export CELERY_CONFIG_URI=myproject.celeryconfig
+
+When `CELERY_CONFIG_URI=beacon:///ewoks/config.yml` you can do this instead
+
+.. code:: bash
+
+    export CELERY_LOADER=ewoksjob.config.EwoksLoader
+    export BEACON_HOST=localhost:25000
+
 Worker side
 -----------
 
@@ -49,17 +83,10 @@ Launch a worker which serves the ewoks application
 
 .. code:: bash
 
-    export CELERY_CONFIG_MODULE="myproject.celeryconfig"  # python module name which can be imported
     celery -A ewoksjob.apps.ewoks worker
 
 Client side
 -----------
-
-Load configuration
-
-.. code:: python
-
-    current_app.config_from_object("celeryconfig")
 
 Prepare for sending/receiving ewoks events
 

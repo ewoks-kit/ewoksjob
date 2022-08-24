@@ -6,11 +6,11 @@ else:
     # SQLite backend (does not support task monitoring or cancelling)
     import os
 
-    SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
-    DATA_DIR = os.path.join(SCRIPT_DIR, "results")
-    os.makedirs(DATA_DIR, exist_ok=True)
-    broker_url = f"sqla+sqlite:///{os.path.join(DATA_DIR, 'celery.db')}"
-    result_backend = f"db+sqlite:///{os.path.join(DATA_DIR ,'celery_results.db')}"
+    _SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
+    _DATA_DIR = os.path.join(_SCRIPT_DIR, "results")
+    os.makedirs(_DATA_DIR, exist_ok=True)
+    broker_url = f"sqla+sqlite:///{os.path.join(_DATA_DIR, 'celery.db')}"
+    result_backend = f"db+sqlite:///{os.path.join(_DATA_DIR ,'celery_results.db')}"
 
 result_serializer = "pickle"
 accept_content = ["application/json", "application/x-python-serialize"]

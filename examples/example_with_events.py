@@ -3,15 +3,14 @@ intermediate results (ewoks events) or final result (job return value)
 """
 
 import os
-import sys
 import argparse
 from typing import Optional
+
 from ewoksjob.client import submit
 from ewoksjob.client.process import submit as submit_local
 from ewoksjob.client.process import pool_context
 from ewoksjob.events.readers import instantiate_reader
 
-# Results directory
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, "results")
 
@@ -114,7 +113,9 @@ if __name__ == "__main__":
     reader, args, kwargs = job_argument()
 
     if options.celery:
-        sys.path.append(SCRIPT_DIR)  # so the celery configuration can be loaded
+        os.environ["CELERY_LOADER"] = "ewoksjob.config.EwoksLoader"
+        os.environ["CELERY_CONFIG_URI"] = os.path.join(SCRIPT_DIR, "celeryconfig.py")
+
         future = submit(args=args, kwargs=kwargs)
         workflow_results = future.get(timeout=3, interval=0.1)
     else:
