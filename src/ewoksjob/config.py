@@ -22,14 +22,11 @@ class EwoksLoader(BaseLoader):
         self.app = app
         super().__init__(app)
 
-    def read_configuration(self) -> dict:
+    def read_configuration(self) -> Optional[dict]:
         config = read_configuration(_get_cfg_uri())
-
-        # Warning: calling with silent=True causes sphinx doc
-        # building to fail.
-        self.app.config_from_object(config, force=True)
-
-        return config
+        if config:
+            return config
+        return super().read_configuration()
 
 
 def _get_cfg_uri() -> str:
@@ -40,7 +37,7 @@ def _get_cfg_uri() -> str:
     return os.environ.get("CELERY_CONFIG_URI", default_cfg)
 
 
-def read_configuration(cfg_uri: Optional[str] = None) -> dict:
+def read_configuration(cfg_uri: Optional[str] = None) -> Optional[dict]:
     """Examples:
 
     - Python module:
@@ -69,10 +66,11 @@ def read_configuration(cfg_uri: Optional[str] = None) -> dict:
 
     if file_type == "yaml":
         config = _read_yaml_config(cfg_uri)
-        if "celery" in config:
-            config = config["celery"]
-        elif "CELERY" in config:
-            config = config["CELERY"]
+        if config:
+            if "celery" in config:
+                config = config["celery"]
+            elif "CELERY" in config:
+                config = config["CELERY"]
     elif file_type == "python":
         config = _read_py_config(cfg_uri)
     else:
@@ -81,18 +79,29 @@ def read_configuration(cfg_uri: Optional[str] = None) -> dict:
     return config
 
 
-def _read_yaml_config(resource: str) -> dict:
+def _read_yaml_config(resource: str) -> Optional[dict]:
     from blissdata.beacon.files import read_config
 
-    return read_config(resource)
+    try:
+        return read_config(resource)
+    except Exception as e:
+        logger.error(f"Cannot get celery configuration '{resource}' from Beacon: {e}")
 
 
-def _read_py_config(cfg_uri: Optional[str] = None) -> dict:
+def _read_py_config(cfg_uri: Optional[str] = None) -> Optional[dict]:
+    """Warning: this is not thread-safe and it has side-effects during execution"""
     sys_path, module = _get_config_module(cfg_uri)
     keep_sys_path = sys.path
     sys.path.insert(0, sys_path)
     try:
-        config = vars(importlib.import_module(module))
+        try:
+            config = vars(importlib.import_module(module))
+        except ModuleNotFoundError:
+            if cfg_uri:
+                logger.error(
+                    f"Celery configuration module '{module}' cannot be imported (Extra import path: {sys_path})"
+                )
+            return None
         mtype = type(os)
         config = {
             k: v
