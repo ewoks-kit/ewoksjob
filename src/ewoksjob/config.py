@@ -4,6 +4,7 @@ import logging
 import importlib
 from pathlib import Path
 from typing import Optional, Tuple
+from urllib.parse import urlparse
 
 from celery.loaders.base import BaseLoader
 from celery import Celery
@@ -42,26 +43,41 @@ def _get_cfg_uri() -> str:
 def read_configuration(cfg_uri: Optional[str] = None) -> dict:
     """Examples:
 
-    - Beacon URL:
-        - beacon:///ewoks/config.yml
-        - beacon://id22:25000/ewoks/config.yml
-    - Yaml file:
-        - /tmp/ewoks/config.yml
-    - Python file:
-        - /tmp/ewoks/config.py
     - Python module:
         - myproject.config
+    - Python file:
+        - /tmp/ewoks/config.py
+    - Yaml file:
+        - /tmp/ewoks/config.yml
+    - Beacon yaml file:
+        - beacon:///ewoks/config.yml
+        - beacon://id22:25000/ewoks/config.yml
     """
-    if cfg_uri and (
-        cfg_uri.startswith("beacon:") or cfg_uri.split(".")[-1] in ("yml", "yaml")
-    ):
+    file_type = None
+    if cfg_uri:
+        puri = urlparse(cfg_uri)
+        if puri.scheme == "beacon":
+            file_type = "yaml"
+        elif puri.scheme in ("file", ""):
+            cfg_uri = puri.path
+            if os.path.splitext(cfg_uri)[-1] == ".py":
+                file_type = "python"
+            else:
+                file_type = "yaml"
+    else:
+        file_type = "python"
+
+    if file_type == "yaml":
         config = _read_yaml_config(cfg_uri)
         if "celery" in config:
             config = config["celery"]
         elif "CELERY" in config:
             config = config["CELERY"]
-    else:
+    elif file_type == "python":
         config = _read_py_config(cfg_uri)
+    else:
+        raise ValueError(f"Configuration URL '{cfg_uri}' is not supported")
+
     return config
 
 
