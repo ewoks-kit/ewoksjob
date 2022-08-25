@@ -42,7 +42,7 @@ Other configurations as available, like the serialization of results (json by de
     accept_content = ["application/json", "application/x-python-serialize"]
     result_expires = 600
 
-The configuration can be specified in as a
+The configuration can be declared in a
 
 - Python module:
     - myproject.config
@@ -50,7 +50,7 @@ The configuration can be specified in as a
     - /tmp/ewoks/config.py
 - Yaml file:
     - /tmp/ewoks/config.yml
-- Beacon URL:
+- Beacon yaml file:
     - beacon:///ewoks/config.yml
     - beacon://id22:25000/ewoks/config.yml
 
@@ -75,6 +75,8 @@ When `CELERY_CONFIG_URI=beacon:///ewoks/config.yml` you can do this instead
 
     export CELERY_LOADER=ewoksjob.config.EwoksLoader
     export BEACON_HOST=localhost:25000
+
+Note: the environment variable *CELERY_LOADER* is not required to be set manually on the client side because *ewoksjob* does it for you.
 
 Worker side
 -----------

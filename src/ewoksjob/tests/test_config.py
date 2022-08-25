@@ -34,7 +34,7 @@ def py_config(tmpdir):
     ]
     with open(filename, "w") as f:
         f.writelines(lines)
-    return filename
+    return f"file://{filename}"
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def yaml_config(tmpdir):
     ]
     with open(filename, "w") as f:
         f.writelines(lines)
-    return filename
+    return f"file://{filename}"
 
 
 @pytest.fixture

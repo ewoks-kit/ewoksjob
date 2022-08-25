@@ -4,6 +4,7 @@ import logging
 import importlib
 from pathlib import Path
 from typing import Optional, Tuple
+from urllib.parse import urlparse
 
 from celery.loaders.base import BaseLoader
 from celery import Celery
@@ -21,14 +22,11 @@ class EwoksLoader(BaseLoader):
         self.app = app
         super().__init__(app)
 
-    def read_configuration(self) -> dict:
+    def read_configuration(self) -> Optional[dict]:
         config = read_configuration(_get_cfg_uri())
-
-        # Warning: calling with silent=True causes sphinx doc
-        # building to fail.
-        self.app.config_from_object(config, force=True)
-
-        return config
+        if config:
+            return config
+        return super().read_configuration()
 
 
 def _get_cfg_uri() -> str:
@@ -39,44 +37,71 @@ def _get_cfg_uri() -> str:
     return os.environ.get("CELERY_CONFIG_URI", default_cfg)
 
 
-def read_configuration(cfg_uri: Optional[str] = None) -> dict:
+def read_configuration(cfg_uri: Optional[str] = None) -> Optional[dict]:
     """Examples:
 
-    - Beacon URL:
-        - beacon:///ewoks/config.yml
-        - beacon://id22:25000/ewoks/config.yml
-    - Yaml file:
-        - /tmp/ewoks/config.yml
-    - Python file:
-        - /tmp/ewoks/config.py
     - Python module:
         - myproject.config
+    - Python file:
+        - /tmp/ewoks/config.py
+    - Yaml file:
+        - /tmp/ewoks/config.yml
+    - Beacon yaml file:
+        - beacon:///ewoks/config.yml
+        - beacon://id22:25000/ewoks/config.yml
     """
-    if cfg_uri and (
-        cfg_uri.startswith("beacon:") or cfg_uri.split(".")[-1] in ("yml", "yaml")
-    ):
-        config = _read_yaml_config(cfg_uri)
-        if "celery" in config:
-            config = config["celery"]
-        elif "CELERY" in config:
-            config = config["CELERY"]
+    file_type = None
+    if cfg_uri:
+        puri = urlparse(cfg_uri)
+        if puri.scheme == "beacon":
+            file_type = "yaml"
+        elif puri.scheme in ("file", ""):
+            cfg_uri = puri.path
+            if os.path.splitext(cfg_uri)[-1] == ".py":
+                file_type = "python"
+            else:
+                file_type = "yaml"
     else:
+        file_type = "python"
+
+    if file_type == "yaml":
+        config = _read_yaml_config(cfg_uri)
+        if config:
+            if "celery" in config:
+                config = config["celery"]
+            elif "CELERY" in config:
+                config = config["CELERY"]
+    elif file_type == "python":
         config = _read_py_config(cfg_uri)
+    else:
+        raise ValueError(f"Configuration URL '{cfg_uri}' is not supported")
+
     return config
 
 
-def _read_yaml_config(resource: str) -> dict:
+def _read_yaml_config(resource: str) -> Optional[dict]:
     from blissdata.beacon.files import read_config
 
-    return read_config(resource)
+    try:
+        return read_config(resource)
+    except Exception as e:
+        logger.error(f"Cannot get celery configuration '{resource}' from Beacon: {e}")
 
 
-def _read_py_config(cfg_uri: Optional[str] = None) -> dict:
+def _read_py_config(cfg_uri: Optional[str] = None) -> Optional[dict]:
+    """Warning: this is not thread-safe and it has side-effects during execution"""
     sys_path, module = _get_config_module(cfg_uri)
     keep_sys_path = sys.path
     sys.path.insert(0, sys_path)
     try:
-        config = vars(importlib.import_module(module))
+        try:
+            config = vars(importlib.import_module(module))
+        except ModuleNotFoundError:
+            if cfg_uri:
+                logger.error(
+                    f"Celery configuration module '{module}' cannot be imported (Extra import path: {sys_path})"
+                )
+            return None
         mtype = type(os)
         config = {
             k: v
