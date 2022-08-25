@@ -4,7 +4,7 @@ import logging
 import importlib
 from pathlib import Path
 from typing import Optional, Tuple
-from urllib.parse import urlparse
+from urllib.parse import urlparse, ParseResult
 
 from celery.loaders.base import BaseLoader
 from celery import Celery
@@ -52,11 +52,11 @@ def read_configuration(cfg_uri: Optional[str] = None) -> Optional[dict]:
     """
     file_type = None
     if cfg_uri:
-        puri = urlparse(cfg_uri)
-        if puri.scheme == "beacon":
+        presult = _parse_url(cfg_uri)
+        if presult.scheme == "beacon":
             file_type = "yaml"
-        elif puri.scheme in ("file", ""):
-            cfg_uri = puri.path
+        elif presult.scheme in ("file", ""):
+            cfg_uri = _url_to_filename(presult)
             if os.path.splitext(cfg_uri)[-1] == ".py":
                 file_type = "python"
             else:
@@ -66,17 +66,46 @@ def read_configuration(cfg_uri: Optional[str] = None) -> Optional[dict]:
 
     if file_type == "yaml":
         config = _read_yaml_config(cfg_uri)
-        if config:
-            if "celery" in config:
-                config = config["celery"]
-            elif "CELERY" in config:
-                config = config["CELERY"]
     elif file_type == "python":
         config = _read_py_config(cfg_uri)
     else:
         raise ValueError(f"Configuration URL '{cfg_uri}' is not supported")
 
+    if config:
+        if "celery" in config:
+            config = config["celery"]
+        elif "CELERY" in config:
+            config = config["CELERY"]
+
     return config
+
+
+def _parse_url(url: str) -> ParseResult:
+    presult = urlparse(url)
+    if presult.scheme == "beacon":
+        # beacon:///path/to/file.yml
+        # beacon://id00:25000/path/to/file.yml
+        return presult
+    elif presult.scheme in ("file", ""):
+        # /path/to/file.yaml
+        # file:///path/to/file.yaml
+        return presult
+    elif sys.platform == "win32" and len(presult.scheme) == 1:
+        # c:\\path\\to\\file.yaml
+        return urlparse(f"file://{url}")
+    else:
+        return presult
+
+
+def _url_to_filename(presult: ParseResult) -> str:
+    if presult.netloc and presult.path:
+        # urlparse("file://c:/a/b")
+        return presult.netloc + presult.path
+    elif presult.netloc:
+        # urlparse("file://c:\\a\\b")
+        return presult.netloc
+    else:
+        return presult.path
 
 
 def _read_yaml_config(resource: str) -> Optional[dict]:

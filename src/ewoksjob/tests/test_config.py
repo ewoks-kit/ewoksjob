@@ -12,10 +12,12 @@ EXPECTED = {
 
 def test_py_config(py_config):
     assert read_configuration(py_config) == EXPECTED
+    assert read_configuration(f"file://{py_config}") == EXPECTED
 
 
 def test_yaml_config(yaml_config):
     assert read_configuration(yaml_config) == EXPECTED
+    assert read_configuration(f"file://{yaml_config}") == EXPECTED
 
 
 def test_beacon_config(beacon_config):
@@ -34,7 +36,7 @@ def py_config(tmpdir):
     ]
     with open(filename, "w") as f:
         f.writelines(lines)
-    return f"file://{filename}"
+    return filename
 
 
 @pytest.fixture
@@ -50,7 +52,7 @@ def yaml_config(tmpdir):
     ]
     with open(filename, "w") as f:
         f.writelines(lines)
-    return f"file://{filename}"
+    return filename
 
 
 @pytest.fixture
