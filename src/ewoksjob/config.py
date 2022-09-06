@@ -9,6 +9,11 @@ from urllib.parse import urlparse, ParseResult
 from celery.loaders.base import BaseLoader
 from celery import Celery
 
+try:
+    from blissdata.beacon.files import read_config as bliss_read_config
+except ImportError:
+    bliss_read_config = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,7 +35,7 @@ class EwoksLoader(BaseLoader):
 
 
 def _get_cfg_uri() -> str:
-    if os.environ.get("BEACON_HOST", None):
+    if os.environ.get("BEACON_HOST", None) and bliss_read_config is not None:
         default_cfg = "beacon:///ewoks/config.yml"
     else:
         default_cfg = ""
@@ -109,10 +114,8 @@ def _url_to_filename(presult: ParseResult) -> str:
 
 
 def _read_yaml_config(resource: str) -> Optional[dict]:
-    from blissdata.beacon.files import read_config
-
     try:
-        return read_config(resource)
+        return bliss_read_config(resource)
     except Exception as e:
         logger.error(f"Cannot get celery configuration '{resource}' from Beacon: {e}")
 

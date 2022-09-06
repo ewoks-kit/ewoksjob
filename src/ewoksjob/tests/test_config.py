@@ -58,7 +58,7 @@ def yaml_config(tmpdir):
 @pytest.fixture
 def beacon_config(mocker):
     url = "beacon://localhost:1234/config.yml"
-    client = mocker.patch("blissdata.beacon.files.read_config")
+    client = mocker.patch("ewoksjob.config.bliss_read_config")
 
     def read_config(_url):
         if _url == url:
