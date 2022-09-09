@@ -5,7 +5,21 @@ from ewokscore import events
 from ewoksjob.events.readers import instantiate_reader
 from ewokscore.events import cleanup
 from .utils import has_redis_server
-from ..client import process
+from ..client import local
+
+try:
+    from pyslurmutils.tests.conftest import slurm_data_directory  # noqa F401
+    from pyslurmutils.tests.conftest import slurm_log_directory  # noqa F401
+    from pyslurmutils.tests.conftest import data_directory  # noqa F401
+    from pyslurmutils.tests.conftest import log_directory  # noqa F401
+    from pyslurmutils.tests.conftest import slurm_env  # noqa F401
+    from pyslurmutils.tests.conftest import slurm_config
+except ImportError:
+
+    @pytest.fixture(scope="session")
+    def slurm_config() -> None:
+        pytest.skip("requires pyslurmutils")
+
 
 if has_redis_server():
     import redis
@@ -64,11 +78,20 @@ def ewoks_worker(celery_session_worker, celery_worker_pool):
 
 @pytest.fixture(scope="session")
 def local_ewoks_worker():
-    with process.pool_context(max_worker=8) as pool:
+    with local.pool_context(max_workers=8) as pool:
         yield
         while gc.collect():
             pass
-        assert len(pool._jobs) == 0
+        assert len(pool._tasks) == 0
+
+
+@pytest.fixture(scope="session")
+def local_slurm_ewoks_worker(slurm_config):
+    with local.pool_context(pool="slurm", max_workers=8, **slurm_config) as pool:
+        yield
+        while gc.collect():
+            pass
+        assert len(pool._tasks) == 0
 
 
 @pytest.fixture()

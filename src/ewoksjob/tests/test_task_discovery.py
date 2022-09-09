@@ -1,5 +1,5 @@
 from ..client import celery
-from ..client import process
+from ..client import local
 from .utils import get_result
 
 
@@ -8,7 +8,11 @@ def test_submit(ewoks_worker):
 
 
 def test_submit_local(local_ewoks_worker):
-    assert_submit(process)
+    assert_submit(local)
+
+
+def test_submit_local_slurm(local_slurm_ewoks_worker):
+    assert_submit(local)
 
 
 def assert_submit(mod):

@@ -1,3 +1,4 @@
+import os
 from functools import wraps
 from typing import Callable, Mapping, Optional, Tuple
 from concurrent.futures import Future
@@ -7,7 +8,6 @@ from ..test_workflow import test_workflow
 
 try:
     import ewoks
-    from ewokscore import task_discovery
     from ... import tasks
 except ImportError as e:
     ewoks = None
@@ -42,7 +42,6 @@ def trigger_workflow(
     return _submit_with_jobid(ewoks.execute_graph, args=args, kwargs=kwargs)
 
 
-@_requires_ewoks
 def convert_workflow(
     args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
 ) -> Future:
@@ -98,11 +97,7 @@ def discover_tasks_from_modules(
     pool = get_active_pool()
     if kwargs is None:
         kwargs = dict()
-    return pool.submit(_discover_tasks_from_modules, args=args, kwargs=kwargs)
-
-
-def _discover_tasks_from_modules(*args, **kwargs):
-    return list(task_discovery.discover_tasks_from_modules(*args, **kwargs))
+    return pool.submit(tasks.discover_tasks_from_modules, args=args, kwargs=kwargs)
 
 
 def _submit_with_jobid(
@@ -112,6 +107,10 @@ def _submit_with_jobid(
     if kwargs is None:
         kwargs = dict()
     execinfo = kwargs.setdefault("execinfo", dict())
-    task_id = pool.check_task_id(execinfo.get("job_id"))
+    if not execinfo.get("job_id"):
+        job_id = os.environ.get("SLURM_JOB_ID", None)
+        if job_id:
+            execinfo["job_id"] = job_id
+    task_id = pool.generate_task_id(execinfo.get("job_id"))
     execinfo["job_id"] = task_id
     return pool.submit(func, task_id=task_id, args=args, kwargs=kwargs)

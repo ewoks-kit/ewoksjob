@@ -1,6 +1,6 @@
 import pytest
 from ..client import celery
-from ..client import process
+from ..client import local
 from .utils import wait_not_finished
 
 
@@ -9,7 +9,11 @@ def test_normal(ewoks_worker):
 
 
 def test_normal_local(local_ewoks_worker):
-    assert_normal(process)
+    assert_normal(local)
+
+
+def test_normal_local_slurm(local_slurm_ewoks_worker):
+    assert_normal(local)
 
 
 def test_cancel(ewoks_worker):
@@ -17,7 +21,11 @@ def test_cancel(ewoks_worker):
 
 
 def test_cancel_local(local_ewoks_worker):
-    assert_cancel(process)
+    assert_cancel(local)
+
+
+def test_cancel_local_slurm(local_slurm_ewoks_worker):
+    assert_cancel(local)
 
 
 def assert_normal(mod):
@@ -35,7 +43,7 @@ def assert_cancel(mod):
     timeout = seconds * 2
     future = mod.submit_test(seconds)
 
-    if mod is process:
+    if mod is local:
         # The current implementation does not allow cancelling running tasks
         mod.cancel(future.task_id)
         try:

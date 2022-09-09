@@ -7,8 +7,8 @@ import argparse
 from typing import Optional
 
 from ewoksjob.client import submit
-from ewoksjob.client.process import submit as submit_local
-from ewoksjob.client.process import pool_context
+from ewoksjob.client.local import submit as submit_local
+from ewoksjob.client.local import pool_context
 from ewoksjob.events.readers import instantiate_reader
 
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))

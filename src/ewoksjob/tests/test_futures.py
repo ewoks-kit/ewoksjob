@@ -1,6 +1,6 @@
 import pytest
 from ..client import celery
-from ..client import process
+from ..client import local
 from .utils import wait_not_finished
 from .utils import has_redis_server
 
@@ -14,7 +14,11 @@ def test_futures(ewoks_worker):
 
 
 def test_futures_local(local_ewoks_worker):
-    assert_futures(process)
+    assert_futures(local)
+
+
+def test_futures_local_slurm(local_slurm_ewoks_worker):
+    assert_futures(local)
 
 
 def assert_futures(mod):

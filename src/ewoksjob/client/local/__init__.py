@@ -1,4 +1,4 @@
-"""Client side process pool
+"""Client side pool managed in the current process
 """
 from concurrent.futures import CancelledError  # noqa F401
 from .tasks import *  # noqa F403
