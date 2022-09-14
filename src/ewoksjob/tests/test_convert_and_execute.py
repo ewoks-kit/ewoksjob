@@ -1,6 +1,6 @@
 from ewokscore.tests.examples.graphs import get_graph
 from ..client import celery
-from ..client import process
+from ..client import local
 from .utils import get_result
 
 
@@ -10,8 +10,13 @@ def test_submit(ewoks_worker, tmpdir):
 
 
 def test_submit_local(local_ewoks_worker, tmpdir):
-    assert_submit(process, tmpdir)
-    assert_submit_test(process, tmpdir)
+    assert_submit(local, tmpdir)
+    assert_submit_test(local, tmpdir)
+
+
+def test_submit_local_slurm(local_slurm_ewoks_worker, tmpdir):
+    assert_submit(local, tmpdir)
+    assert_submit_test(local, tmpdir)
 
 
 def assert_submit(mod, tmpdir):

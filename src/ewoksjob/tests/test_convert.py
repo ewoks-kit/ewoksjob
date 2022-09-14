@@ -1,5 +1,5 @@
 from ..client import celery
-from ..client import process
+from ..client import local
 from .utils import get_result
 
 
@@ -8,7 +8,11 @@ def test_convert(ewoks_worker, tmpdir):
 
 
 def test_convert_local(local_ewoks_worker, tmpdir):
-    assert_convert(process, tmpdir)
+    assert_convert(local, tmpdir)
+
+
+def test_convert_local_slurm(local_slurm_ewoks_worker, tmpdir):
+    assert_convert(local, tmpdir)
 
 
 def assert_convert(mod, tmpdir):

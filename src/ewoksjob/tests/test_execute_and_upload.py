@@ -2,7 +2,7 @@ import time
 import pytest
 from ewokscore.tests.examples.graphs import get_graph
 from ..client import celery
-from ..client import process
+from ..client import local
 from .utils import get_result
 
 
@@ -10,8 +10,8 @@ def test_submit(ewoks_worker):
     assert_submit(celery)
 
 
-def test_submit_local(local_ewoks_worker):
-    assert_submit(process)
+def test_submit_local_slurm(local_slurm_ewoks_worker):
+    assert_submit(local)
 
 
 def assert_submit(mod):
@@ -23,7 +23,7 @@ def assert_submit(mod):
             "beamline": "id00",
             "proposal": f"id00{time.strftime('%y%m')}",
             "dataset": "testdataset",
-            "path": "/path/to/processed/dataset",
+            "path": "/path/to/localed/dataset",
             "sample": "testsample",
             "raw": "/path/to/raw/dataset",
         }

@@ -1,26 +1,34 @@
 import sys
 from functools import wraps
 from typing import Dict, List, Union
+
 import celery
 import ewoks
-from ewokscore import task_discovery
+
 from .. import tasks
+from ..worker.preload import add_workers
+from ..worker.submit import submit
 
 app = celery.Celery("ewoks")
+add_workers(app)
 
 
-def _add_job_id(method):
+def _ensure_ewoks_job_id(method):
+    """Use celery task ID as ewoks job ID when not ewoks job ID is provided"""
+
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         execinfo = kwargs.setdefault("execinfo", dict())
-        if "job_id" not in execinfo:
+        if not execinfo.get("job_id"):
             execinfo["job_id"] = self.request.id
         return method(self, *args, **kwargs)
 
     return wrapper
 
 
-def _add_working_directory(method):
+def _allow_cwd_imports(method):
+    """Allows import from the current working directory"""
+
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         if "" not in sys.path:
@@ -31,33 +39,33 @@ def _add_working_directory(method):
 
 
 @app.task(bind=True)
-@_add_job_id
-@_add_working_directory
+@_ensure_ewoks_job_id
+@_allow_cwd_imports
 def execute_workflow(self, *args, **kwargs) -> Dict:
-    return ewoks.execute_graph(*args, **kwargs)
+    return submit(ewoks.execute_graph, *args, **kwargs)
 
 
 @app.task()
-@_add_working_directory
+@_allow_cwd_imports
 def convert_workflow(*args, **kwargs) -> Union[str, dict]:
-    return ewoks.convert_graph(*args, **kwargs)
+    return submit(ewoks.convert_graph, *args, **kwargs)
 
 
 @app.task(bind=True)
-@_add_job_id
-@_add_working_directory
+@_ensure_ewoks_job_id
+@_allow_cwd_imports
 def convert_and_execute_workflow(self, *args, **kwargs) -> Dict:
-    return tasks.convert_and_execute_graph(*args, **kwargs)
+    return submit(tasks.convert_and_execute_graph, *args, **kwargs)
 
 
 @app.task(bind=True)
-@_add_job_id
-@_add_working_directory
+@_ensure_ewoks_job_id
+@_allow_cwd_imports
 def execute_and_upload_workflow(self, *args, **kwargs) -> Dict:
-    return tasks.execute_and_upload_graph(*args, **kwargs)
+    return submit(tasks.execute_and_upload_graph, *args, **kwargs)
 
 
 @app.task()
-@_add_working_directory
+@_allow_cwd_imports
 def discover_tasks_from_modules(*args, **kwargs) -> List[dict]:
-    return list(task_discovery.discover_tasks_from_modules(*args, **kwargs))
+    return submit(tasks.discover_tasks_from_modules, *args, **kwargs)
