@@ -32,7 +32,7 @@ Basic worker dependencies
 
 .. code:: bash
 
-    python3 -m pip install ewoksjob[worker,beacon,redis,monitor]
+    python3 -m pip install ewoksjob[worker,beacon,redis,monitor,slurm]
 
 Install the project that implements the actual worker tasks (`ewoksxrpd` is just an example)
 
@@ -98,7 +98,7 @@ Basic worker dependencies
 
 .. code:: bash
 
-    python3 -m pip install ewoksjob[worker,redis,monitor]
+    python3 -m pip install ewoksjob[worker,redis,monitor,slurm]
 
 Install the project that implements the actual worker tasks (`ewoksxrpd` is just an example)
 
