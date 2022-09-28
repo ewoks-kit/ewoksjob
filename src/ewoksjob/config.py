@@ -152,6 +152,6 @@ def _get_config_module(cfg_uri: Optional[str] = None) -> Tuple[str, str]:
         return os.getcwd(), "celeryconfig"
     path = Path(cfg_uri)
     if path.is_file():
-        parent = str(path.parent.absolute())
+        parent = str(path.parent.resolve())
         return parent, path.stem
     return os.getcwd(), cfg_uri
