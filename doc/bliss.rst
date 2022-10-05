@@ -1,10 +1,10 @@
 Usage with *BLISS* at the ESRF
 ==============================
 
-Assume you have a project called `ewoksxrpd` which implements some tasks for data processing.
-
-You need to create a worker python environment (conda or anything else), install *ewoksjob*
-in the *BLISS* conda environment and configure ewoks in the beamline configuration (Beacon).
+For online data processing with *Ewoks*, a beamline needs at least one python environment
+with the scientific libraries installed (conda or anything else) and Ewoks to be
+enabled in the beamline configuration (Beacon). When workflows are triggered from *BLISS*,
+the *BLISS* conda environment needs *ewoksjob* to be installed.
 
 Worker environment
 ------------------
@@ -115,6 +115,8 @@ Install the client dependencies
 
     conda install celery
     python3 -m pip install ewoksjob
+
+This is only needed when workflows are triggered directly from *BLISS*.
 
 Ewoks configuration
 -------------------
