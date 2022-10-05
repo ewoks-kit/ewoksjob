@@ -13,8 +13,10 @@ Decide first whether the code needs to be managed and edited by the beamline sta
 When the data processing code is well established and doesn't change often, most likely the
 BCU will manage it.
 
+Some beamlines will need more than one worker environment.
+
 Managed by *blissadm*
-^^^^^^^^^^^^^^^^^^^^^
++++++++++++++++++++++
 
 Create a conda environment for the worker, in this example called `ewoksworker`
 
@@ -34,53 +36,10 @@ Basic worker dependencies
 
     python3 -m pip install ewoksjob[worker,beacon,redis,monitor,slurm]
 
-Install the project that implements the actual worker tasks (`ewoksxrpd` is just an example)
-
-.. code:: bash
-
-    python3 -m pip install ewoksxrpd
-
-Supervisor
-++++++++++
-
-In this example we register a job monitor (you only ever need one) and one worker (you may need more than one)
-
-.. code::
-
-    [group:ewoks]
-    programs=ewoksmonitor, ewoksworker
-    priority=900
-
-    [program:ewoksmonitor]
-    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker &&& exec celery flower"
-    directory=/users/opid00/
-    user=opid00
-    environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
-    startsecs=2
-    autostart=true
-    redirect_stderr=true
-    stdout_logfile=/var/log/%(program_name)s.log
-    stdout_logfile_maxbytes=1MB
-    stdout_logfile_backups=10
-    stdout_capture_maxbytes=1MB
-
-    [program:ewoksworker]
-    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker &&& exec celery -A ewoksjob.apps.ewoks worker"
-    directory=/users/opid00/
-    user=opid00
-    environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
-    startsecs=2
-    autostart=true
-    redirect_stderr=true
-    stdout_logfile=/var/log/%(program_name)s.log
-    stdout_logfile_maxbytes=1MB
-    stdout_logfile_backups=10
-    stdout_capture_maxbytes=1MB
-
-Make sure to replace `id00` with the proper string.
+Install the project(s) that implement the actual worker tasks (depends on the beamline).
 
 Managed by *opid00*
-^^^^^^^^^^^^^^^^^^^
++++++++++++++++++++
 
 Create a conda environment for the worker, in this example called `ewoksworker`
 
@@ -98,16 +57,12 @@ Basic worker dependencies
 
 .. code:: bash
 
-    python3 -m pip install ewoksjob[worker,redis,monitor,slurm]
+    python3 -m pip install ewoksjob[worker,beacon,redis,monitor,slurm]
 
-Install the project that implements the actual worker tasks (`ewoksxrpd` is just an example)
-
-.. code:: bash
-
-    python3 -m pip install ewoksxrpd
+Install the project(s) that implement the actual worker tasks (depends on the beamline).
 
 Supervisor
-++++++++++
+----------
 
 In this example we register a job monitor (you only ever need one) and one worker (you may need more than one)
 
