@@ -140,7 +140,8 @@ Ewoks must be configured in the beamline configuration (Beacon). For example
         accept_content: ["application/json", "application/x-python-serialize"]
         result_expires: 600
 
-Make sure to replace `hostname` with the host where the Redis database is running.
+Make sure to replace `hostname` with the host where the Redis database is
+running (never use *localhost*).
 
 Test installation
 -----------------
