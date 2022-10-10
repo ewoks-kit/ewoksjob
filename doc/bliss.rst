@@ -73,7 +73,7 @@ In this example we register a job monitor (you only ever need one) and one worke
     priority=900
 
     [program:ewoksmonitor]
-    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker &&& exec celery flower"
+    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker && exec celery flower"
     directory=/users/opid00/
     user=opid00
     environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
@@ -86,7 +86,7 @@ In this example we register a job monitor (you only ever need one) and one worke
     stdout_capture_maxbytes=1MB
 
     [program:ewoksworker]
-    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker &&& exec celery -A ewoksjob.apps.ewoks worker"
+    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker && exec celery -A ewoksjob.apps.ewoks worker"
     directory=/users/opid00/
     user=opid00
     environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
