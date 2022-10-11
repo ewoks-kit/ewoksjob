@@ -28,17 +28,23 @@ class EwoksLoader(BaseLoader):
         super().__init__(app)
 
     def read_configuration(self) -> Optional[dict]:
-        config = read_configuration(_get_cfg_uri())
+        config = read_configuration(get_cfg_uri())
         if config:
             return config
         return super().read_configuration()
 
 
-def _get_cfg_uri() -> str:
-    if os.environ.get("BEACON_HOST", None) and bliss_read_config is not None:
-        default_cfg = "beacon:///ewoks/config.yml"
-    else:
-        default_cfg = ""
+def get_cfg_uri() -> str:
+    """Returns the celery configuration URL based on environment variables"""
+    default_cfg = ""
+    beacon_host = os.environ.get("BEACON_HOST", None)
+    if beacon_host:
+        if bliss_read_config:
+            default_cfg = "beacon:///ewoks/config.yml"
+        else:
+            logger.warning(
+                f"Cannot get celery configuration from {beacon_host} because 'blissdata' is not installed. Fall back to celery's default configuration discovery."
+            )
     return os.environ.get("CELERY_CONFIG_URI", default_cfg)
 
 
