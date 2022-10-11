@@ -35,30 +35,30 @@ class EwoksLoader(BaseLoader):
 
 
 def get_cfg_uri() -> str:
-    """Returns the celery configuration URL based on environment variables"""
-    default_cfg = ""
+    """Returns the celery configuration URL based on environment variables."""
+    cfg_uri = os.environ.get("CELERY_CONFIG_URI")
+    if cfg_uri:
+        return cfg_uri
     beacon_host = os.environ.get("BEACON_HOST", None)
     if beacon_host:
-        if bliss_read_config:
-            default_cfg = "beacon:///ewoks/config.yml"
-        else:
-            logger.warning(
-                f"Cannot get celery configuration from {beacon_host} because 'blissdata' is not installed. Fall back to celery's default configuration discovery."
-            )
-    return os.environ.get("CELERY_CONFIG_URI", default_cfg)
+        return "beacon:///ewoks/config.yml"
+    return ""
 
 
 def read_configuration(cfg_uri: Optional[str] = None) -> Optional[dict]:
-    """Examples:
+    """When the URI is not provided, we will assume it is the python module "celeryconfig"
+    (or whatever module defined by the CELERY_CONFIG_MODULE environment variable).
 
-    - Python module:
+    Different types of URI's are supported:
+
+     - Python module:
         - myproject.config
-    - Python file:
+     - Python file:
         - /tmp/ewoks/config.py
-    - Yaml file:
+     - Yaml file:
         - /tmp/ewoks/config.yml
-    - Beacon yaml file:
-        - beacon:///ewoks/config.yml
+     - Beacon yaml file:
+        - beacon:///ewoks/config.yml  (this requires the BEACON_HOST environment variable)
         - beacon://id22:25000/ewoks/config.yml
     """
     file_type = None
@@ -75,6 +75,8 @@ def read_configuration(cfg_uri: Optional[str] = None) -> Optional[dict]:
     else:
         file_type = "python"
 
+    logger.info(f"Loading celery configuration '{cfg_uri}' ({file_type})")
+
     if file_type == "yaml":
         config = _read_yaml_config(cfg_uri)
     elif file_type == "python":
@@ -87,6 +89,11 @@ def read_configuration(cfg_uri: Optional[str] = None) -> Optional[dict]:
             config = config["celery"]
         elif "CELERY" in config:
             config = config["CELERY"]
+
+    if not config:
+        logger.warning(
+            f"Celery configuration from '{cfg_uri}' is empty or could not be loaded. Fall back to celery's configuration discovery mechanism"
+        )
 
     return config
 
@@ -120,6 +127,11 @@ def _url_to_filename(presult: ParseResult) -> str:
 
 
 def _read_yaml_config(resource: str) -> Optional[dict]:
+    if bliss_read_config is None:
+        logger.error(
+            f"Cannot get celery configuration '{resource}' from Beacon: blissdata is not installed"
+        )
+        return
     try:
         return bliss_read_config(resource)
     except Exception as e:
