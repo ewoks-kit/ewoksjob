@@ -34,7 +34,7 @@ def get_submit_function() -> Optional[Callable]:
 class TaskPool(thread.TaskPool):
     """SLURM Task Pool."""
 
-    slurm_executor_options = dict()
+    executor_options = dict()
 
     def __init__(self, *args, **kwargs):
         if SlurmExecutor is None:
@@ -50,7 +50,7 @@ class TaskPool(thread.TaskPool):
     def _create_slurm_executor(self):
         global _SLURM_EXECUTOR
         self.slurm_executor = SlurmExecutor(
-            max_workers=self.limit, **self.slurm_executor_options
+            max_workers=self.limit, **self.executor_options
         )
         _SLURM_EXECUTOR = weakref.proxy(self.slurm_executor)
 

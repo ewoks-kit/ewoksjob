@@ -12,14 +12,13 @@ from ewoksjob.client.local import pool_context
 from ewoksjob.events.readers import instantiate_reader
 
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
-DATA_DIR = os.path.join(SCRIPT_DIR, "results")
 
 
 def ewoks_event(celery: Optional[bool] = None):
     # Events during execution
     if celery:
         # Redis backend
-        events_url = "redis://localhost:10003/2"
+        events_url = "redis://localhost:6379/2"
         handlers = [
             {
                 "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
@@ -27,8 +26,10 @@ def ewoks_event(celery: Optional[bool] = None):
             }
         ]
     else:
-        # SQLite backend (flower will not work)
-        events_url = f"file://{os.path.join(DATA_DIR, 'ewoks_events.db')}"
+        # SQLite backend
+        dbfile = os.path.join(SCRIPT_DIR, "results", "ewoks", "ewoks_events.db")
+        os.makedirs(os.path.dirname(dbfile), exist_ok=True)
+        events_url = f"file://{dbfile}"
         handlers = [
             {
                 "class": "ewoksjob.events.handlers.Sqlite3EwoksEventHandler",
@@ -61,7 +62,10 @@ def test_workflow():
         {"id": "task1", "name": 1, "value": 2},
         {"id": "task2", "name": 1, "value": 3},
     ]
-    varinfo = {"root_uri": DATA_DIR, "scheme": "nexus"}
+    varinfo = {
+        "root_uri": os.path.join(SCRIPT_DIR, "results", "example_with_events"),
+        "scheme": "nexus",
+    }
     return workflow, inputs, varinfo
 
 
@@ -108,14 +112,9 @@ if __name__ == "__main__":
     )
     options = parser.parse_args()
 
-    os.makedirs(DATA_DIR, exist_ok=True)
-
     reader, args, kwargs = job_argument()
 
     if options.celery:
-        os.environ["CELERY_LOADER"] = "ewoksjob.config.EwoksLoader"
-        os.environ["CELERY_CONFIG_URI"] = os.path.join(SCRIPT_DIR, "celeryconfig.py")
-
         future = submit(args=args, kwargs=kwargs)
         workflow_results = future.get(timeout=3, interval=0.1)
     else:

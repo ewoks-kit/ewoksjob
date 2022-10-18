@@ -1,25 +1,37 @@
+def result(value=False, filename=None):
+    if filename:
+        with open(filename, "w"):
+            pass
+    return value is None
+
+
 def test_workflow():
     return {
         "graph": {"id": "sleepgraph", "schema_version": "1.0"},
         "nodes": [
             {
-                "id": "sleepnode",
+                "id": "sleep",
                 "task_type": "method",
                 "task_identifier": "time.sleep",
                 "default_inputs": [{"name": 0, "value": 0}],
             },
             {
-                "id": "checknode",
+                "id": "result",
                 "task_type": "method",
-                "task_identifier": "operator.eq",
-                "default_inputs": [{"name": 0, "value": None}],
+                "task_identifier": "ewoksjob.client.test_workflow.result",
+                "default_inputs": [
+                    {"name": "value", "value": None},
+                    {"name": "filename", "value": None},
+                ],
             },
         ],
         "links": [
             {
-                "source": "sleepnode",
-                "target": "checknode",
-                "data_mapping": [{"source_output": "return_value", "target_input": 1}],
+                "source": "sleep",
+                "target": "result",
+                "data_mapping": [
+                    {"source_output": "return_value", "target_input": "value"}
+                ],
             },
         ],
     }

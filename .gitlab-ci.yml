@@ -4,6 +4,9 @@ include:
 test-3.7:
   extends: .test-3.7
 
+test-3.7-win:
+  extends: .test-3.7-win
+
 test-3.7-redis:
   extends: .test-3.7
   before_script:
@@ -11,14 +14,26 @@ test-3.7-redis:
     - apt install -y redis-server
     - !reference [.test-3.7, before_script]
 
-test-3.8-examples:
+test-3.8-examples-sql:
   extends: .test-3.8
   script:
     - python -m pip install --pre .[test]
-    - python examples/example_with_events.py
-    - ./examples/worker.sh &
-    - python examples/example_with_events.py --celery
-    - python examples/hello_world.py
+    - python -m pip install --pre ewoksppf
+    - ./scripts/worker.sh --sql --pool=process &
+    - ./scripts/runjobs.sh --sql
+
+test-3.8-examples-redis:
+  extends: .test-3.8
+  before_script:
+    - apt update
+    - apt install -y redis-server
+    - !reference [.test-3.8, before_script]
+  script:
+    - python -m pip install --pre .[test]
+    - python -m pip install --pre ewoksppf
+    - redis-server &
+    - ./scripts/worker.sh --redis --pool=process &
+    - ./scripts/runjobs.sh --redis
 
 build_sdist:
   extends: .build_sdist
