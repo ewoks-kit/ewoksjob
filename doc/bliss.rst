@@ -103,6 +103,9 @@ Make sure to replace `id00` with the proper string.
 *BLISS* environment
 -------------------
 
+When workflows are triggered directly from *BLISS*, *ewoksjob* and its
+dependencies need to be install in the *BLISS* conda environment.
+
 Activate the *BLISS* conda environment
 
 .. code:: bash
@@ -113,10 +116,20 @@ Install the client dependencies
 
 .. code:: bash
 
-    conda install celery
-    python3 -m pip install ewoksjob
+    conda install ewoksjob
 
-This is only needed when workflows are triggered directly from *BLISS*.
+If the conda package does not exist yet, do this instead
+
+.. code:: bash
+
+    conda install "celery>5"
+    python3 -m pip install --no-deps ewoksjob ewoksutils
+
+For `bliss<1.11` you will need an additional dependency
+
+.. code:: bash
+
+    python3 -m pip install --no-deps blissdata
 
 Ewoks configuration
 -------------------
