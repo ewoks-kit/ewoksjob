@@ -6,11 +6,11 @@ import celery
 import ewoks
 
 from .. import tasks
-from ..worker.preload import add_workers
+from ..worker.options import add_options
 from ..worker.submit import submit
 
 app = celery.Celery("ewoks")
-add_workers(app)
+add_options(app)
 
 
 def _ensure_ewoks_job_id(method):

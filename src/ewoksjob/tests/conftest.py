@@ -62,11 +62,10 @@ def celery_worker_parameters():
 @pytest.fixture(scope="session")
 def celery_worker_pool():
     if os.name == "nt":
-        # "prefork" doesn't work on windows
+        # "prefork" nor "process" works on windows
         return "solo"
     else:
-        # some tests may require more than one worker
-        return "prefork"
+        return "process"
 
 
 @pytest.fixture()

@@ -65,11 +65,16 @@ def trigger_and_upload_workflow(
     return _submit_with_jobid(tasks.execute_and_upload_graph, args=args, kwargs=kwargs)
 
 
-def trigger_test_workflow(seconds=0, kwargs: Optional[Mapping] = None) -> Future:
+def trigger_test_workflow(
+    seconds=0, filename=None, kwargs: Optional[Mapping] = None
+) -> Future:
     args = (test_workflow(),)
     if kwargs is None:
         kwargs = dict()
-    kwargs["inputs"] = [{"id": "sleepnode", "name": 0, "value": seconds}]
+    kwargs["inputs"] = [
+        {"id": "sleep", "name": 0, "value": seconds},
+        {"id": "result", "name": "filename", "value": filename},
+    ]
     return trigger_workflow(
         args=args,
         kwargs=kwargs,
@@ -77,7 +82,10 @@ def trigger_test_workflow(seconds=0, kwargs: Optional[Mapping] = None) -> Future
 
 
 def convert_and_trigger_test_workflow(
-    seconds=0, args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
+    seconds=0,
+    filename=None,
+    args: Optional[Tuple] = tuple(),
+    kwargs: Optional[Mapping] = None,
 ) -> Future:
     if len(args) != 1:
         raise TypeError(
@@ -86,7 +94,10 @@ def convert_and_trigger_test_workflow(
     args = (test_workflow(),) + args
     if kwargs is None:
         kwargs = dict()
-    kwargs["inputs"] = [{"id": "sleepnode", "name": 0, "value": seconds}]
+    kwargs["inputs"] = [
+        {"id": "sleep", "name": 0, "value": seconds},
+        {"id": "result", "name": "filename", "value": filename},
+    ]
     return convert_and_trigger_workflow(args=args, kwargs=kwargs)
 
 

@@ -44,8 +44,11 @@ def pool_context(*args, **kwargs):
 class _LocalPool:
     def __init__(self, *args, pool="process", context="spawn", **kwargs) -> None:
         if pool == "process":
-            if sys.version_info >= (3, 7):
-                kwargs["mp_context"] = multiprocessing.get_context(context)
+            if context:
+                if sys.version_info >= (3, 7):
+                    kwargs["mp_context"] = multiprocessing.get_context(context)
+                else:
+                    multiprocessing.set_start_method(context, force=True)
             self._executor = ProcessPoolExecutor(*args, **kwargs)
         elif pool == "thread":
             self._executor = ThreadPoolExecutor(*args, **kwargs)

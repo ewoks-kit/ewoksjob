@@ -52,13 +52,13 @@ contains celery configuration (mainly the message broker and result backend URL'
 Clone the git repository and start a worker pool
 
 ```bash
-./examples/worker.sh
+scripts/worker.sh --sql
 ```
 
-Submit the hello world workflow
+Submit workflows
 
 ```bash
-python examples/helloworld.py
+scripts/runjobs.sh --sql
 ```
 
 ## Tests

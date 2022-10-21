@@ -17,14 +17,17 @@ def trigger_workflow(**kwargs) -> AsyncResult:
     return send_task("ewoksjob.apps.ewoks.execute_workflow", **kwargs)
 
 
-def trigger_test_workflow(seconds=0, args=None, **kwargs) -> AsyncResult:
+def trigger_test_workflow(seconds=0, filename=None, args=None, **kwargs) -> AsyncResult:
     if args:
         raise TypeError(
             f"trigger_test_workflow() got on unexpected position arguments {args}"
         )
     kwargs["args"] = (test_workflow(),)
     kw = kwargs.setdefault("kwargs", dict())
-    kw["inputs"] = [{"id": "sleepnode", "name": 0, "value": seconds}]
+    kw["inputs"] = [
+        {"id": "sleep", "name": 0, "value": seconds},
+        {"id": "result", "name": "filename", "value": filename},
+    ]
     return trigger_workflow(**kwargs)
 
 
@@ -40,14 +43,19 @@ def trigger_and_upload_workflow(**kwargs) -> AsyncResult:
     return send_task("ewoksjob.apps.ewoks.execute_and_upload_workflow", **kwargs)
 
 
-def convert_and_trigger_test_workflow(seconds=0, args=None, **kwargs) -> AsyncResult:
+def convert_and_trigger_test_workflow(
+    seconds=0, filename=None, args=None, **kwargs
+) -> AsyncResult:
     if len(args) != 1:
         raise TypeError(
             f"convert_and_trigger_test_workflow() requires 1 position arguments 'destination' but got {len(args)}"
         )
     kwargs["args"] = (test_workflow(),) + args
     kw = kwargs.setdefault("kwargs", dict())
-    kw["inputs"] = [{"id": "sleepnode", "name": 0, "value": seconds}]
+    kw["inputs"] = [
+        {"id": "sleep", "name": 0, "value": seconds},
+        {"id": "result", "name": "filename", "value": filename},
+    ]
     return convert_and_trigger_workflow(**kwargs)
 
 
