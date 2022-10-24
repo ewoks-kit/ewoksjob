@@ -1,33 +1,90 @@
 import time
-from ewoksjob.client import submit, CancelledError
 
-# Define a workflow with default inputs
-nodes = [
-    {
-        "id": "task1",
-        "task_type": "method",
-        "task_identifier": "time.sleep",
-        "default_inputs": [{"name": 0, "value": 5}],
-    },
-    {
-        "id": "task2",
-        "task_type": "method",
-        "task_identifier": "time.sleep",
-        "default_inputs": [{"name": 0, "value": 0}],
-    },
-]
-links = [{"source": "task1", "target": "task2"}]
-workflow = {"graph": {"id": "testworkflow"}, "nodes": nodes, "links": links}
+if True:
+    from multiprocessing import get_context
+    from multiprocessing.pool import Pool
+    from multiprocessing import current_process
 
-# Execute a workflow (use a proper Ewoks task scheduler in production)
-future = submit(args=(workflow,), binding="ppf", pool_type="process")
-time.sleep(1)
-
-future.revoke(terminate=True)
-
-try:
-    future.get(timeout=5)
-except CancelledError:
-    pass
+    pool_type = "process"
 else:
-    assert False, "Failed to cancel the job"
+    from billiard import get_context
+    from billiard.pool import Pool
+    from billiard import current_process
+
+    pool_type = "billiard"
+from ewokscore import Task
+
+
+def test_func(sleep_time):
+    time.sleep(sleep_time)
+    return 10
+
+
+class TestTask(Task, optional_input_names=["sleep_time"], output_names=["result"]):
+    def run(self):
+        if current_process().daemon:
+            print(
+                "Task process is daemonic (cannot launch a subprocess unless using Billiard)"
+            )
+        else:
+            print("Task process is non-daemonic (can launch a subprocess)")
+
+        with Pool(processes=1, context=get_context()) as pool:
+            sleep_time = self.get_input_value("sleep_time", 0)
+            self.outputs.result = pool.apply(test_func, args=(sleep_time,))
+
+
+if __name__ == "__main__":
+    from ewoksjob.client import submit, CancelledError
+
+    # Define a workflow with default inputs
+    nodes = [
+        {
+            "id": "task1",
+            "task_type": "class",
+            "task_identifier": "hello_world_ppf_cancel.TestTask",
+            "default_inputs": [{"name": "sleep_time", "value": 5}],
+        },
+        {
+            "id": "task2",
+            "task_type": "class",
+            "task_identifier": "hello_world_ppf_cancel.TestTask",
+            "default_inputs": [{"name": "sleep_time", "value": 0}],
+        },
+    ]
+    links = [
+        {
+            "source": "task1",
+            "target": "task2",
+        },
+    ]
+    workflow = {"graph": {"id": "testworkflow"}, "nodes": nodes, "links": links}
+
+    # Define task inputs
+    inputs = []
+
+    # Execute a workflow (use a proper Ewoks task scheduler in production)
+    varinfo = {}  # optionally save all task outputs
+
+    future = submit(
+        args=(workflow,),
+        kwargs={
+            "varinfo": varinfo,
+            "inputs": inputs,
+            "binding": "ppf",
+            "pool_type": pool_type,
+            "shared_pool": False,
+            "max_workers": 5,  # for shared pool
+        },
+    )
+
+    time.sleep(1)
+
+    future.revoke(terminate=True)
+
+    try:
+        future.get(timeout=5)
+    except CancelledError:
+        pass
+    else:
+        assert False, "Failed to cancel the job"
