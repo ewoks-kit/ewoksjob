@@ -69,4 +69,5 @@ if __name__ == "__main__":
         "root_uri": os.path.join(SCRIPT_DIR, "results", "hello_world")
     }  # optionally save all task outputs
     future = submit(args=(workflow,), kwargs={"varinfo": varinfo, "inputs": inputs})
-    assert future.get(timeout=3) == {"result": 12}
+    result = future.get(timeout=3)
+    assert result == {"result": 12}, result

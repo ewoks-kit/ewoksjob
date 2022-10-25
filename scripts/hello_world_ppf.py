@@ -2,36 +2,35 @@ import time
 
 if True:
     from multiprocessing import get_context
-    from multiprocessing import Value
+    from multiprocessing.pool import Pool
     from multiprocessing import current_process
+
+    pool_type = "process"
 else:
     from billiard import get_context
-    from billiard import Value
-    from multiprocessing import current_process
+    from billiard.pool import Pool
+    from billiard import current_process
+
+    pool_type = "billiard"
 from ewokscore import Task
 
 
-def test_func(arg, sleep_time):
-    if sleep_time:
-        time.sleep(sleep_time)
-    arg.value = 10
+def test_func(sleep_time):
+    time.sleep(sleep_time)
+    return 10
 
 
 class TestTask(Task, optional_input_names=["sleep_time"], output_names=["result"]):
     def run(self):
-        result = Value("i", 0)
         if current_process().daemon:
             print(
                 "Task process is daemonic (cannot launch a subprocess unless using Billiard)"
             )
         else:
             print("Task process is non-daemonic (can launch a subprocess)")
-        p = get_context().Process(
-            target=test_func, args=(result, self.inputs.sleep_time)
-        )
-        p.start()
-        p.join()
-        self.outputs.result = result.value
+        with Pool(processes=1, context=get_context()) as pool:
+            sleep_time = self.get_input_value("sleep_time", 0)
+            self.outputs.result = pool.apply(test_func, args=(sleep_time,))
 
 
 if __name__ == "__main__":
@@ -45,8 +44,19 @@ if __name__ == "__main__":
             "task_identifier": "hello_world_ppf.TestTask",
             "default_inputs": [{"name": "sleep_time", "value": 0}],
         },
+        {
+            "id": "task2",
+            "task_type": "class",
+            "task_identifier": "hello_world_ppf.TestTask",
+            "default_inputs": [{"name": "sleep_time", "value": 0}],
+        },
     ]
-    links = []
+    links = [
+        {
+            "source": "task1",
+            "target": "task2",
+        },
+    ]
     workflow = {"graph": {"id": "testworkflow"}, "nodes": nodes, "links": links}
 
     # Define task inputs
@@ -57,6 +67,14 @@ if __name__ == "__main__":
 
     future = submit(
         args=(workflow,),
-        kwargs={"varinfo": varinfo, "inputs": inputs, "binding": "ppf"},
+        kwargs={
+            "varinfo": varinfo,
+            "inputs": inputs,
+            "binding": "ppf",
+            "pool_type": pool_type,
+            "shared_pool": False,
+            "max_workers": 5,  # for shared pool
+        },
     )
-    assert future.get(timeout=3) == {"result": 10}
+    result = future.get(timeout=3)
+    assert result == {"result": 10}, result
