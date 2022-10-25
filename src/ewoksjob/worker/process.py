@@ -85,7 +85,6 @@ class TaskPool(base.BasePool):
 
     def terminate_job(self, pid, sig=None):
         """Called when revoking a job"""
-        print("terminate_job", pid, sig)
         if sig is None:
             sig = signal.SIGTERM
         try:
