@@ -9,39 +9,10 @@ the *BLISS* conda environment needs *ewoksjob* to be installed.
 Worker environment
 ------------------
 
-Decide first whether the code needs to be managed and edited by the beamline staff or BCU.
-When the data processing code is well established and doesn't change often, most likely the
-BCU will manage it.
+Create a python environment (conda, venv, ...) under *blissadm* (BCU manages the scientific software)
+or *opid00* (beamline staff manages the scientific software).
 
-Some beamlines will need more than one worker environment.
-
-Managed by *blissadm*
-+++++++++++++++++++++
-
-Create a conda environment for the worker, in this example called `ewoksworker`
-
-.. code:: bash
-
-    conda create --prefix /users/blissadm/conda/miniconda/envs/ewoksworker python=3.7
-
-Activate the environment
-
-.. code:: bash
-
-    . blissenv -e ewoksworker
-
-Basic worker dependencies
-
-.. code:: bash
-
-    python3 -m pip install ewoksjob[worker,beacon,redis,monitor,slurm]
-
-Install the project(s) that implement the actual worker tasks (depends on the beamline).
-
-Managed by *opid00*
-+++++++++++++++++++
-
-Create a conda environment for the worker, in this example called `ewoksworker`
+When using conda, create a conda environment for the worker (called `ewoksworker` in this example) like this
 
 .. code:: bash
 
@@ -53,13 +24,15 @@ Activate the environment
 
     conda activate ewoksworker
 
-Basic worker dependencies
+Install basic worker dependencies
 
 .. code:: bash
 
     python3 -m pip install ewoksjob[worker,beacon,redis,monitor,slurm]
 
 Install the project(s) that implement the actual worker tasks (depends on the beamline).
+
+Some beamlines may want multiple environments for different scientific software.
 
 Supervisor
 ----------
@@ -98,7 +71,19 @@ In this example we register a job monitor (you only ever need one) and one worke
     stdout_logfile_backups=10
     stdout_capture_maxbytes=1MB
 
-Make sure to replace `id00` with the proper string.
+Make sure to replace `opid00` and `id00` with the proper string.
+
+Instead of `BEACON_HOST="id00:25000"` you could provide an explicit URL of the celery configuration with `CELERY_CONFIG_URI`
+
+.. code::
+
+    [program:ewoksmonitor]
+    ...
+    environment=CELERY_CONFIG_URI="beacon:///id00:25000/ewoks/config.yml",CELERY_LOADER="ewoksjob.config.EwoksLoader"
+
+    [program:ewoksworker]
+    ...
+    environment=CELERY_CONFIG_URI="beacon:///id00:25000/ewoks/config.yml",CELERY_LOADER="ewoksjob.config.EwoksLoader"
 
 *BLISS* environment
 -------------------
@@ -117,6 +102,9 @@ Install the client dependencies
     python3 -m pip install ewoksjob
 
 This is only needed when workflows are triggered directly from *BLISS*.
+
+When triggering workflows, either the `BEACON_HOST` or `CELERY_CONFIG_URI` environment variables need to be provided.
+When triggering directly from *BLISS*, the `BEACON_HOST` environment variable is already set so nothing extra to do.
 
 Ewoks configuration
 -------------------
