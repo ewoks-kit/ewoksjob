@@ -86,7 +86,7 @@ def local_ewoks_worker():
 
 @pytest.fixture(scope="session")
 def local_slurm_ewoks_worker(slurm_config):
-    with local.pool_context(pool="slurm", max_workers=8, **slurm_config) as pool:
+    with local.pool_context(pool_type="slurm", max_workers=8, **slurm_config) as pool:
         yield
         while gc.collect():
             pass

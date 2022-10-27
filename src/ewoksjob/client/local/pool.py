@@ -42,23 +42,23 @@ def pool_context(*args, **kwargs):
 
 
 class _LocalPool:
-    def __init__(self, *args, pool="process", context="spawn", **kwargs) -> None:
-        if pool == "process":
+    def __init__(self, *args, pool_type="process", context="spawn", **kwargs) -> None:
+        if pool_type == "process":
             if context:
                 if sys.version_info >= (3, 7):
                     kwargs["mp_context"] = multiprocessing.get_context(context)
                 else:
                     multiprocessing.set_start_method(context, force=True)
             self._executor = ProcessPoolExecutor(*args, **kwargs)
-        elif pool == "thread":
+        elif pool_type == "thread":
             self._executor = ThreadPoolExecutor(*args, **kwargs)
-        elif pool == "slurm":
+        elif pool_type == "slurm":
             if SlurmExecutor is None:
                 raise RuntimeError("requires pyslurmutils")
             self._executor = SlurmExecutor(*args, **kwargs)
         else:
-            raise ValueError(f"Unknown pool type '{pool}'")
-        self._pool_type = pool
+            raise ValueError(f"Unknown pool type '{pool_type}'")
+        self._pool_type = pool_type
         self._tasks = weakref.WeakValueDictionary()
 
     def __enter__(self):
