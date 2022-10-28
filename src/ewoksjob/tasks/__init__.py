@@ -1,6 +1,3 @@
-"""Tasks like `ewoks.execute_graph` to be used in job scheduling
-"""
-
-from .convert_and_execute import *  # noqa F403
-from .execute_and_upload import *  # noqa F403
-from .task_discovery import *  # noqa F403
+from .ewoks import execute_graph  # noqa F401
+from .ewoks import convert_graph  # noqa F401
+from .ewoks import discover_tasks_from_modules  # noqa F401
