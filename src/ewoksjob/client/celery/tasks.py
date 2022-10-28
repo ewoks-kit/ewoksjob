@@ -3,61 +3,35 @@ from celery.result import AsyncResult
 from ..test_workflow import test_workflow
 
 __all__ = [
-    "trigger_workflow",
-    "trigger_test_workflow",
+    "execute_graph",
+    "execute_test_graph",
     "convert_workflow",
-    "convert_and_trigger_workflow",
-    "convert_and_trigger_test_workflow",
-    "trigger_and_upload_workflow",
     "discover_tasks_from_modules",
 ]
 
 
-def trigger_workflow(**kwargs) -> AsyncResult:
-    return send_task("ewoksjob.apps.ewoks.execute_workflow", **kwargs)
+def execute_graph(**kw) -> AsyncResult:
+    return send_task("ewoksjob.apps.ewoks.execute_graph", **kw)
 
 
-def trigger_test_workflow(seconds=0, filename=None, args=None, **kwargs) -> AsyncResult:
-    if args:
-        raise TypeError(
-            f"trigger_test_workflow() got on unexpected position arguments {args}"
-        )
-    kwargs["args"] = (test_workflow(),)
-    kw = kwargs.setdefault("kwargs", dict())
-    kw["inputs"] = [
-        {"id": "sleep", "name": 0, "value": seconds},
-        {"id": "result", "name": "filename", "value": filename},
-    ]
-    return trigger_workflow(**kwargs)
-
-
-def convert_workflow(**kwargs) -> AsyncResult:
-    return send_task("ewoksjob.apps.ewoks.convert_workflow", **kwargs)
-
-
-def convert_and_trigger_workflow(**kwargs) -> AsyncResult:
-    return send_task("ewoksjob.apps.ewoks.convert_and_execute_workflow", **kwargs)
-
-
-def trigger_and_upload_workflow(**kwargs) -> AsyncResult:
-    return send_task("ewoksjob.apps.ewoks.execute_and_upload_workflow", **kwargs)
-
-
-def convert_and_trigger_test_workflow(
-    seconds=0, filename=None, args=None, **kwargs
+def execute_test_graph(
+    seconds=0, filename=None, args=None, kwargs=None, **kw
 ) -> AsyncResult:
-    if len(args) != 1:
-        raise TypeError(
-            f"convert_and_trigger_test_workflow() requires 1 position arguments 'destination' but got {len(args)}"
-        )
-    kwargs["args"] = (test_workflow(),) + args
-    kw = kwargs.setdefault("kwargs", dict())
-    kw["inputs"] = [
+    if args:
+        raise TypeError("execute_test_graph does not take position arguments")
+    args = (test_workflow(),)
+    if kwargs is None:
+        kwargs = dict()
+    kwargs["inputs"] = [
         {"id": "sleep", "name": 0, "value": seconds},
         {"id": "result", "name": "filename", "value": filename},
     ]
-    return convert_and_trigger_workflow(**kwargs)
+    return execute_graph(args=args, kwargs=kwargs, **kw)
 
 
-def discover_tasks_from_modules(**kwargs) -> AsyncResult:
-    return send_task("ewoksjob.apps.ewoks.discover_tasks_from_modules", **kwargs)
+def convert_workflow(**kw) -> AsyncResult:
+    return send_task("ewoksjob.apps.ewoks.convert_graph", **kw)
+
+
+def discover_tasks_from_modules(**kw) -> AsyncResult:
+    return send_task("ewoksjob.apps.ewoks.discover_tasks_from_modules", **kw)

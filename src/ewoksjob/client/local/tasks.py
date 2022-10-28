@@ -7,65 +7,38 @@ from .pool import get_active_pool
 from ..test_workflow import test_workflow
 
 try:
-    import ewoks
     from ... import tasks
 except ImportError as e:
-    ewoks = None
-    ewoks_import_error = e
+    tasks = None
+    tasks_import_error = e
 
 
 __all__ = [
-    "trigger_workflow",
-    "trigger_test_workflow",
+    "execute_graph",
+    "execute_test_graph",
     "convert_workflow",
-    "convert_and_trigger_workflow",
-    "convert_and_trigger_test_workflow",
-    "trigger_and_upload_workflow",
     "discover_tasks_from_modules",
 ]
 
 
-def _requires_ewoks(method):
+def _require_tasks(method):
     @wraps(method)
     def wrapper(*args, **kwargs):
-        if ewoks is None:
-            raise ImportError(ewoks_import_error)
+        if tasks is None:
+            raise ImportError(tasks_import_error)
         return method(*args, **kwargs)
 
     return wrapper
 
 
-@_requires_ewoks
-def trigger_workflow(
+@_require_tasks
+def execute_graph(
     args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
 ) -> Future:
-    return _submit_with_jobid(ewoks.execute_graph, args=args, kwargs=kwargs)
+    return _submit_with_jobid(tasks.execute_graph, args=args, kwargs=kwargs)
 
 
-def convert_workflow(
-    args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
-) -> Future:
-    pool = get_active_pool()
-    if kwargs is None:
-        kwargs = dict()
-    return pool.submit(ewoks.convert_graph, args=args, kwargs=kwargs)
-
-
-@_requires_ewoks
-def convert_and_trigger_workflow(
-    args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
-) -> Future:
-    return _submit_with_jobid(tasks.convert_and_execute_graph, args=args, kwargs=kwargs)
-
-
-@_requires_ewoks
-def trigger_and_upload_workflow(
-    args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
-) -> Future:
-    return _submit_with_jobid(tasks.execute_and_upload_graph, args=args, kwargs=kwargs)
-
-
-def trigger_test_workflow(
+def execute_test_graph(
     seconds=0, filename=None, kwargs: Optional[Mapping] = None
 ) -> Future:
     args = (test_workflow(),)
@@ -75,39 +48,22 @@ def trigger_test_workflow(
         {"id": "sleep", "name": 0, "value": seconds},
         {"id": "result", "name": "filename", "value": filename},
     ]
-    return trigger_workflow(
-        args=args,
-        kwargs=kwargs,
-    )
+    return execute_graph(args=args, kwargs=kwargs)
 
 
-def convert_and_trigger_test_workflow(
-    seconds=0,
-    filename=None,
-    args: Optional[Tuple] = tuple(),
-    kwargs: Optional[Mapping] = None,
+@_require_tasks
+def convert_workflow(
+    args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
 ) -> Future:
-    if len(args) != 1:
-        raise TypeError(
-            f"convert_and_trigger_test_workflow() requires 1 position arguments 'destination' but got {len(args)}"
-        )
-    args = (test_workflow(),) + args
-    if kwargs is None:
-        kwargs = dict()
-    kwargs["inputs"] = [
-        {"id": "sleep", "name": 0, "value": seconds},
-        {"id": "result", "name": "filename", "value": filename},
-    ]
-    return convert_and_trigger_workflow(args=args, kwargs=kwargs)
+    pool = get_active_pool()
+    return pool.submit(tasks.convert_graph, args=args, kwargs=kwargs)
 
 
-@_requires_ewoks
+@_require_tasks
 def discover_tasks_from_modules(
     args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
 ) -> Future:
     pool = get_active_pool()
-    if kwargs is None:
-        kwargs = dict()
     return pool.submit(tasks.discover_tasks_from_modules, args=args, kwargs=kwargs)
 
 

@@ -3,7 +3,6 @@ from functools import wraps
 from typing import Dict, List, Union
 
 import celery
-import ewoks
 
 from .. import tasks
 from ..worker.options import add_options
@@ -41,28 +40,14 @@ def _allow_cwd_imports(method):
 @app.task(bind=True)
 @_ensure_ewoks_job_id
 @_allow_cwd_imports
-def execute_workflow(self, *args, **kwargs) -> Dict:
-    return submit(ewoks.execute_graph, *args, **kwargs)
+def execute_graph(self, *args, **kwargs) -> Dict:
+    return submit(tasks.execute_graph, *args, **kwargs)
 
 
 @app.task()
 @_allow_cwd_imports
-def convert_workflow(*args, **kwargs) -> Union[str, dict]:
-    return submit(ewoks.convert_graph, *args, **kwargs)
-
-
-@app.task(bind=True)
-@_ensure_ewoks_job_id
-@_allow_cwd_imports
-def convert_and_execute_workflow(self, *args, **kwargs) -> Dict:
-    return submit(tasks.convert_and_execute_graph, *args, **kwargs)
-
-
-@app.task(bind=True)
-@_ensure_ewoks_job_id
-@_allow_cwd_imports
-def execute_and_upload_workflow(self, *args, **kwargs) -> Dict:
-    return submit(tasks.execute_and_upload_graph, *args, **kwargs)
+def convert_graph(*args, **kwargs) -> Union[str, dict]:
+    return submit(tasks.convert_graph, *args, **kwargs)
 
 
 @app.task()

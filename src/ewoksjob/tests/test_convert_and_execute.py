@@ -23,9 +23,9 @@ def assert_submit(mod, tmpdir):
     graph, expected = get_graph("acyclic1")
     expected = expected["task6"]
     filename = tmpdir / "test.json"
-    args = graph, str(filename)
-    kwargs = {"save_options": {"indent": 2}}
-    future1 = mod.convert_and_trigger_workflow(args=args, kwargs=kwargs)
+    args = (graph,)
+    kwargs = {"save_options": {"indent": 2}, "convert_destination": str(filename)}
+    future1 = mod.submit(args=args, kwargs=kwargs)
     future2 = mod.get_future(future1.task_id)
     results = get_result(future1, timeout=3)
     assert results == expected
@@ -36,9 +36,8 @@ def assert_submit(mod, tmpdir):
 
 def assert_submit_test(mod, tmpdir):
     filename = tmpdir / "test.json"
-    args = (str(filename),)
-    kwargs = {"save_options": {"indent": 2}}
-    future1 = mod.convert_and_trigger_test_workflow(args=args, kwargs=kwargs)
+    kwargs = {"save_options": {"indent": 2}, "convert_destination": str(filename)}
+    future1 = mod.submit_test(kwargs=kwargs)
     future2 = mod.get_future(future1.task_id)
     results = get_result(future1, timeout=3)
     assert results == {"return_value": True}

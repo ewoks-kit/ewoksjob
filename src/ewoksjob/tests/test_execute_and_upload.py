@@ -18,7 +18,7 @@ def assert_submit(mod):
     graph, expected = get_graph("acyclic1")
     expected = expected["task6"]
     kwargs = {
-        "upload_kwargs": {
+        "upload_parameters": {
             "metadata_urls": list(),
             "beamline": "id00",
             "proposal": f"id00{time.strftime('%y%m')}",
@@ -28,6 +28,6 @@ def assert_submit(mod):
             "raw": "/path/to/raw/dataset",
         }
     }
-    future1 = mod.trigger_and_upload_workflow(args=(graph,), kwargs=kwargs)
+    future1 = mod.submit(args=(graph,), kwargs=kwargs)
     with pytest.raises(RuntimeError, match="requires pyicat-plus"):
         get_result(future1, timeout=3)
