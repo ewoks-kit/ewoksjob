@@ -73,8 +73,8 @@ if __name__ == "__main__":
             "inputs": inputs,
             "binding": "ppf",
             "pool_type": pool_type,
-            "shared_pool": False,
-            "max_workers": 5,  # for shared pool
+            "scaling_workers": True,
+            "max_workers": 5,  # when scaling_workers=False
         },
     )
 
