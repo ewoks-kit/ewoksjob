@@ -1,13 +1,17 @@
 """Tasks to be executed in a celery or local pool."""
 
-import ewoks
+import logging
 from typing import Dict
 
 try:
     from pyicat_plus.client.main import IcatClient
 except ImportError:
     IcatClient = None
+
+import ewoks
 from ewokscore import task_discovery
+
+logger = logging.getLogger(__name__)
 
 convert_graph = ewoks.convert_graph
 
@@ -31,6 +35,11 @@ def execute_graph(
             "metadata_urls", ["bcu-mq-01.esrf.fr:61613", "bcu-mq-02.esrf.fr:61613"]
         )
         client = IcatClient(metadata_urls=metadata_urls)
+        logger.info(
+            "Sending processed dataset '%s' to ICAT: %s",
+            upload_parameters.get("dataset"),
+            upload_parameters.get("path"),
+        )
         client.store_processed_data(**upload_parameters)
     return result
 
