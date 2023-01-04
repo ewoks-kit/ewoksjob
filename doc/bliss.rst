@@ -28,7 +28,7 @@ Install basic worker dependencies
 
 .. code:: bash
 
-    python3 -m pip install ewoksjob[worker,beacon,redis,monitor,slurm]
+    python3 -m pip install ewoksjob[blissworker]
 
 Install the project(s) that implement the actual worker tasks (depends on the beamline).
 
