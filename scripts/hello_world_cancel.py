@@ -1,5 +1,5 @@
 import time
-from ewoksjob.client import submit, CancelledError
+from ewoksjob.client import submit, CancelledErrors
 
 # Define a workflow with default inputs
 nodes = [
@@ -27,7 +27,7 @@ future.revoke(terminate=True)
 
 try:
     future.get(timeout=5)
-except CancelledError:
+except CancelledErrors:
     pass
 else:
     assert False, "Failed to cancel the job"

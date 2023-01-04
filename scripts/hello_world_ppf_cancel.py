@@ -35,7 +35,7 @@ class TestTask(Task, optional_input_names=["sleep_time"], output_names=["result"
 
 
 if __name__ == "__main__":
-    from ewoksjob.client import submit, CancelledError
+    from ewoksjob.client import submit, CancelledErrors
 
     # Define a workflow with default inputs
     nodes = [
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     try:
         future.get(timeout=5)
-    except CancelledError:
+    except CancelledErrors:
         pass
     else:
         assert False, "Failed to cancel the job"
