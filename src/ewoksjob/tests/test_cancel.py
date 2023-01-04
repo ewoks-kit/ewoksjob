@@ -51,7 +51,7 @@ def assert_cancel(mod, tmpdir):
         mod.cancel(future.task_id)
         try:
             results = mod.get_result(future.task_id, timeout=timeout)
-        except mod.CancelledError:
+        except mod.CancelledErrors:
             assert not filename.exists()
         else:
             assert results == {"return_value": True}
@@ -62,7 +62,7 @@ def assert_cancel(mod, tmpdir):
         mod.cancel(future.task_id)
         try:
             results = mod.get_result(future.task_id, timeout=timeout)
-        except mod.CancelledError:
+        except mod.CancelledErrors:
             assert not filename.exists()
         else:
             assert results == {"return_value": True}

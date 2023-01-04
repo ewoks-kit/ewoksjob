@@ -1,7 +1,10 @@
 """Remote worker pool managed by Celery
 """
 import os
-from celery.exceptions import TaskRevokedError as CancelledError  # noqa F401
+from billiard.exceptions import Terminated
+from celery.exceptions import TaskRevokedError as CancelledError
+
+CancelledErrors = CancelledError, Terminated
 from .tasks import *  # noqa F403
 from .utils import *  # noqa F403
 from .tasks import execute_graph as submit  # noqa F401
