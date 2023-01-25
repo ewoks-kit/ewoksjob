@@ -16,7 +16,7 @@ When using conda, create a conda environment for the worker (called `ewoksworker
 
 .. code:: bash
 
-    conda create --name ewoksworker python=3.7
+    conda create --name ewoksworker python=3.8
 
 Activate the environment
 
@@ -46,11 +46,11 @@ In this example we register a job monitor (you only ever need one) and one worke
     priority=900
 
     [program:ewoksmonitor]
-    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker && exec celery flower"
+    command=bash -c "source /users/blissadm/conda/miniconda/bin/activate ewoksworker && celery flower"
     directory=/users/opid00/
     user=opid00
     environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
-    startsecs=2
+    startsecs=5
     autostart=true
     redirect_stderr=true
     stdout_logfile=/var/log/%(program_name)s.log
@@ -59,11 +59,11 @@ In this example we register a job monitor (you only ever need one) and one worke
     stdout_capture_maxbytes=1MB
 
     [program:ewoksworker]
-    command=bash -c "source /users/opid00/anaconda3/bin/activate ewoksworker && exec celery -A ewoksjob.apps.ewoks worker"
+    command=bash -c "source /users/blissadm/conda/miniconda/bin/activate ewoksworker && celery -A ewoksjob.apps.ewoks worker"
     directory=/users/opid00/
     user=opid00
     environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
-    startsecs=2
+    startsecs=5
     autostart=true
     redirect_stderr=true
     stdout_logfile=/var/log/%(program_name)s.log
@@ -72,6 +72,12 @@ In this example we register a job monitor (you only ever need one) and one worke
     stdout_capture_maxbytes=1MB
 
 Make sure to replace `opid00` and `id00` with the proper string.
+
+The filename `/users/blissadm/conda/miniconda/bin/activate` may differ as well. Type `conda activate base;type activate` in a terminal
+with the correct user to see where the conda activation script is located.
+
+The working directory is important if the beamline wants to quickly add workflow tasks (i.e. without pip-installing a python project).
+In this case `directory=/users/opid00/ewoks` is probably more appropriate. All `.py` files in this directory can contain ewoks tasks.
 
 Instead of `BEACON_HOST="id00:25000"` you could provide an explicit URL of the celery configuration with `CELERY_CONFIG_URI`
 
