@@ -76,6 +76,9 @@ Make sure to replace `opid00` and `id00` with the proper string.
 The filename `/users/blissadm/conda/miniconda/bin/activate` may differ as well. Type `conda activate base;type activate` in a terminal
 with the correct user to see where the conda activation script is located.
 
+The working directory is important if the beamline wants to quickly add workflow tasks (i.e. without pip-installing a python project).
+In this case `directory=/users/opid00/ewoks` is probably more appropriate. All `.py` files in this directory can contain ewoks tasks.
+
 Instead of `BEACON_HOST="id00:25000"` you could provide an explicit URL of the celery configuration with `CELERY_CONFIG_URI`
 
 .. code::
