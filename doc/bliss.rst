@@ -50,7 +50,7 @@ In this example we register a job monitor (you only ever need one) and one worke
     directory=/users/opid00/
     user=opid00
     environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
-    startsecs=2
+    startsecs=5
     autostart=true
     redirect_stderr=true
     stdout_logfile=/var/log/%(program_name)s.log
@@ -63,7 +63,7 @@ In this example we register a job monitor (you only ever need one) and one worke
     directory=/users/opid00/
     user=opid00
     environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
-    startsecs=2
+    startsecs=5
     autostart=true
     redirect_stderr=true
     stdout_logfile=/var/log/%(program_name)s.log
