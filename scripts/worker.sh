@@ -14,4 +14,4 @@ else
     export CELERY_CONFIG_URI=$SCRIPT_DIR/celeryconfig_sql.py
 fi
 
-celery -A ewoksjob.apps.ewoks worker "${@:2}"
+(cd $SCRIPT_DIR; celery -A ewoksjob.apps.ewoks worker "${@:2}")
