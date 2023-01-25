@@ -16,7 +16,7 @@ When using conda, create a conda environment for the worker (called `ewoksworker
 
 .. code:: bash
 
-    conda create --name ewoksworker python=3.7
+    conda create --name ewoksworker python=3.8
 
 Activate the environment
 
