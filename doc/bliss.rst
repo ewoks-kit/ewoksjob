@@ -37,7 +37,17 @@ Some beamlines may want multiple environments for different scientific software.
 Supervisor
 ----------
 
-In this example we register a job monitor (you only ever need one) and one worker (you may need more than one)
+The supervisor config should be created in `/users/blissadm/local/daemon/config/supervisor.d`. 
+
+At each change, the configuration must be reloaded in `supervisor` through `supervisorctl`. 
+
+For this, run `supervisorctl` to enter supervisor's shell and then the following commands:
+  - `reread`: to check changes in the config. It should print that the `ewoks` config changed
+  - `update`: to apply changes in the config.
+
+Other `supervisorctl` commands can be listed with `help`.
+
+Below is an example that registers a job monitor (you only ever need one) and one worker (you may need more than one).
 
 .. code::
 
@@ -111,6 +121,14 @@ This is only needed when workflows are triggered directly from *BLISS*.
 
 When triggering workflows, either the `BEACON_HOST` or `CELERY_CONFIG_URI` environment variables need to be provided.
 When triggering directly from *BLISS*, the `BEACON_HOST` environment variable is already set so nothing extra to do.
+
+.. note::
+    
+    For `bliss<=1.9`, `blissdata` must be installed separately
+
+    .. code:: bash
+
+        python3 -m pip install blissdata
 
 Ewoks configuration
 -------------------
