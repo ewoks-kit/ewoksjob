@@ -9,8 +9,8 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import Future
 
 try:
-    from pyslurmutils.futures import SlurmExecutor
-    from pyslurmutils.futures import Future as SlurmFuture
+    from pyslurmutils.concurrent.futures import SlurmExecutor
+    from pyslurmutils.concurrent.futures import Future as SlurmFuture
 except ImportError:
     SlurmExecutor = None
 

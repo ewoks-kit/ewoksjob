@@ -8,8 +8,8 @@ import weakref
 from celery.concurrency import thread
 
 try:
-    from pyslurmutils.futures import SlurmExecutor
-    from pyslurmutils.client.errors import SlurmError
+    from pyslurmutils.concurrent.futures import SlurmExecutor
+    from pyslurmutils.concurrent.client.errors import SlurmError
 except ImportError:
     SlurmExecutor = None
 
