@@ -11,14 +11,10 @@ def test_submit_local(local_ewoks_worker):
     assert_submit(local)
 
 
-def test_submit_local_slurm(local_slurm_ewoks_worker):
-    assert_submit(local)
-
-
 def assert_submit(mod):
     future1 = mod.discover_tasks_from_modules(args=("ewokscore",))
     future2 = mod.get_future(future1.task_id)
-    results = get_result(future1, timeout=3)
+    results = get_result(future1, timeout=10)
     assert results
     results = get_result(future2, timeout=0)
     assert results

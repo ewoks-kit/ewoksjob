@@ -61,29 +61,29 @@ The configuration can be declared in a
     - beacon:///ewoks/config.yml
     - beacon://id22:25000/ewoks/config.yml
 
-If the *celery* configuration is a python module, you can select the configuration with this environment variable
+The configuration URI can be provided as an environment variable
 
 .. code:: bash
 
-    export CELERY_CONFIG_MODULE=myproject.celeryconfig
+    export EWOKS_CONFIG_URI=myproject.config
 
-By default `CELERY_CONFIG_MODULE=celeryconfig`.
-
-If the *celery* configuration is not a python module, you can select the configuration with these environment variables
+In case of a Beacon URL that has `/ewoks/config.yml`
 
 .. code:: bash
 
-    export CELERY_LOADER=ewoksjob.config.EwoksLoader
-    export CELERY_CONFIG_URI=myproject.celeryconfig
+    export EWOKS_CONFIG_URI=beacon://hostname:25000/ewoks/config.yml
 
-When `CELERY_CONFIG_URI=beacon:///ewoks/config.yml` you can do this instead
+it is enough to specify the `BEACON_HOST` environment variable
 
 .. code:: bash
 
-    export CELERY_LOADER=ewoksjob.config.EwoksLoader
-    export BEACON_HOST=localhost:25000
+    export BEACON_HOST=hostname:25000
 
-Note: the environment variable *CELERY_LOADER* is not required to be set manually on the client side because *ewoksjob* does it for you.
+On the worker side, the configuration URI can also be provided as a CLI argument
+
+.. code:: bash
+
+    ewoksjob --config=myproject.config worker
 
 Worker side
 -----------
@@ -92,7 +92,7 @@ Launch a worker which serves the ewoks application
 
 .. code:: bash
 
-    celery -A ewoksjob.apps.ewoks worker
+    ewoksjob worker
 
 Client side
 -----------

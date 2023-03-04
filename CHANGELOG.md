@@ -1,6 +1,14 @@
 # CHANGELOG.md
 
+## 0.3.0 (unreleased)
+
 ## 0.2.0 (unreleased)
+
+Changes:
+  - Refactor Slurm pool to use gevent
+
+New features:
+  - add console script `ewoksjob` to start worker and monitor
 
 ## 0.1.1
 

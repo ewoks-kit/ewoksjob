@@ -7,7 +7,7 @@ __all__ = [
     "get_future",
     "cancel",
     "get_result",
-    "get_not_finished",
+    "get_not_finished_task_ids",
     "get_not_finished_futures",
 ]
 
@@ -32,7 +32,7 @@ def get_result(task_id, **kwargs):
         return future.get(**kwargs)
 
 
-def get_not_finished():
+def get_not_finished_task_ids():
     inspect = current_app.control.inspect()
     task_ids = list()
 
@@ -55,5 +55,5 @@ def get_not_finished():
 
 
 def get_not_finished_futures() -> List[AsyncResult]:
-    lst = [get_future(task_id) for task_id in get_not_finished()]
+    lst = [get_future(task_id) for task_id in get_not_finished_task_ids()]
     return [future for future in lst if future is not None]

@@ -52,13 +52,17 @@ class EwoksLoader(Loader):
 
 def get_cfg_uri() -> str:
     """Returns the celery configuration URI based on environment variables."""
-    cfg_uri = os.environ.get("CELERY_CONFIG_URI")
+    cfg_uri = os.environ.get("EWOKS_CONFIG_URI")
+    if cfg_uri:
+        return cfg_uri
+    cfg_uri = os.environ.get("CELERY_CONFIG_URI")  # deprecate?
     if cfg_uri:
         return cfg_uri
     beacon_host = os.environ.get("BEACON_HOST", None)
     if beacon_host:
         return "beacon:///ewoks/config.yml"
     cfg_uri = os.environ.get("CELERY_CONFIG_MODULE")
+    # the CLI option --config sets this environment variable
     if cfg_uri:
         return cfg_uri
     return ""

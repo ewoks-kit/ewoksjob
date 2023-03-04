@@ -6,16 +6,16 @@ with specific hardware
 
 .. code:: bash
 
-    celery -A ewoksjob.apps.ewoks worker -Q cpuworker
-    celery -A ewoksjob.apps.ewoks worker -Q gpuworker --pool=solo
-    celery -A ewoksjob.apps.ewoks worker -Q slurmworker --pool=slurm
+    ewoksjob worker -Q cpuworker
+    ewoksjob worker -Q gpuworker --pool=solo
+    ewoksjob worker -Q slurmworker --pool=slurm
 
 Or you can have workers with different environments
 
 .. code:: bash
 
-    conda activate xrf; celery -A ewoksjob.apps.ewoks worker -Q xrf
-    conda activate xrpd; celery -A ewoksjob.apps.ewoks worker -Q xrpd
+    conda activate xrf; ewoksjob worker -Q xrf
+    conda activate xrpd; ewoksjob worker -Q xrpd
 
 The client can then select a specific worker
 
@@ -27,7 +27,7 @@ If you don't have workers without a queue
 
 .. code:: bash
 
-    celery -A ewoksjob.apps.ewoks worker
+    ewoksjob worker
 
 you can add a default queue to the celery configuration
 

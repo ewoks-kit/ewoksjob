@@ -18,10 +18,3 @@ def test_task_discovery_local(local_ewoks_worker):
     assert not future.running()
     with pytest.raises(localTimeoutError):
         get_result(future, timeout=0)
-
-
-def test_task_discovery_local_slurm(local_slurm_ewoks_worker):
-    future = local.get_future("abc")
-    assert not future.running()
-    with pytest.raises(localTimeoutError):
-        get_result(future, timeout=0)

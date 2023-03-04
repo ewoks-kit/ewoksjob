@@ -56,10 +56,10 @@ Below is an example that registers a job monitor (you only ever need one) and on
     priority=900
 
     [program:ewoksmonitor]
-    command=bash -c "source /users/blissadm/conda/miniconda/bin/activate ewoksworker && celery flower"
+    command=bash -c "source /users/blissadm/conda/miniconda/bin/activate ewoksworker && ewoksjob monitor"
     directory=/users/opid00/
     user=opid00
-    environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
+    environment=BEACON_HOST="id00:25000"
     startsecs=5
     autostart=true
     redirect_stderr=true
@@ -69,10 +69,10 @@ Below is an example that registers a job monitor (you only ever need one) and on
     stdout_capture_maxbytes=1MB
 
     [program:ewoksworker]
-    command=bash -c "source /users/blissadm/conda/miniconda/bin/activate ewoksworker && celery -A ewoksjob.apps.ewoks worker"
+    command=bash -c "source /users/blissadm/conda/miniconda/bin/activate ewoksworker && ewoksjob worker"
     directory=/users/opid00/
     user=opid00
-    environment=BEACON_HOST="id00:25000",CELERY_LOADER="ewoksjob.config.EwoksLoader"
+    environment=BEACON_HOST="id00:25000"
     startsecs=5
     autostart=true
     redirect_stderr=true
@@ -89,17 +89,17 @@ with the correct user to see where the conda activation script is located.
 The working directory is important if the beamline wants to quickly add workflow tasks (i.e. without pip-installing a python project).
 In this case `directory=/users/opid00/ewoks` is probably more appropriate. All `.py` files in this directory can contain ewoks tasks.
 
-Instead of `BEACON_HOST="id00:25000"` you could provide an explicit URL of the celery configuration with `CELERY_CONFIG_URI`
+Instead of `BEACON_HOST="id00:25000"` you could provide an explicit URL of the celery configuration with `EWOKS_CONFIG_URI`
 
 .. code::
 
     [program:ewoksmonitor]
     ...
-    environment=CELERY_CONFIG_URI="beacon:///id00:25000/ewoks/config.yml",CELERY_LOADER="ewoksjob.config.EwoksLoader"
+    environment=EWOKS_CONFIG_URI="beacon:///id00:25000/ewoks/config.yml"
 
     [program:ewoksworker]
     ...
-    environment=CELERY_CONFIG_URI="beacon:///id00:25000/ewoks/config.yml",CELERY_LOADER="ewoksjob.config.EwoksLoader"
+    environment=EWOKS_CONFIG_URI="beacon:///id00:25000/ewoks/config.yml"
 
 *BLISS* environment
 -------------------
@@ -119,7 +119,7 @@ Install the client dependencies
 
 This is only needed when workflows are triggered directly from *BLISS*.
 
-When triggering workflows, either the `BEACON_HOST` or `CELERY_CONFIG_URI` environment variables need to be provided.
+When triggering workflows, either the `BEACON_HOST` or `EWOKS_CONFIG_URI` environment variables need to be provided.
 When triggering directly from *BLISS*, the `BEACON_HOST` environment variable is already set so nothing extra to do.
 
 .. note::

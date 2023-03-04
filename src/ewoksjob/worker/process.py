@@ -24,7 +24,7 @@ class TaskPool(base.BasePool):
     can create child processes without the need for billiard.
     """
 
-    executor_options = dict()
+    EXECUTOR_OPTIONS = dict()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -34,7 +34,7 @@ class TaskPool(base.BasePool):
     def _ensure_executor(self):
         if self._executor is None:
             logger.info("Start executor ...")
-            mp_context = get_context(self.executor_options.get("context"))
+            mp_context = get_context(self.EXECUTOR_OPTIONS.get("context"))
             initargs = self.options["initargs"]
             self._executor = ProcessPoolExecutor(
                 max_workers=self.limit,
@@ -42,8 +42,8 @@ class TaskPool(base.BasePool):
                 initargs=initargs,
                 mp_context=mp_context,
             )
-            if self.executor_options.get("precreate"):
-                timeout = self.executor_options.get("timeout", 10)
+            if self.EXECUTOR_OPTIONS.get("precreate"):
+                timeout = self.EXECUTOR_OPTIONS.get("timeout", 10)
                 logger.info("Pre-create workers ...")
                 try:
                     self._executor.submit(os.getpid).result(timeout=timeout)

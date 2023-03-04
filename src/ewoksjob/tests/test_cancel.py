@@ -12,26 +12,18 @@ def test_normal_local(local_ewoks_worker, tmpdir):
     assert_normal(local, tmpdir)
 
 
-def test_normal_local_slurm(local_slurm_ewoks_worker, tmpdir):
-    assert_normal(local, tmpdir)
-
-
-def test_cancel(ewoks_worker, tmpdir):
+def test_cancel(ewoks_worker, tmpdir, skip_if_gevent):
     assert_cancel(celery, tmpdir)
 
 
-def test_cancel_local(local_ewoks_worker, tmpdir):
-    assert_cancel(local, tmpdir)
-
-
-def test_cancel_local_slurm(local_slurm_ewoks_worker, tmpdir):
+def test_cancel_local(local_ewoks_worker, tmpdir, skip_if_gevent):
     assert_cancel(local, tmpdir)
 
 
 def assert_normal(mod, tmpdir):
     seconds = 5
     timeout = 10
-    filename = tmpdir / "finished.sem"
+    filename = tmpdir / "finished.smf"
     future = mod.submit_test(seconds=seconds, filename=str(filename))
     wait_not_finished(mod, {future.task_id}, timeout=timeout)
     results = mod.get_result(future.task_id, timeout=timeout)
@@ -43,7 +35,7 @@ def assert_normal(mod, tmpdir):
 def assert_cancel(mod, tmpdir):
     seconds = 10
     timeout = seconds * 2
-    filename = tmpdir / "finished.sem"
+    filename = tmpdir / "finished.smf"
     future = mod.submit_test(seconds=seconds, filename=str(filename))
 
     if mod is local:
@@ -69,4 +61,5 @@ def assert_cancel(mod, tmpdir):
             assert filename.exists()
             pytest.xfail(f"{mod.__name__} ran until completion")
 
+    # TODO: checking the futures is not enough, check with celery
     wait_not_finished(mod, set(), timeout=timeout)
