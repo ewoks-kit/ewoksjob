@@ -9,7 +9,7 @@ from celery.concurrency import thread
 
 try:
     from pyslurmutils.concurrent.futures import SlurmExecutor
-    from pyslurmutils.concurrent.client.errors import SlurmError
+    from pyslurmutils.client.errors import SlurmError
 except ImportError:
     SlurmExecutor = None
 
