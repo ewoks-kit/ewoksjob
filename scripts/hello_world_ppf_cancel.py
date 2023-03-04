@@ -71,7 +71,7 @@ if __name__ == "__main__":
         kwargs={
             "varinfo": varinfo,
             "inputs": inputs,
-            "binding": "ppf",
+            "engine": "ppf",
             "pool_type": pool_type,
             "scaling_workers": True,
             "max_workers": 5,  # when scaling_workers=False
