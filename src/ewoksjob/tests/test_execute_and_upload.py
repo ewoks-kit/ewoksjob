@@ -24,7 +24,7 @@ def assert_submit(mod):
             "proposal": f"id00{time.strftime('%y%m')}",
             "dataset": "testdataset",
             "path": "/path/to/localed/dataset",
-            "sample": "testsample",
+            "metadata": {"Sample_name": "test"},
             "raw": "/path/to/raw/dataset",
         }
     }
