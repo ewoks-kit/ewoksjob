@@ -8,6 +8,7 @@ EXPECTED = {
     "result_serializer": "pickle",
     "accept_content": ["application/json", "application/x-python-serialize"],
     "result_expires": 600,
+    "task_remote_tracebacks": True,
 }
 
 
@@ -44,6 +45,7 @@ def py_config(tmpdir) -> str:
         "result_serializer = 'pickle'\n",
         "accept_content = ['application/json', 'application/x-python-serialize']\n",
         "result_expires = 600\n",
+        "task_remote_tracebacks = True\n",
     ]
     with open(filename, "w") as f:
         f.writelines(lines)
@@ -60,6 +62,7 @@ def yaml_config(tmpdir) -> str:
         "  result_serializer: 'pickle'\n",
         "  accept_content: ['application/json', 'application/x-python-serialize']\n",
         "  result_expires: 600\n",
+        "  task_remote_tracebacks: True\n",
     ]
     with open(filename, "w") as f:
         f.writelines(lines)

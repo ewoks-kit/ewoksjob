@@ -7,3 +7,4 @@ celery:
   result_backend: redis://localhost:6379/4
   result_expires: 600
   result_serializer: pickle
+  task_remote_tracebacks: true
