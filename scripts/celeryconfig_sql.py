@@ -10,3 +10,4 @@ result_backend = f"db+sqlite:///{os.path.join(_DATA_DIR ,'celery_results.db')}"
 result_serializer = "pickle"
 accept_content = ["application/json", "application/x-python-serialize"]
 result_expires = 600
+task_remote_tracebacks = True

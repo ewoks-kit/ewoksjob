@@ -33,6 +33,7 @@ if has_redis_server():
             "result_backend": f"{url}/1",
             "result_serializer": "pickle",
             "accept_content": ["application/json", "application/x-python-serialize"],
+            "task_remote_tracebacks": True,
         }
 
 else:
@@ -46,6 +47,7 @@ else:
             "result_backend": f"db+sqlite:///{tmpdir / 'celery_results.db'}",
             "result_serializer": "pickle",
             "accept_content": ["application/json", "application/x-python-serialize"],
+            "task_remote_tracebacks": True,
         }
 
 
