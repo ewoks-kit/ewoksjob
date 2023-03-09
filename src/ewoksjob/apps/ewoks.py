@@ -6,7 +6,7 @@ import celery
 
 from .. import tasks
 from ..worker.options import add_options
-from ..worker.submit import submit
+from ..worker.task import worker_task
 
 app = celery.Celery("ewoks")
 add_options(app)
@@ -40,17 +40,20 @@ def _allow_cwd_imports(method):
 @app.task(bind=True)
 @_ensure_ewoks_job_id
 @_allow_cwd_imports
+@worker_task
 def execute_graph(self, *args, **kwargs) -> Dict:
-    return submit(tasks.execute_graph, *args, **kwargs)
+    return tasks.execute_graph(*args, **kwargs)
 
 
 @app.task()
 @_allow_cwd_imports
+@worker_task
 def convert_graph(*args, **kwargs) -> Union[str, dict]:
-    return submit(tasks.convert_graph, *args, **kwargs)
+    return tasks.convert_graph(*args, **kwargs)
 
 
 @app.task()
 @_allow_cwd_imports
+@worker_task
 def discover_tasks_from_modules(*args, **kwargs) -> List[dict]:
-    return submit(tasks.discover_tasks_from_modules, *args, **kwargs)
+    return tasks.discover_tasks_from_modules(*args, **kwargs)
