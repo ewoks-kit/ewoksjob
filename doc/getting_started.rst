@@ -147,7 +147,7 @@ Job arguments are the same as the arguments of `ewoks.execute_graph`
     execinfo = {"handlers": handlers}
     args = (workflow,)
     kwargs = {
-        "binding": None,
+        "engine": None,
         "execinfo": execinfo,
         "inputs": inputs,
         "varinfo": varinfo,

@@ -74,7 +74,7 @@ def job_argument():
     workflow, inputs, varinfo = test_workflow()
     args = (workflow,)
     kwargs = {
-        "binding": None,
+        "engine": None,
         "execinfo": execinfo,
         "inputs": inputs,
         "varinfo": varinfo,
