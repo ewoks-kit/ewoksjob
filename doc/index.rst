@@ -12,13 +12,13 @@ Install on the client side
 
 .. code:: bash
 
-    python3 -m pip install ewoksjob[redis]
+    pip install ewoksjob[redis]
 
 Install on the worker side
 
 .. code:: bash
 
-    python3 -m pip install ewoksjob[worker,redis,monitor]
+    pip install ewoksjob[worker,redis,monitor]
 
 The communication between client and worker goes through *Redis*, *RabbitMQ* or *Sqlite3*.
 Depending on which one you choose, the `redis` installation option may vary. Both client and
@@ -50,8 +50,8 @@ Run the tests
 
 .. code:: bash
 
-    python3 -m pip install ewoksjob[test]
-    python3 -m pytest --pyargs ewoksjob.tests
+    pip install ewoksjob[test]
+    pytest --pyargs ewoksjob.tests
 
 Documentation
 -------------

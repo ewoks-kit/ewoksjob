@@ -28,7 +28,7 @@ Install basic worker dependencies
 
 .. code:: bash
 
-    python3 -m pip install ewoksjob[blissworker]
+    pip install ewoksjob[blissworker]
 
 Install the project(s) that implement the actual worker tasks (depends on the beamline).
 
@@ -115,7 +115,7 @@ Install the client dependencies
 .. code:: bash
 
     conda install celery
-    python3 -m pip install ewoksjob
+    pip install ewoksjob
 
 This is only needed when workflows are triggered directly from *BLISS*.
 
@@ -128,7 +128,7 @@ When triggering directly from *BLISS*, the `BEACON_HOST` environment variable is
 
     .. code:: bash
 
-        python3 -m pip install blissdata
+        pip install blissdata
 
 Ewoks configuration
 -------------------
