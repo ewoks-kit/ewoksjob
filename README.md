@@ -64,7 +64,7 @@ scripts/runjobs.sh --sql
 ## Tests
 
 ```bash
-python3 -m pytest --pyargs ewoksjob
+pytest --pyargs ewoksjob
 ```
 
 To run the redis tests you need `redis-server` (e.g. `conda install redis-server`).
