@@ -44,7 +44,7 @@ Start a web server for monitoring jobs
 
 .. code:: bash
 
-    flower
+    celery flower
 
 Run the tests
 
