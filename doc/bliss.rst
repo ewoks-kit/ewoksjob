@@ -124,7 +124,7 @@ When triggering directly from *BLISS*, the `BEACON_HOST` environment variable is
 
 .. note::
     
-    For `bliss<=1.9`, `blissdata` must be installed separately
+    For `bliss<=1.10`, `blissdata` must be installed separately
 
     .. code:: bash
 
