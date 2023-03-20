@@ -8,15 +8,15 @@ Install on the client side
 
 .. code:: bash
 
-    pip install ewoksjob[redis]
+    pip install ewoksjob[redis,sql]
 
 Install on the worker side
 
 .. code:: bash
 
-    pip install ewoksjob[worker,redis]
+    pip install ewoksjob[worker,redis,sql]
 
-The `redis` option may vary, depending on which database/broker is choosen for messaging and data transfer.
+The `redis` and `sql` options are needed when using either for messaging or data transfer.
 
 Configuration
 -------------
@@ -27,14 +27,20 @@ and results are stored
 .. code:: python
 
     # SQLite backend
-    broker_url = f"sqla+sqlite:///{os.path.join(..., 'celery.db')}"
-    result_backend = f"db+sqlite:///{os.path.join(... ,'celery_results.db')}"
+    broker_url = f"sqla+sqlite:///path/to/celery.db"
+    result_backend = f"db+sqlite:///path/to/celery_results.db"
 
     # Redis backend
     broker_url = "redis://localhost:10003/3"
     result_backend = "redis://localhost:10003/4"
 
-Other configurations as available, like the serialization of results (json by default)
+    # RabbitMQ backend
+    broker_url = f"pyamqp://guest@localhost//"
+    result_backend = "rpc://"
+    result_persistent = True
+
+Other backends for results are supported (mongo, memcached). Other configurations as available,
+like the serialization of results (json by default)
 
 .. code:: python
 
@@ -183,3 +189,22 @@ Get intermediate results from ewoks events
     # Get access to all output variables of "task1"
     results = result_event["outputs"]
     assert results.variable_values["return_value"] == 3
+
+Install brokers
+---------------
+
+Redis can be installed using the system package manager or conda
+
+.. code:: bash
+
+    apt install redis-server    # system package
+    conda install redis-server  # conda package
+    redis-server
+
+RabbitMQ can be installed using the system package manager or conda
+
+.. code:: bash
+
+    apt install rabbitmq-server    # system package
+    conda install rabbitmq-server  # conda package
+    rabbitmq-server
