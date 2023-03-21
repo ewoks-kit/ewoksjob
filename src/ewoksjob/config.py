@@ -1,12 +1,13 @@
 import os
 import sys
+import types
 import logging
 import importlib
 from pathlib import Path
 from typing import Tuple
 from urllib.parse import urlparse, ParseResult
 
-from celery.loaders.base import BaseLoader
+from celery.loaders.default import Loader
 from celery import Celery
 
 try:
@@ -17,7 +18,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class EwoksLoader(BaseLoader):
+class EwoksLoader(Loader):
     """Celery loader based on a configuration URI: python file, python module, yaml file, Beacon URL.
 
     Requires the environment variable CELERY_LOADER=ewoksjob.config.EwoksLoader
@@ -28,10 +29,16 @@ class EwoksLoader(BaseLoader):
         super().__init__(app)
 
     def read_configuration(self) -> dict:
+        if "" not in sys.path:
+            # This happens when the python process was launched
+            # through a python console script
+            sys.path.append("")
+
         cfg_uri = get_cfg_uri()
         if not cfg_uri:
-            # Load from module "celeryconfig" or use default configuration
+            # Load from the module "celeryconfig" if available
             return super().read_configuration()
+
         try:
             file_type = get_cfg_type(cfg_uri)
             logger.info(f"Loading celery configuration '{cfg_uri}' (type: {file_type})")
@@ -142,11 +149,10 @@ def _read_py_config(cfg_uri: str) -> dict:
     sys.path.insert(0, sys_path)
     try:
         config = vars(importlib.import_module(module))
-        mtype = type(os)
         config = {
             k: v
             for k, v in config.items()
-            if not k.startswith("_") and not isinstance(v, mtype)
+            if not k.startswith("_") and not isinstance(v, types.ModuleType)
         }
         return config
     finally:
