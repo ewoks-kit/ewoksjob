@@ -1,4 +1,3 @@
-import sys
 from functools import wraps
 from typing import Dict, List, Union
 
@@ -25,35 +24,20 @@ def _ensure_ewoks_job_id(method):
     return wrapper
 
 
-def _allow_cwd_imports(method):
-    """Allows import from the current working directory"""
-
-    @wraps(method)
-    def wrapper(self, *args, **kwargs):
-        if "" not in sys.path:
-            sys.path.append("")
-        return method(self, *args, **kwargs)
-
-    return wrapper
-
-
 @app.task(bind=True)
 @_ensure_ewoks_job_id
-@_allow_cwd_imports
 @worker_task
 def execute_graph(self, *args, **kwargs) -> Dict:
     return tasks.execute_graph(*args, **kwargs)
 
 
 @app.task()
-@_allow_cwd_imports
 @worker_task
 def convert_graph(*args, **kwargs) -> Union[str, dict]:
     return tasks.convert_graph(*args, **kwargs)
 
 
 @app.task()
-@_allow_cwd_imports
 @worker_task
 def discover_tasks_from_modules(*args, **kwargs) -> List[dict]:
     return tasks.discover_tasks_from_modules(*args, **kwargs)
