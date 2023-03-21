@@ -1,5 +1,6 @@
 import os
 import sys
+import types
 import logging
 import importlib
 from pathlib import Path
@@ -142,11 +143,10 @@ def _read_py_config(cfg_uri: str) -> dict:
     sys.path.insert(0, sys_path)
     try:
         config = vars(importlib.import_module(module))
-        mtype = type(os)
         config = {
             k: v
             for k, v in config.items()
-            if not k.startswith("_") and not isinstance(v, mtype)
+            if not k.startswith("_") and not isinstance(v, types.ModuleType)
         }
         return config
     finally:
