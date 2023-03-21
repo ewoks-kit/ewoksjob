@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Tuple
 from urllib.parse import urlparse, ParseResult
 
-from celery.loaders.base import BaseLoader
+from celery.loaders.default import Loader
 from celery import Celery
 
 try:
@@ -18,7 +18,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class EwoksLoader(BaseLoader):
+class EwoksLoader(Loader):
     """Celery loader based on a configuration URI: python file, python module, yaml file, Beacon URL.
 
     Requires the environment variable CELERY_LOADER=ewoksjob.config.EwoksLoader
@@ -29,10 +29,16 @@ class EwoksLoader(BaseLoader):
         super().__init__(app)
 
     def read_configuration(self) -> dict:
+        if "" not in sys.path:
+            # This happens when the python process was launched
+            # through a python console script
+            sys.path.append("")
+
         cfg_uri = get_cfg_uri()
         if not cfg_uri:
-            # Load from module "celeryconfig" or use default configuration
+            # Load from the module "celeryconfig" if available
             return super().read_configuration()
+
         try:
             file_type = get_cfg_type(cfg_uri)
             logger.info(f"Loading celery configuration '{cfg_uri}' (type: {file_type})")
