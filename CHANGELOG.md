@@ -2,6 +2,11 @@
 
 ## 0.3.0 (unreleased)
 
+## 0.2.1
+
+Bug fixes:
+  - Install `gevent` when installing with the [slurm] option
+
 ## 0.2.0
 
 Changes:
