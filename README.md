@@ -31,7 +31,7 @@ pip install ewoksjob[worker]
 Start a worker pool that can execute ewoks graphs
 
 ```bash
-celery -A ewoksjob.apps.ewoks worker
+ewoksjob worker
 ```
 
 Start a workflow on the client side

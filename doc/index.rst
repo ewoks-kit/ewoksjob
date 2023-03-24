@@ -28,7 +28,7 @@ Start a worker that can execute *ewoks* graphs
 
 .. code:: bash
 
-    celery -A ewoksjob.apps.ewoks worker
+    ewoksjob worker
 
 Start a workflow from python, possible from another machine
 
@@ -44,7 +44,7 @@ Start a web server for monitoring jobs
 
 .. code:: bash
 
-    celery flower
+    ewoksjob monitor
 
 Run the tests
 

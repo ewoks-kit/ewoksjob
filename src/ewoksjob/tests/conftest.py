@@ -1,9 +1,12 @@
 import gc
 import os
 import pytest
+
 from ewokscore import events
-from ewoksjob.events.readers import instantiate_reader
 from ewokscore.events import cleanup
+from ewoksjob.events.readers import instantiate_reader
+from ewoksjob.worker import options as worker_options
+
 from .utils import has_redis_server
 from ..client import local
 
@@ -57,7 +60,11 @@ def celery_includes():
 
 
 @pytest.fixture(scope="session")
-def celery_worker_parameters():
+def celery_worker_parameters(slurm_config):
+    if _use_slurm_pool():
+        rmap = {v: k for k, v in worker_options.SLURM_NAME_MAP.items()}
+        options = {rmap[k]: v for k, v in slurm_config.items()}
+        worker_options.apply_worker_options(options)
     return {"loglevel": "debug"}
 
 
@@ -66,8 +73,29 @@ def celery_worker_pool():
     if os.name == "nt":
         # "prefork" nor "process" works on windows
         return "solo"
+    elif _use_slurm_pool():
+        return "slurm"
     else:
         return "process"
+
+
+def _use_slurm_pool() -> bool:
+    return gevent_patched()
+
+
+def gevent_patched() -> bool:
+    try:
+        from gevent.monkey import is_anything_patched
+    except ImportError:
+        return False
+
+    return is_anything_patched()
+
+
+@pytest.fixture()
+def skip_if_gevent():
+    if gevent_patched():
+        pytest.skip("not supported with gevent yet")
 
 
 @pytest.fixture()
@@ -78,17 +106,14 @@ def ewoks_worker(celery_session_worker, celery_worker_pool):
 
 
 @pytest.fixture(scope="session")
-def local_ewoks_worker():
-    with local.pool_context(max_workers=8) as pool:
-        yield
-        while gc.collect():
-            pass
-        assert len(pool._tasks) == 0
-
-
-@pytest.fixture(scope="session")
-def local_slurm_ewoks_worker(slurm_config):
-    with local.pool_context(pool_type="slurm", max_workers=8, **slurm_config) as pool:
+def local_ewoks_worker(slurm_config):
+    kw = {"max_workers": 8}
+    if _use_slurm_pool():
+        pool_type = "slurm"
+        kw.update(slurm_config)
+    else:
+        pool_type = None
+    with local.pool_context(pool_type=pool_type, **kw) as pool:
         yield
         while gc.collect():
             pass

@@ -1,11 +1,14 @@
+"""Celery ewoks application"""
+
 from functools import wraps
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Callable
 
 import celery
+import ewoks
+from ewokscore import task_discovery
 
-from .. import tasks
 from ..worker.options import add_options
-from ..worker.task import worker_task
+from ..worker.task import worker_execute_wrapper
 
 app = celery.Celery("ewoks")
 add_options(app)
@@ -26,18 +29,35 @@ def _ensure_ewoks_job_id(method):
 
 @app.task(bind=True)
 @_ensure_ewoks_job_id
-@worker_task
+@worker_execute_wrapper
 def execute_graph(self, *args, **kwargs) -> Dict:
-    return tasks.execute_graph(*args, **kwargs)
+    return ewoks.execute_graph(*args, **kwargs)
 
 
 @app.task()
-@worker_task
+@worker_execute_wrapper
 def convert_graph(*args, **kwargs) -> Union[str, dict]:
-    return tasks.convert_graph(*args, **kwargs)
+    return ewoks.convert_graph(*args, **kwargs)
 
 
 @app.task()
-@worker_task
+@worker_execute_wrapper
 def discover_tasks_from_modules(*args, **kwargs) -> List[dict]:
-    return tasks.discover_tasks_from_modules(*args, **kwargs)
+    return task_discovery.discover_tasks_from_modules(*args, **kwargs)
+
+
+_TASK_MAPPING: Dict[Callable, Callable] = {
+    "execute_graph": ewoks.execute_graph,
+    "convert_graph": ewoks.convert_graph,
+    "discover_tasks_from_modules": task_discovery.discover_tasks_from_modules,
+}
+
+_BOUND_TASKS = {"execute_graph"}
+
+
+def get_ewoks_task_from_celery_task(celery_task: Callable) -> Callable:
+    return _TASK_MAPPING[celery_task.__name__]
+
+
+def celery_task_is_bound(celery_task: Callable) -> Callable:
+    return celery_task.__name__ in _BOUND_TASKS

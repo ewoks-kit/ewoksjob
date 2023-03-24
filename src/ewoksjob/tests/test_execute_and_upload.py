@@ -10,7 +10,7 @@ def test_submit(ewoks_worker):
     assert_submit(celery)
 
 
-def test_submit_local_slurm(local_slurm_ewoks_worker):
+def test_submit_local(local_ewoks_worker):
     assert_submit(local)
 
 
@@ -30,4 +30,4 @@ def assert_submit(mod):
     }
     future1 = mod.submit(args=(graph,), kwargs=kwargs)
     with pytest.raises(RuntimeError, match="requires pyicat-plus"):
-        get_result(future1, timeout=3)
+        get_result(future1, timeout=10)

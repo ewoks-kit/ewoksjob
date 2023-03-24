@@ -7,7 +7,7 @@ __all__ = [
     "get_future",
     "cancel",
     "get_result",
-    "get_not_finished",
+    "get_not_finished_task_ids",
     "get_not_finished_futures",
 ]
 
@@ -30,11 +30,13 @@ def get_result(task_id, **kwargs):
         return future.result(**kwargs)
 
 
-def get_not_finished() -> list:
+def get_not_finished_task_ids() -> list:
+    """Get all task ID's that are not finished"""
     pool = get_active_pool()
-    return pool.get_not_finished()
+    return pool.get_not_finished_task_ids()
 
 
 def get_not_finished_futures() -> List[Future]:
-    lst = [get_future(task_id) for task_id in get_not_finished()]
+    """Get all futures that are not finished"""
+    lst = [get_future(task_id) for task_id in get_not_finished_task_ids()]
     return [future for future in lst if future is not None]

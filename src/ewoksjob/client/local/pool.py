@@ -9,10 +9,10 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import Future
 
 try:
-    from pyslurmutils.concurrent.futures import SlurmExecutor
-    from pyslurmutils.concurrent.futures import Future as SlurmFuture
+    from pyslurmutils.concurrent.futures import SlurmRestExecutor
+    from pyslurmutils.client.job_io.file_io import Future as SlurmFuture
 except ImportError:
-    SlurmExecutor = None
+    SlurmRestExecutor = None
 
 
 __all__ = ["get_active_pool", "pool_context"]
@@ -42,7 +42,17 @@ def pool_context(*args, **kwargs):
 
 
 class _LocalPool:
-    def __init__(self, *args, pool_type="process", context="spawn", **kwargs) -> None:
+    def __init__(
+        self,
+        *args,
+        pool_type: Optional[str] = None,
+        context: Optional[str] = None,
+        **kwargs,
+    ) -> None:
+        if pool_type is None:
+            pool_type = "process"
+        if context is None:
+            context = "spawn"
         if pool_type == "process":
             if context:
                 if sys.version_info >= (3, 7):
@@ -53,9 +63,9 @@ class _LocalPool:
         elif pool_type == "thread":
             self._executor = ThreadPoolExecutor(*args, **kwargs)
         elif pool_type == "slurm":
-            if SlurmExecutor is None:
+            if SlurmRestExecutor is None:
                 raise RuntimeError("requires pyslurmutils")
-            self._executor = SlurmExecutor(*args, **kwargs)
+            self._executor = SlurmRestExecutor(*args, **kwargs)
         else:
             raise ValueError(f"Unknown pool type '{pool_type}'")
         self._pool_type = pool_type
@@ -105,14 +115,19 @@ class _LocalPool:
     def get_future(self, task_id):
         future = self._tasks.get(task_id)
         if future is None:
-            if self.pool_type == "slurm":
-                future = SlurmFuture(0, self._executor.io_handler)
-            else:
-                future = Future()
-            self._patch_future(future, self.generate_task_id(task_id))
+            return self._get_dummy_future(task_id)
         return future
 
-    def get_not_finished(self) -> list:
+    def _get_dummy_future(self, task_id):
+        if self.pool_type == "slurm":
+            future = SlurmFuture(0, "", self._executor.client.io_handler)
+        else:
+            future = Future()
+        self._patch_future(future, self.generate_task_id(task_id))
+        return future
+
+    def get_not_finished_task_ids(self) -> list:
+        """Get all task ID's that are not finished"""
         return [task_id for task_id, future in self._tasks.items() if not future.done()]
 
     def _patch_future(self, future, task_id):

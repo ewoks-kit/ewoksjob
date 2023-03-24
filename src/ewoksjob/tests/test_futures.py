@@ -17,10 +17,6 @@ def test_futures_local(local_ewoks_worker):
     assert_futures(local)
 
 
-def test_futures_local_slurm(local_slurm_ewoks_worker):
-    assert_futures(local)
-
-
 def assert_futures(mod):
     seconds = 2
     timeout = seconds * 4

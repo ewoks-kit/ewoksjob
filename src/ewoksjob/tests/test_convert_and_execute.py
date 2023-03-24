@@ -14,11 +14,6 @@ def test_submit_local(local_ewoks_worker, tmpdir):
     assert_submit_test(local, tmpdir)
 
 
-def test_submit_local_slurm(local_slurm_ewoks_worker, tmpdir):
-    assert_submit(local, tmpdir)
-    assert_submit_test(local, tmpdir)
-
-
 def assert_submit(mod, tmpdir):
     graph, expected = get_graph("acyclic1")
     expected = expected["task6"]
@@ -27,7 +22,7 @@ def assert_submit(mod, tmpdir):
     kwargs = {"save_options": {"indent": 2}, "convert_destination": str(filename)}
     future1 = mod.submit(args=args, kwargs=kwargs)
     future2 = mod.get_future(future1.task_id)
-    results = get_result(future1, timeout=3)
+    results = get_result(future1, timeout=10)
     assert results == expected
     results = get_result(future2, timeout=0)
     assert results == expected
@@ -39,7 +34,7 @@ def assert_submit_test(mod, tmpdir):
     kwargs = {"save_options": {"indent": 2}, "convert_destination": str(filename)}
     future1 = mod.submit_test(kwargs=kwargs)
     future2 = mod.get_future(future1.task_id)
-    results = get_result(future1, timeout=3)
+    results = get_result(future1, timeout=10)
     assert results == {"return_value": True}
     results = get_result(future2, timeout=0)
     assert results == {"return_value": True}

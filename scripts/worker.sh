@@ -9,9 +9,9 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export CELERY_LOADER=ewoksjob.config.EwoksLoader
 
 if [[ $1 == "--redis" ]];then
-    export CELERY_CONFIG_URI=$SCRIPT_DIR/celeryconfig_redis.py
+    export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_redis.py
 else
-    export CELERY_CONFIG_URI=$SCRIPT_DIR/celeryconfig_sql.py
+    export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_sql.py
 fi
 
-(cd $SCRIPT_DIR; celery -A ewoksjob.apps.ewoks worker "${@:2}")
+(cd $SCRIPT_DIR; ewoksjob worker "${@:2}")

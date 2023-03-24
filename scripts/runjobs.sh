@@ -8,10 +8,10 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [[ $1 == "--redis" ]];then
     echo "RUN REDIS JOBS"
-    export CELERY_CONFIG_URI=$SCRIPT_DIR/celeryconfig_redis.py
+    export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_redis.py
 else
     echo "RUN SQL JOBS"
-    export CELERY_CONFIG_URI=$SCRIPT_DIR/celeryconfig_sql.py
+    export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_sql.py
 fi
 
 echo "RUN example_with_events.py"

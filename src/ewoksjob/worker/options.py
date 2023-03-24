@@ -1,12 +1,16 @@
+import os
+import getpass
 from typing import Dict
 from multiprocessing import get_context
 from multiprocessing import get_all_start_methods
+
 from click import Choice
 from celery import Celery
 from celery import bootsteps
 from celery import concurrency
 from celery.bin import worker
 from celery.bin.base import CeleryOption
+
 from .slurm import TaskPool as SlurmTaskPool
 from .process import TaskPool as ProcessTaskPool
 
@@ -28,9 +32,13 @@ def add_options(app: Celery) -> None:
 
 class CustomWorkersBootStep(bootsteps.Step):
     def __init__(self, parent, **options):
-        SlurmTaskPool.executor_options = _extract_slurm_options(options)
-        ProcessTaskPool.executor_options = _extract_process_options(options)
+        apply_worker_options(options)
         super().__init__(parent, **options)
+
+
+def apply_worker_options(options):
+    SlurmTaskPool.EXECUTOR_OPTIONS = _extract_slurm_options(options)
+    ProcessTaskPool.EXECUTOR_OPTIONS = _extract_process_options(options)
 
 
 def _add_slurm_pool_options(app: Celery) -> None:
@@ -38,6 +46,7 @@ def _add_slurm_pool_options(app: Celery) -> None:
         CeleryOption(
             ["--slurm-url"],
             required=False,
+            default=os.environ.get("SLURM_URL"),
             help="SLURM REST URL",
             help_group="Slurm Pool Options",
         )
@@ -46,6 +55,7 @@ def _add_slurm_pool_options(app: Celery) -> None:
         CeleryOption(
             ["--slurm-token"],
             required=False,
+            default=os.environ.get("SLURM_TOKEN"),
             help="SLURM REST access token",
             help_group="Slurm Pool Options",
         )
@@ -54,6 +64,7 @@ def _add_slurm_pool_options(app: Celery) -> None:
         CeleryOption(
             ["--slurm-user"],
             required=False,
+            default=os.environ.get("SLURM_USER", getpass.getuser()),
             help="SLURM user name",
             help_group="Slurm Pool Options",
         )
@@ -99,6 +110,14 @@ def _add_slurm_pool_options(app: Celery) -> None:
             help_group="Slurm Pool Options",
         )
     )
+    app.user_options["preload"].add(
+        CeleryOption(
+            ["--slurm-python-cmd"],
+            required=False,
+            help="Python command (Default: python3)",
+            help_group="Slurm Pool Options",
+        )
+    )
 
 
 def _add_process_pool_options(app: Celery) -> None:
@@ -124,18 +143,23 @@ def _add_process_pool_options(app: Celery) -> None:
     )
 
 
+SLURM_NAME_MAP = {
+    "slurm_url": "url",
+    "slurm_user": "user_name",
+    "slurm_token": "token",
+    "slurm_log_directory": "log_directory",
+    "slurm_data_directory": "data_directory",
+    "slurm_pre_script": "pre_script",
+    "slurm_post_script": "post_script",
+    "slurm_parameters": "parameters",
+    "slurm_python_cmd": "python_cmd",
+}
+
+
 def _extract_slurm_options(options: Dict) -> dict:
-    namemap = {
-        "slurm_url": "url",
-        "slurm_user": "user_name",
-        "slurm_token": "token",
-        "slurm_log_directory": "log_directory",
-        "slurm_data_directory": "data_directory",
-        "slurm_pre_script": "pre_script",
-        "slurm_post_script": "post_script",
-        "slurm_parameters": "parameters",
+    slurm_options = {
+        name: options.get(option) for option, name in SLURM_NAME_MAP.items()
     }
-    slurm_options = {name: options.get(option) for option, name in namemap.items()}
     parameters = slurm_options.pop("parameters", None)
     if parameters:
         parameters = [s.partition("=") for s in parameters]
@@ -143,11 +167,15 @@ def _extract_slurm_options(options: Dict) -> dict:
     return slurm_options
 
 
+PROCESS_NAME_MAP = {
+    "process_context": "context",
+    "process_no_precreate": "precreate",
+}
+
+
 def _extract_process_options(options: Dict) -> dict:
-    namemap = {
-        "process_context": "context",
-        "process_no_precreate": "precreate",
+    process_options = {
+        name: options.get(option) for option, name in PROCESS_NAME_MAP.items()
     }
-    process_options = {name: options.get(option) for option, name in namemap.items()}
     process_options["precreate"] = not process_options["precreate"]
     return process_options
