@@ -2,9 +2,9 @@ Usage with *BLISS* at the ESRF
 ==============================
 
 For online data processing with *Ewoks*, a beamline needs at least one python environment
-with the scientific libraries installed (conda or anything else) and Ewoks to be
-enabled in the beamline configuration (Beacon). When workflows are triggered from *BLISS*,
-the *BLISS* conda environment needs *ewoksjob* to be installed.
+with the scientific libraries installed (conda or anything else) and Ewoks to be configured
+in Beacon. When workflows are triggered from *BLISS*, the *BLISS* conda environment needs
+the *ewoksjob* python package.
 
 Worker environment
 ------------------
@@ -18,7 +18,7 @@ When using conda, create a conda environment for the worker (called `ewoksworker
 
     conda create --name ewoksworker python=3.8
 
-Activate the environment
+Any python version supported by `ewoksjob` will do. Activate the environment
 
 .. code:: bash
 
@@ -39,15 +39,11 @@ Supervisor
 
 The supervisor config should be created in `/users/blissadm/local/daemon/config/supervisor.d`. 
 
-At each change, the configuration must be reloaded in `supervisor` through `supervisorctl`. 
+Each change made to the configuration must be applied by the `supervisorctl` shell command twice:
+  - `supervisorctl reread`: to check changes in the config. It should print that the `ewoks` config changed.
+  - `supervisorctl update`: to apply changes in the config.
 
-For this, run `supervisorctl` to enter supervisor's shell and then the following commands:
-  - `reread`: to check changes in the config. It should print that the `ewoks` config changed
-  - `update`: to apply changes in the config.
-
-Other `supervisorctl` commands can be listed with `help`.
-
-Below is an example that registers a job monitor (you only ever need one) and one worker (you may need more than one).
+This is an example that registers a job monitor (you only ever need one) and one worker (you may need more than one):
 
 .. code::
 
@@ -124,14 +120,14 @@ When triggering directly from *BLISS*, the `BEACON_HOST` environment variable is
 
 .. note::
     
-    For `bliss<=1.10`, `blissdata` must be installed separately
+    For `bliss <1.11`, `blissdata` must be installed separately
 
     .. code:: bash
 
         pip install blissdata
 
-Ewoks configuration
--------------------
+Beacon configuration
+--------------------
 
 Ewoks must be configured in the beamline configuration (Beacon). For example
 
