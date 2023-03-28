@@ -103,7 +103,7 @@ def _add_slurm_pool_options(app: Celery) -> None:
     )
     app.user_options["preload"].add(
         CeleryOption(
-            ["-sp", "--slurm-parameters"],
+            ["-sp", "--slurm-parameter", "slurm_parameters"],
             required=False,
             multiple=True,
             help="SLURM job parameters (-sp NAME=VALUE). See https://slurm.schedmd.com/rest_api.html#v0.0.38_job_properties",
