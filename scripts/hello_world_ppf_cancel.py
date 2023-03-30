@@ -71,8 +71,6 @@ if __name__ == "__main__":
         kwargs={
             "varinfo": varinfo,
             "inputs": inputs,
-            "outputs": [{"all": True}],
-            "merge_outputs": True,
             "engine": "ppf",
             "pool_type": pool_type,
             "scaling_workers": True,
