@@ -1,6 +1,7 @@
 import os
 import getpass
-from typing import Dict
+import json
+from typing import Dict, Tuple, Any
 from multiprocessing import get_context
 from multiprocessing import get_all_start_methods
 
@@ -106,7 +107,7 @@ def _add_slurm_pool_options(app: Celery) -> None:
             ["-sp", "--slurm-parameter", "slurm_parameters"],
             required=False,
             multiple=True,
-            help="SLURM job parameters (-sp NAME=VALUE). See https://slurm.schedmd.com/rest_api.html#v0.0.38_job_properties",
+            help="SLURM job parameters (-sp NAME=VALUE).",
             help_group="Slurm Pool Options",
         )
     )
@@ -162,9 +163,22 @@ def _extract_slurm_options(options: Dict) -> dict:
     }
     parameters = slurm_options.pop("parameters", None)
     if parameters:
-        parameters = [s.partition("=") for s in parameters]
-        slurm_options["parameters"] = {p[0]: p[2] for p in parameters if p[2]}
+        slurm_options["parameters"] = dict(
+            _parse_slurm_parameter(p) for p in parameters
+        )
     return slurm_options
+
+
+def _parse_slurm_parameter(parameter: str) -> Tuple[str, Any]:
+    name, _, value = parameter.partition("=")
+    return name, _parse_value(value)
+
+
+def _parse_value(value: str) -> Any:
+    try:
+        return json.loads(value)
+    except Exception:
+        return value
 
 
 PROCESS_NAME_MAP = {
