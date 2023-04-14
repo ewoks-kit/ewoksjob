@@ -1,6 +1,15 @@
 import time
+
 import pytest
 from ewokscore.tests.examples.graphs import get_graph
+
+try:
+    import pyicat_plus  # noqa F401
+
+    ICAT_ERROR_MSG = "The message queue URL's are missing"
+except ImportError:
+    ICAT_ERROR_MSG = "requires pyicat-plus"
+
 from ..client import celery
 from ..client import local
 from .utils import get_result
@@ -29,5 +38,5 @@ def assert_submit(mod):
         }
     }
     future1 = mod.submit(args=(graph,), kwargs=kwargs)
-    with pytest.raises(RuntimeError, match="requires pyicat-plus"):
+    with pytest.raises(RuntimeError, match=ICAT_ERROR_MSG):
         get_result(future1, timeout=10)
