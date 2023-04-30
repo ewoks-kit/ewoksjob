@@ -1,4 +1,4 @@
-ewoksjob |release|
+ewoksjob |version|
 ===================
 
 ewoksjob provides utilities for job scheduling of `ewoks <https://ewoks.readthedocs.io/>`_ workflows.
