@@ -1,6 +1,6 @@
 from celery.execute import send_task
 from celery.result import AsyncResult
-from ..test_workflow import test_workflow
+from ..dummy_workflow import dummy_workflow
 
 __all__ = [
     "execute_graph",
@@ -19,7 +19,7 @@ def execute_test_graph(
 ) -> AsyncResult:
     if args:
         raise TypeError("execute_test_graph does not take position arguments")
-    args = (test_workflow(),)
+    args = (dummy_workflow(),)
     if kwargs is None:
         kwargs = dict()
     kwargs["inputs"] = [
