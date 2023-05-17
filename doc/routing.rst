@@ -1,5 +1,5 @@
-Routing
-=======
+Named queues
+============
 
 Workers can have different capabilities. You can have workers
 with specific hardware
@@ -34,3 +34,12 @@ you can add a default queue to the celery configuration
 .. code:: python
 
     task_default_queue = 'cpuworker'
+
+By default a worker is identified by the name `celery@<hostname>`.
+When multiple workers run on the same host you need to provide
+the name yourself to avoid name collision or `celery` will raise a warning. For example
+
+.. code:: bash
+
+    ewoksjob worker -Q worker1 -n worker1@mypcname
+    ewoksjob worker -Q worker2 -n worker2@mypcname
