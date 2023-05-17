@@ -37,7 +37,7 @@ you can add a default queue to the celery configuration
 
 By default a worker is identified by the name `celery@<hostname>`.
 When multiple workers run on the same host you need to provide
-the name yourself to avoid name collision. For example
+the name yourself to avoid name collision or `celery` will raise a warning. For example
 
 .. code:: bash
 
