@@ -5,7 +5,7 @@ def result(value=False, filename=None):
     return value is None
 
 
-def test_workflow():
+def dummy_workflow():
     return {
         "graph": {"id": "sleepgraph", "schema_version": "1.0"},
         "nodes": [
@@ -18,7 +18,7 @@ def test_workflow():
             {
                 "id": "result",
                 "task_type": "method",
-                "task_identifier": "ewoksjob.client.test_workflow.result",
+                "task_identifier": "ewoksjob.client.dummy_workflow.result",
                 "default_inputs": [
                     {"name": "value", "value": None},
                     {"name": "filename", "value": None},

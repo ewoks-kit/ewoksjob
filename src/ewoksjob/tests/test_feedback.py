@@ -58,4 +58,4 @@ def assert_feedback(scheme, handlers, reader, tmpdir):
     assert len(evts) == 1
 
     event_values = evts[0]["outputs"]
-    assert event_values.variable_values == {"sum": 3}
+    assert event_values.get_variable_values() == {"sum": 3}

@@ -6,7 +6,7 @@ import ewoks
 from ewokscore import task_discovery
 
 from .pool import get_active_pool
-from ..test_workflow import test_workflow
+from ..dummy_workflow import dummy_workflow
 
 
 __all__ = [
@@ -26,7 +26,7 @@ def execute_graph(
 def execute_test_graph(
     seconds=0, filename=None, kwargs: Optional[Mapping] = None
 ) -> Future:
-    args = (test_workflow(),)
+    args = (dummy_workflow(),)
     if kwargs is None:
         kwargs = dict()
     kwargs["inputs"] = [

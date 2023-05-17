@@ -99,7 +99,7 @@ def assert_results(workflow_results, reader, job_id):
 
     # Get access to all output variables of "task1"
     results = result_event["outputs"]
-    assert results.variable_values["return_value"] == 3
+    assert results["return_value"].value == 3
 
 
 if __name__ == "__main__":
