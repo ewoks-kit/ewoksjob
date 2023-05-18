@@ -2,6 +2,11 @@
 
 ## 0.3.0 (unreleased)
 
+## 0.2.2
+
+Changes:
+  - CLI JSON encoding of slurm parameters
+
 ## 0.2.1
 
 Bug fixes:
