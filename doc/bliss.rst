@@ -6,6 +6,8 @@ with the scientific libraries installed (conda or anything else) and Ewoks to be
 in Beacon. When workflows are triggered from *BLISS*, the *BLISS* conda environment needs
 the *ewoksjob* python package.
 
+.. _Worker environment:
+
 Worker environment
 ------------------
 
@@ -162,3 +164,31 @@ Run a test workflow in a *BLISS* session
     DEMO_SESSION [1]: from ewoksjob.client import submit_test
     DEMO_SESSION [2]: submit_test().get()
              Out [2]: {'return_value': True}
+
+
+Slurm
+-----
+
+A worker that redirects jobs to slurm can be started with the `--pool=slurm` option
+
+.. code::
+
+    [group:ewoks]
+    programs=ewoksmonitor, ewoksworker, ewoksworker_slurm
+    priority=900
+
+    [program:ewoksworker_slurm]
+    command=bash -c "source /users/blissadm/conda/miniconda/bin/activate ewoksworker && exec ewoksjob worker --pool=slurm -Q slurm -n slurm@id00 --slurm-pre-script='module load ...' --slurm-log-directory='/tmp_14_days/{user_name}/slurm_logs' -sp time_limit=240"
+    directory=/users/opid00/ewoks
+    user=opid00
+    environment=BEACON_HOST="id00:25000",SLURM_URL="http://...",SLURM_USER="opid00",SLURM_TOKEN="eyJhbGciO..."
+    startsecs=2
+    autostart=true
+    redirect_stderr=true
+    stdout_logfile=/var/log/%(program_name)s.log
+    stdout_logfile_maxbytes=1MB
+    stdout_logfile_backups=10
+    stdout_capture_maxbytes=1MB
+
+More details on the parameters can be found :ref:`here <Slurm>`. The environment specified with
+`--slurm-pre-script` needs to be setup like any other worker environment (see :ref:`Worker environment`).
