@@ -2,6 +2,11 @@
 
 ## 0.3.0 (unreleased)
 
+## 0.2.3
+
+Bug fixes:
+  - blacklist broken kombu version
+
 ## 0.2.2
 
 Changes:
