@@ -2,10 +2,10 @@ import pytest
 import datetime
 import threading
 from ewokscore import events
-from .utils import has_redis_server
+from .utils import has_redis
 
 
-@pytest.mark.skipif(not has_redis_server(), reason="redis-server not installed")
+@pytest.mark.skipif(not has_redis(), reason="redis-server not installed")
 def test_redis(redis_ewoks_events):
     handlers, reader = redis_ewoks_events
     assert_event_reader(handlers, reader)
@@ -16,7 +16,7 @@ def test_sqlite3(sqlite3_ewoks_events):
     assert_event_reader(handlers, reader)
 
 
-@pytest.mark.skipif(not has_redis_server(), reason="redis-server not installed")
+@pytest.mark.skipif(not has_redis(), reason="redis-server not installed")
 def test_redis_stop_wait_events(redis_ewoks_events):
     _, reader = redis_ewoks_events
     assert_stop_event(reader)
