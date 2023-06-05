@@ -2,12 +2,12 @@ import pytest
 from ..client import celery
 from ..client import local
 from .utils import wait_not_finished
-from .utils import has_redis_server
+from .utils import has_redis
 
 
 @pytest.mark.skip(reason="working in manual testing")
 @pytest.mark.skipif(
-    not has_redis_server(), reason="memory and sqlite do not support task monitoring"
+    not has_redis(), reason="memory and sqlite do not support task monitoring"
 )
 def test_futures(ewoks_worker):
     assert_futures(celery)

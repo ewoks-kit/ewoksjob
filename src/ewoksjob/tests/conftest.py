@@ -7,7 +7,7 @@ from ewokscore.events import cleanup
 from ewoksjob.events.readers import instantiate_reader
 from ewoksjob.worker import options as worker_options
 
-from .utils import has_redis_server
+from .utils import has_redis
 from ..client import local
 
 try:
@@ -24,7 +24,7 @@ except ImportError:
         pytest.skip("requires pyslurmutils")
 
 
-if has_redis_server():
+if has_redis():
     import redis
 
     @pytest.fixture(scope="session")
