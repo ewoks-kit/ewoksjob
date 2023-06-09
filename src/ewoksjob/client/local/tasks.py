@@ -14,6 +14,7 @@ __all__ = [
     "execute_test_graph",
     "convert_workflow",
     "discover_tasks_from_modules",
+    "discover_all_tasks",
 ]
 
 
@@ -50,6 +51,13 @@ def discover_tasks_from_modules(
     return pool.submit(
         task_discovery.discover_tasks_from_modules, args=args, kwargs=kwargs
     )
+
+
+def discover_all_tasks(
+    args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
+) -> Future:
+    pool = get_active_pool()
+    return pool.submit(task_discovery.discover_all_tasks, args=args, kwargs=kwargs)
 
 
 def _submit_with_jobid(
