@@ -46,10 +46,17 @@ def discover_tasks_from_modules(*args, **kwargs) -> List[dict]:
     return task_discovery.discover_tasks_from_modules(*args, **kwargs)
 
 
+@app.task()
+@worker_execute_wrapper
+def discover_all_tasks(*args, **kwargs) -> List[dict]:
+    return task_discovery.discover_all_tasks(*args, **kwargs)
+
+
 _TASK_MAPPING: Dict[Callable, Callable] = {
     "execute_graph": ewoks.execute_graph,
     "convert_graph": ewoks.convert_graph,
     "discover_tasks_from_modules": task_discovery.discover_tasks_from_modules,
+    "discover_all_tasks": task_discovery.discover_all_tasks,
 }
 
 _BOUND_TASKS = {"execute_graph"}

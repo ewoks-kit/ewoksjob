@@ -7,6 +7,7 @@ __all__ = [
     "execute_test_graph",
     "convert_workflow",
     "discover_tasks_from_modules",
+    "discover_all_tasks",
 ]
 
 
@@ -35,3 +36,7 @@ def convert_workflow(**kw) -> AsyncResult:
 
 def discover_tasks_from_modules(**kw) -> AsyncResult:
     return send_task("ewoksjob.apps.ewoks.discover_tasks_from_modules", **kw)
+
+
+def discover_all_tasks(**kw) -> AsyncResult:
+    return send_task("ewoksjob.apps.ewoks.discover_all_tasks", **kw)
