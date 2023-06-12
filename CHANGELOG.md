@@ -2,6 +2,11 @@
 
 ## 0.3.0 (unreleased)
 
+## 0.2.5
+
+New features:
+  - Add automatic task discovery to the ewoks celery API
+
 ## 0.2.4
 
 Bug fixes:
