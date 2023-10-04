@@ -108,25 +108,23 @@ Activate the *BLISS* conda environment
 
     . blissenv -d
 
-Install the client dependencies
+Install the client dependencies for `bliss >=1.11`
 
 .. code:: bash
 
-    conda install celery
     pip install ewoksjob
+
+For older versions of bliss do this instead
+
+.. code:: bash
+
+    conda install celery  # Bliss dependencies were managed by conda
+    pip install ewoksjob, blissdata
 
 This is only needed when workflows are triggered directly from *BLISS*.
 
 When triggering workflows, either the `BEACON_HOST` or `EWOKS_CONFIG_URI` environment variables need to be provided.
 When triggering directly from *BLISS*, the `BEACON_HOST` environment variable is already set so nothing extra to do.
-
-.. note::
-    
-    For `bliss <1.11`, `blissdata` must be installed separately
-
-    .. code:: bash
-
-        pip install blissdata
 
 Beacon configuration
 --------------------
