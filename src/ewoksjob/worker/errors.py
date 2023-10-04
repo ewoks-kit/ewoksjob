@@ -1,7 +1,15 @@
 import traceback
 from contextlib import contextmanager
 
-_CLIENT_EXCEPTION_MODULES = ("builtins", "celery", "billiard", "kombu", "ewoksjob")
+_CLIENT_EXCEPTION_MODULES = (
+    "builtins",
+    "concurrent",
+    "celery",
+    "billiard",
+    "multiprocessing",
+    "kombu",
+    "ewoksjob",
+)
 
 
 class EwoksJobException(Exception):
