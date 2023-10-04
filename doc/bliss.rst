@@ -11,14 +11,13 @@ the *ewoksjob* python package.
 Worker environment
 ------------------
 
-Create a python environment (conda, venv, ...) under *blissadm* (BCU manages the scientific software)
-or *opid00* (beamline staff manages the scientific software).
+Create a python environment (conda, venv, ...) as *blissadm*.
 
 When using conda, create a conda environment for the worker (called `ewoksworker` in this example) like this
 
 .. code:: bash
 
-    conda create --name ewoksworker python=3.8
+    conda create --name ewoksworker python=3.9
 
 Any python version supported by `ewoksjob` will do. Activate the environment
 
@@ -39,10 +38,10 @@ Some beamlines may want multiple environments for different scientific software.
 Supervisor
 ----------
 
-The supervisor config should be created in `/users/blissadm/local/daemon/config/supervisor.d`. 
+The supervisor config should be created in `/users/blissadm/local/daemon/config/supervisor.d/ewoks.conf`.
 
-Each change made to the configuration must be applied by the `supervisorctl` shell command twice:
-  - `supervisorctl reread`: to check changes in the config. It should print that the `ewoks` config changed.
+Each change made to the configuration must be applied by the `supervisorctl` shell command:
+  - `supervisorctl reread`: to load changes in the config.
   - `supervisorctl update`: to apply changes in the config.
 
 This is an example that registers a job monitor (you only ever need one) and one worker (you may need more than one):
@@ -85,7 +84,8 @@ The filename `/users/blissadm/conda/miniconda/bin/activate` may differ as well. 
 with the correct user to see where the conda activation script is located.
 
 The working directory is important if the beamline wants to quickly add workflow tasks (i.e. without pip-installing a python project).
-In this case `directory=/users/opid00/ewoks` is probably more appropriate. All `.py` files in this directory can contain ewoks tasks.
+In this case `directory=/users/opid00/ewoks` is probably more appropriate. All `.py` files in this directory and its subdirectories
+can contain ewoks tasks.
 
 Instead of `BEACON_HOST="id00:25000"` you could provide an explicit URL of the celery configuration with `EWOKS_CONFIG_URI`
 
@@ -144,15 +144,15 @@ Ewoks must be configured in the beamline configuration (Beacon). For example
     # /users/blissadm/local/beamline_configuration/ewoks/config.yml
 
     celery:
-        broker_url: "redis://hostname:25001/2"
-        result_backend: "redis://hostname:25001/3"
+        broker_url: "redis://id00:25001/2"
+        result_backend: "redis://id00:25001/3"
         result_serializer: "pickle"
         accept_content: ["application/json", "application/x-python-serialize"]
         result_expires: 600
         task_remote_tracebacks: true
 
-Make sure to replace `hostname` with the host where the Redis database is
-running (never use *localhost*).
+Make sure to replace `id00` with the host where the Redis database is
+running on (never use *localhost*).
 
 Test installation
 -----------------
@@ -179,9 +179,13 @@ A worker that redirects jobs to slurm can be started with the `--pool=slurm` opt
 
     [program:ewoksworker_slurm]
     command=bash -c "source /users/blissadm/conda/miniconda/bin/activate ewoksworker && exec ewoksjob worker --pool=slurm -Q slurm -n slurm@id00 --slurm-pre-script='module load ...' --slurm-log-directory='/tmp_14_days/{user_name}/slurm_logs' -sp time_limit=240"
-    directory=/users/opid00/ewoks
+    directory=/users/opid00/
     user=opid00
-    environment=BEACON_HOST="id00:25000",SLURM_URL="http://...",SLURM_USER="opid00",SLURM_TOKEN="eyJhbGciO..."
+    environment=
+        BEACON_HOST="id00:25000",
+        SLURM_URL="http://...",
+        SLURM_USER="opid00",
+        SLURM_TOKEN="eyJhbGciO..."
     startsecs=2
     autostart=true
     redirect_stderr=true
