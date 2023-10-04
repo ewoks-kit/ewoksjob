@@ -242,7 +242,7 @@ Finally the server configuration should be saved in addition to the supervisor c
                 "arguments": [
                     {
                         "name": "url",
-                        "value": "redis://id01:25001/4",
+                        "value": "redis://id00:25001/4",
                     },
                     {"name": "ttl", "value": 86400},
                 ],
