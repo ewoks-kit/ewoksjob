@@ -194,3 +194,66 @@ A worker that redirects jobs to slurm can be started with the `--pool=slurm` opt
 
 More details on the parameters can be found :ref:`here <Slurm>`. The environment specified with
 `--slurm-pre-script` needs to be setup like any other worker environment (see :ref:`Worker environment`).
+
+Ewoks server
+------------
+
+To provide ewoks as a web service with a web GUI you can install this in the worker environment
+
+.. code:: bash
+
+    pip install ewoksserver[frontend]
+
+Configure the server in the supervisor configuration file
+
+.. code::
+
+    [group:ewoks]
+    programs=..., ewoksserver
+    priority=900
+
+    ...
+
+    [program:ewoksserver]
+    command=bash -c "source /users/blissadm/conda/miniconda/bin/activate ewoksworker && python -u -m ewoksserver.server -c /users/blissadm/local/daemon/config/supervisor.d/ewoksserverconfig.py --host=0.0.0.0"
+    directory=/users/opid00/ewoks/
+    user=opid00
+    environment=BEACON_HOST="id00:25000"
+    startsecs=5
+    autostart=true
+    redirect_stderr=true
+    stdout_logfile=/var/log/%(program_name)s.log
+    stdout_logfile_maxbytes=1MB
+    stdout_logfile_backups=10
+    stdout_capture_maxbytes=1MB
+
+Finally the server configuration should be saved in addition to the supervisor configuration
+
+.. code:: python
+
+    # /users/blissadm/local/daemon/config/supervisor.d/ewoksserverconfig.py
+
+    RESOURCE_DIRECTORY = "/users/opid01/ewoks/resources"
+
+    EWOKS = {
+        "handlers": [
+            {
+                "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
+                "arguments": [
+                    {
+                        "name": "url",
+                        "value": "redis://id00:25001/4",
+                    },
+                    {"name": "ttl", "value": 86400},
+                ],
+            }
+        ]
+    }
+
+    CELERY = {}
+
+Make sure to replace `id00` with the beamline name.
+
+Note: since `CELERY` is defined but empty, the server will use `BEACON_HOST` to fetch
+the celery configuration. This ensures that ewoks server executes workflows by sending
+them to the workers instead of executing them locally in a subprocess.
