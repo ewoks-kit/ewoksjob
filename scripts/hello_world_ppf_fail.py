@@ -12,8 +12,8 @@ else:
     from billiard import current_process
 
     pool_type = "billiard"
+
 from ewokscore import Task
-from ewoksjob.worker.errors import EwoksJobException
 
 
 def test_func(sleep_time):
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     try:
         future.get(timeout=5)
-    except EwoksJobException as e:
+    except RuntimeError as e:
         assert str(e) == "Task 'task2' failed"
     else:
         assert False, "Job did not fail"
