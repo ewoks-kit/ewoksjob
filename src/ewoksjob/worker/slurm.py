@@ -1,9 +1,9 @@
-"""SLURM execution pool."""
+"""Pool that redirects tasks to a Slurm cluster."""
 
 import weakref
 import logging
 from functools import wraps
-from typing import Callable, Optional
+from typing import Callable
 
 from celery.concurrency.gevent import TaskPool as _TaskPool
 
@@ -12,21 +12,12 @@ try:
 except ImportError:
     SlurmPythonJobRestClient = None
 
+from .executor import set_executor_getter, ExecutorType
+
+
 __all__ = ("TaskPool",)
 
 logger = logging.getLogger(__name__)
-
-
-_SLURM_CLIENT = None
-
-
-def get_executor() -> Optional[Callable]:
-    try:
-        spawn = _SLURM_CLIENT.spawn
-    except (AttributeError, ReferenceError):
-        # TaskPool is not instantiated
-        return None
-    return _slurm_execute(spawn)
 
 
 class TaskPool(_TaskPool):
@@ -41,35 +32,50 @@ class TaskPool(_TaskPool):
         self._create_slurm_client()
 
     def restart(self):
-        self._slurm_client.cleanup()
-        self._slurm_client = None
+        self._remove_slurm_client()
         self._create_slurm_client()
 
-    def _create_slurm_client(self):
-        global _SLURM_CLIENT
-        self._slurm_client = SlurmPythonJobRestClient(
-            max_workers=self.limit, **self.EXECUTOR_OPTIONS
-        )
-        _SLURM_CLIENT = weakref.proxy(self._slurm_client)
-
     def on_stop(self):
-        self._slurm_client.cleanup()
-        self._slurm_client = None
+        self._remove_slurm_client()
         super().on_stop()
 
     def terminate_job(self, pid, signal=None):
         print("TODO: support job cancelling for the slurm pool")
 
+    def _create_slurm_client(self):
+        self._slurm_client = SlurmPythonJobRestClient(
+            max_workers=self.limit, **self.EXECUTOR_OPTIONS
+        )
+        _set_slurm_client(self._slurm_client)
+
+    def _remove_slurm_client(self):
+        self._slurm_client.cleanup()
+        self._slurm_client = None
+
+
+_SLURM_CLIENT = None
+
+
+def _set_slurm_client(slurm_client):
+    global _SLURM_CLIENT
+    _SLURM_CLIENT = weakref.proxy(slurm_client)
+    set_executor_getter(_get_executor)
+
+
+def _get_executor() -> ExecutorType:
+    try:
+        spawn = _SLURM_CLIENT.spawn
+    except (AttributeError, ReferenceError):
+        # TaskPool is not instantiated
+        return
+    return _slurm_execute(spawn)
+
 
 def _slurm_execute(spawn: Callable) -> Callable:
+    """Instead of executing the celery task, forward the ewoks task to Slurm."""
+
     @wraps(spawn)
-    def executor(celery_task, *args, **kwargs):
-        from ..apps import ewoks
-
-        ewoks_task = ewoks.get_ewoks_task_from_celery_task(celery_task)
-        if ewoks.celery_task_is_bound(celery_task):
-            args = args[1:]  # remove `self`
-
+    def executor(ewoks_task: Callable, *args, **kwargs):
         future = spawn(ewoks_task, args=args, kwargs=kwargs)
         try:
             return future.result()
