@@ -16,7 +16,7 @@ add_options(app)
 
 
 def _ensure_ewoks_job_id(celery_task: Callable) -> Callable:
-    """Use celery task ID as ewoks job ID when not ewoks job ID is provided"""
+    """Use celery task ID as ewoks job ID when ewoks job ID is not provided"""
 
     @wraps(celery_task)
     def new_celery_task(self, *args, **kwargs):
