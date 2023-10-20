@@ -10,6 +10,11 @@ from urllib.parse import urlparse, ParseResult
 from celery.loaders.default import Loader
 from celery import Celery
 
+from blissdata.beacon.data import BeaconData
+from blissdata.redis_engine import set_redis_url
+redis_url = BeaconData().get_redis_data_db()
+set_redis_url(redis_url)
+
 try:
     from blissdata.beacon.files import read_config as bliss_read_config
 except ImportError:
