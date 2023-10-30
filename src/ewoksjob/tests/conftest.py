@@ -3,7 +3,6 @@ import os
 import pytest
 
 from ewokscore import events
-from ewokscore.events import cleanup
 from ewoksjob.events.readers import instantiate_reader
 from ewoksjob.worker import options as worker_options
 
@@ -132,7 +131,7 @@ def sqlite3_ewoks_events(tmpdir):
     reader = instantiate_reader(uri)
     yield handlers, reader
     reader.close()
-    cleanup()
+    events.cleanup()
 
 
 @pytest.fixture()
@@ -155,4 +154,4 @@ def redis_ewoks_events(redisdb):
         assert connection.ttl(key) >= 0, key
 
     reader.close()
-    cleanup()
+    events.cleanup()
