@@ -5,7 +5,10 @@ import celery
 
 
 def _patch_eventlet():
-    import eventlet.debug
+    try:
+        import eventlet.debug
+    except ImportError:
+        return
 
     eventlet.monkey_patch()
     blockdetect = float(os.environ.get("EVENTLET_NOBLOCK", 0))
@@ -14,8 +17,11 @@ def _patch_eventlet():
 
 
 def _patch_gevent():
-    import gevent.monkey
-    import gevent.signal
+    try:
+        import gevent.monkey
+        import gevent.signal
+    except ImportError:
+        return
 
     gevent.monkey.patch_all()
 
