@@ -8,3 +8,4 @@ celery:
   result_expires: 600
   result_serializer: pickle
   task_remote_tracebacks: true
+  enable_utc: false

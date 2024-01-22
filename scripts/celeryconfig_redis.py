@@ -4,3 +4,4 @@ result_serializer = "pickle"
 accept_content = ["application/json", "application/x-python-serialize"]
 result_expires = 600
 task_remote_tracebacks = True
+enable_utc = False
