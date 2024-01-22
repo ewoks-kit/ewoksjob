@@ -44,6 +44,7 @@ Start a web server for monitoring jobs
 
 .. code:: bash
 
+    export FLOWER_UNAUTHENTICATED_API=true  # allow canceling jobs
     ewoksjob monitor
 
 Run the tests
