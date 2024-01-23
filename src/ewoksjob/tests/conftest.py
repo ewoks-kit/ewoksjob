@@ -36,6 +36,7 @@ if has_redis():
             "result_serializer": "pickle",
             "accept_content": ["application/json", "application/x-python-serialize"],
             "task_remote_tracebacks": True,
+            "enable_utc": False,
         }
 
 else:
@@ -50,6 +51,7 @@ else:
             "result_serializer": "pickle",
             "accept_content": ["application/json", "application/x-python-serialize"],
             "task_remote_tracebacks": True,
+            "enable_utc": False,
         }
 
 

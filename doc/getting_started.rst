@@ -48,6 +48,10 @@ like the serialization of results (json by default)
     accept_content = ["application/json", "application/x-python-serialize"]
     result_expires = 600
     task_remote_tracebacks = True
+    enable_utc = False
+
+The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_
+describes the different parameters available.
 
 The configuration can be declared in a
 
