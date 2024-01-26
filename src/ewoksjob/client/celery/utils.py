@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import Dict, List, Optional, Set
 from celery import current_app
 from celery.result import AsyncResult
 
@@ -9,6 +9,7 @@ __all__ = [
     "get_result",
     "get_not_finished_task_ids",
     "get_not_finished_futures",
+    "get_workers",
 ]
 
 
@@ -57,3 +58,18 @@ def get_not_finished_task_ids():
 def get_not_finished_futures() -> List[AsyncResult]:
     lst = [get_future(task_id) for task_id in get_not_finished_task_ids()]
     return [future for future in lst if future is not None]
+
+
+def get_workers() -> List[str]:
+    queues_dict: Optional[
+        Dict[str, List[dict]]
+    ] = current_app.control.inspect().active_queues()
+    if queues_dict is None:
+        return list()
+
+    workers: Set[str] = set()
+    for queue_infos in queues_dict.values():
+        for queue_info in queue_infos:
+            workers.add(queue_info["name"])
+
+    return list(workers)
