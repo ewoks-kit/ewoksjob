@@ -103,9 +103,9 @@ class EwoksEventReader:
             if isinstance(input_uris, str):
                 input_uris = json.loads(input_uris)
             inputs = {
-                uri["name"]: Variable(data_uri=uri["value"])
-                if uri["value"]
-                else Variable()
+                uri["name"]: (
+                    Variable(data_uri=uri["value"]) if uri["value"] else Variable()
+                )
                 for uri in input_uris
             }
             event["inputs"] = VariableContainer(inputs)

@@ -61,9 +61,9 @@ def get_not_finished_futures() -> List[AsyncResult]:
 
 
 def get_workers() -> List[str]:
-    queues_dict: Optional[
-        Dict[str, List[dict]]
-    ] = current_app.control.inspect().active_queues()
+    queues_dict: Optional[Dict[str, List[dict]]] = (
+        current_app.control.inspect().active_queues()
+    )
     if queues_dict is None:
         return list()
 

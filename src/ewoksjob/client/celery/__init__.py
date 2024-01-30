@@ -1,5 +1,6 @@
 """Remote worker pool managed by Celery
 """
+
 import os
 from billiard.exceptions import Terminated
 
