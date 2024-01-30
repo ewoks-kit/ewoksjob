@@ -2,6 +2,24 @@
 """
 import os
 from billiard.exceptions import Terminated
+
+try:
+    from gevent.monkey import is_anything_patched
+    from gevent.monkey import is_module_patched
+except ImportError:
+    pass
+else:
+    if is_anything_patched() and not is_module_patched("threading"):
+        # Make Celery use `celery.backends.asynchronous.Drainer`
+        # instead of `celery.backends.asynchronous.geventDrainer`.
+        # The later causes CTRL-C to not be raised and other things
+        # like Bliss scans to hang when calling `AsyncResult.get`.
+        from kombu.utils import compat
+
+        compat._environment = "default"
+
+        # The real solution is to patch threads.
+
 from celery.exceptions import TaskRevokedError as CancelledError
 
 CancelledErrors = CancelledError, Terminated
