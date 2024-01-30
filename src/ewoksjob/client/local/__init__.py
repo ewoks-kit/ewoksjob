@@ -1,5 +1,6 @@
 """Client side pool managed in the current process
 """
+
 from concurrent.futures import CancelledError  # noqa F401
 
 CancelledErrors = (CancelledError,)

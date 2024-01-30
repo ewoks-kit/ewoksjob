@@ -18,9 +18,9 @@ from .process import TaskPool as ProcessTaskPool
 ALL_MP_CONTEXTS = list(get_all_start_methods())
 DEFAULT_MP_CONTEXT = get_context()._name
 
-concurrency.ALIASES[
-    "process"
-] = f"{ProcessTaskPool.__module__}:{ProcessTaskPool.__name__}"
+concurrency.ALIASES["process"] = (
+    f"{ProcessTaskPool.__module__}:{ProcessTaskPool.__name__}"
+)
 concurrency.ALIASES["slurm"] = f"{SlurmTaskPool.__module__}:{SlurmTaskPool.__name__}"
 worker.WORKERS_POOL.choices = list(worker.WORKERS_POOL.choices) + ["process", "slurm"]
 
