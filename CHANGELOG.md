@@ -1,6 +1,15 @@
 # CHANGELOG.md
 
-## 0.3.0 (unreleased)
+## 0.4.0 (unreleased)
+
+## 0.3.0
+
+Bug fixes:
+  - Fix exception type for pypushflow >= 0.6
+
+New features:
+  - `ewoksjob.client`: Add `get_workers` util to retrieve Celery workers
+  - Use local timezone instead of UTC in Celery
 
 ## 0.2.5
 
