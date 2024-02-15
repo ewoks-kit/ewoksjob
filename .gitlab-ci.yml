@@ -21,6 +21,13 @@ test-3.7-redis:
     - apt install -y redis-server
     - !reference [.test-3.7, before_script]
 
+test-3.8-redis:
+  extends: .test-3.8
+  before_script:
+    - apt update
+    - apt install -y redis-server
+    - !reference [.test-3.8, before_script]
+
 test-3.7-redis-slurm:
   extends: test-3.7-redis
   script:
