@@ -6,87 +6,12 @@ variables:
   WARNING1: "ignore::DeprecationWarning:kombu.utils.compat"
   WARNING2: "ignore::DeprecationWarning:celery.utils.imports"
 
-test-3.7:
-  extends: .test-3.7
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
-
-test-3.9:
-  extends: .test-3.9
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
-
-test-3.10:
-  extends: .test-3.10
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
-
-test-3.7-slurm:
-  extends: test-3.7
-  script:
-    - python -m pip install --pre .[test,orange]
-    - python -m gevent.monkey --module pytest . -v
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
-
-test-3.7-win:
-  extends: .test-3.7-win
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
-
-test-3.8-redis:
-  extends: .test-3.8
-  before_script:
-    - apt update
-    - apt install -y redis-server
-    - !reference [.test-3.8, before_script]
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
-
-test-3.8-redis-slurm:
-  extends: test-3.8-redis
-  script:
-    - python -m pip install --pre .[test,orange]
-    - python -m gevent.monkey --module pytest . -v
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
-
-test-3.8-examples-sql:
-  extends: .test-3.8
-  script:
-    - python -m pip install --pre .[test]
-    - python -m pip install --pre ewoksppf
-    - ./scripts/worker.sh --sql --pool=process &
-    - ./scripts/runjobs.sh --sql
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
-
-test-3.8-examples-redis:
-  extends: .test-3.8
-  before_script:
-    - apt update
-    - apt install -y redis-server
-    - !reference [.test-3.8, before_script]
-  script:
-    - python -m pip install --pre .[test]
-    - python -m pip install --pre ewoksppf
-    - redis-server &
-    - ./scripts/worker.sh --redis --pool=process &
-    - ./scripts/runjobs.sh --redis
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
-
 build_sdist:
   extends: .build_sdist
+  only:
+    refs:
+      - main
+      - merge_requests
 
 test_sdist-3.9-redis:
   extends: .test_sdist-3.9
@@ -97,12 +22,20 @@ test_sdist-3.9-redis:
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+  only:
+    refs:
+      - main
+      - merge_requests
 
 test_sdist-3.10-win:
   extends: .test_sdist-3.10-win
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+  only:
+    refs:
+      - main
+      - merge_requests
 
 build_doc:
   extends: .build_doc

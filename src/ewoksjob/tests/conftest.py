@@ -2,12 +2,43 @@ import gc
 import os
 import pytest
 
-from ewokscore import events
-from ewoksjob.events.readers import instantiate_reader
-from ewoksjob.worker import options as worker_options
+# TODO: for testing
 
-from .utils import has_redis
-from ..client import local
+import sys
+
+if sys.version_info < (3, 9):
+    from importlib_metadata import entry_points as _entry_points
+
+    def iter_entry_points(group: str):
+        return _entry_points(group=group)
+
+elif sys.version_info < (3, 10):
+    from importlib.metadata import entry_points as _entry_points
+
+    def iter_entry_points(group: str):
+        return _entry_points().get(group, [])
+
+else:
+    from importlib.metadata import entry_points as _entry_points
+
+    def iter_entry_points(group: str):
+        return _entry_points(group=group)
+
+
+print()
+print("==============networkx=============")
+for ep in iter_entry_points("networkx.backends"):
+    print("networkx.backends", ep)
+for ep in iter_entry_points("networkx.backend_info"):
+    print("networkx.backend_info", ep)
+print("====================================")
+
+from ewokscore import events  # noqa E402
+from ewoksjob.events.readers import instantiate_reader  # noqa E402
+from ewoksjob.worker import options as worker_options  # noqa E402
+
+from .utils import has_redis  # noqa E402
+from ..client import local  # noqa E402
 
 try:
     from pyslurmutils.tests.conftest import slurm_data_directory  # noqa F401
