@@ -96,7 +96,7 @@ test_sdist-3.9-redis:
     - !reference [.test_sdist-3.8, before_script]
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2} -W ignore::RuntimeWarning:networkx.utils.backends" # networkx #7372
 
 test_sdist-3.10-win:
   extends: .test_sdist-3.10-win
