@@ -75,7 +75,7 @@ def get_cfg_type(cfg_uri: str) -> str:
     if presult.scheme in ("file", ""):
         cfg_uri = _url_to_filename(presult)
         ext = os.path.splitext(cfg_uri)[-1]
-        if ext in (".yaml", "yml"):
+        if ext in (".yaml", ".yml"):
             return "yaml"
         return "python"
     return ""
