@@ -1,6 +1,12 @@
 # CHANGELOG.md
 
-## 0.4.0 (unreleased)
+## (unreleased)
+
+## 0.3.1
+
+Bug fixes:
+  - Support `.yml` configuration files in addition to `.yaml`
+  - Support not fully patched gevent environment
 
 ## 0.3.0
 
