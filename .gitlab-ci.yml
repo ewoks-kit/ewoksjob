@@ -5,24 +5,28 @@ include:
 variables:
   WARNING1: "ignore::DeprecationWarning:kombu.utils.compat"
   WARNING2: "ignore::DeprecationWarning:celery.utils.imports"
+  WARNINGS: "-W ${WARNING1} -W ${WARNING2}"
 
 test-3.7:
   extends: .test-3.7
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.9:
   extends: .test-3.9
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.10:
   extends: .test-3.10
+  before_script:
+    - !reference [.test-3.10, before_script]
+    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.7-slurm:
   extends: test-3.7
@@ -31,23 +35,19 @@ test-3.7-slurm:
     - python -m gevent.monkey --module pytest . -v
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.7-win:
   extends: .test-3.7-win
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.8-redis:
-  extends: .test-3.8
-  before_script:
-    - apt update
-    - apt install -y redis-server
-    - !reference [.test-3.8, before_script]
+  extends: .test-3.8-redis
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.8-redis-slurm:
   extends: test-3.8-redis
@@ -56,7 +56,7 @@ test-3.8-redis-slurm:
     - python -m gevent.monkey --module pytest . -v
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.8-examples-sql:
   extends: .test-3.8
@@ -67,14 +67,10 @@ test-3.8-examples-sql:
     - ./scripts/runjobs.sh --sql
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.8-examples-redis:
-  extends: .test-3.8
-  before_script:
-    - apt update
-    - apt install -y redis-server
-    - !reference [.test-3.8, before_script]
+  extends: .test-3.8-redis
   script:
     - python -m pip install --pre .[test]
     - python -m pip install --pre ewoksppf
@@ -83,26 +79,25 @@ test-3.8-examples-redis:
     - ./scripts/runjobs.sh --redis
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 build_sdist:
   extends: .build_sdist
 
 test_sdist-3.9-redis:
-  extends: .test_sdist-3.9
-  before_script:
-    - apt update
-    - apt install -y redis-server
-    - !reference [.test_sdist-3.8, before_script]
+  extends: .test_sdist-3.9-redis
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2} -W ignore::RuntimeWarning:networkx.utils.backends" # networkx #7372
+    PYTEST_WARNINGS: "-W error ${WARNINGS} -W ignore::RuntimeWarning:networkx.utils.backends" # networkx #7372
 
 test_sdist-3.10-win:
   extends: .test_sdist-3.10-win
+  before_script:
+    - !reference [.test_sdist-3.10-win, before_script]
+    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error -W ${WARNING1} -W ${WARNING2}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 build_doc:
   extends: .build_doc
