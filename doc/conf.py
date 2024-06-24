@@ -1,10 +1,13 @@
 """rm -rf doc/_generated/; sphinx-build doc build/sphinx/html -E -a
 """
 
+from ewoksjob import __version__ as release
+
 project = "ewoksjob"
-version = "0.1"
-copyright = "2021, ESRF"
+version = ".".join(release.split(".")[:2])
+copyright = "2019-2024, ESRF"
 author = "ESRF"
+docstitle = f"{project} {version}"
 
 extensions = [
     "sphinx.ext.autodoc",
@@ -22,3 +25,27 @@ html_static_path = []
 
 autosummary_generate = True
 autodoc_default_flags = ["members", "undoc-members", "show-inheritance"]
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+
+html_theme = "pydata_sphinx_theme"
+# To renable when adding static resources
+# html_static_path = ["_static"]
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "gitlab",
+            "url": "https://gitlab.esrf.fr/workflow/ewoks/ewoksjob",
+            "icon": "fa-brands fa-gitlab",
+        },
+        {
+            "name": "pypi",
+            "url": "https://pypi.org/project/ewoksjob",
+            "icon": "fa-brands fa-python",
+        },
+    ],
+    "navbar_start": ["navbar_start"],
+    "footer_start": ["copyright"],
+    "footer_end": ["footer_end"],
+}
