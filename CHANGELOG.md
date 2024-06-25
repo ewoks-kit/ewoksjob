@@ -2,6 +2,10 @@
 
 ## (unreleased)
 
+## 0.3.3
+
+- Update documentation
+
 ## 0.3.2
 
 Bug fixes:
