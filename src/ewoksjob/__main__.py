@@ -34,9 +34,12 @@ celery.maybe_patch_concurrency = functools.partial(
 def main(argv=None) -> None:
     if argv is None:
         argv = sys.argv
-    if "worker" in argv and "-A" not in argv:
-        argv = argv[:1] + ["-A", "ewoksjob.apps.ewoks"] + argv[1:]
-    if "monitor" in argv:
+    if "worker" in argv:
+        if "-A" not in argv:
+            argv = argv[:1] + ["-A", "ewoksjob.apps.ewoks"] + argv[1:]
+        if "--loglevel" not in argv and "-l" not in argv:
+            argv += ["--loglevel", "INFO"]
+    elif "monitor" in argv:
         argv[argv.index("monitor")] = "flower"
     sys.argv = argv
     os.environ.setdefault("CELERY_LOADER", "ewoksjob.config.EwoksLoader")
