@@ -2,6 +2,12 @@
 
 ## (unreleased)
 
+## 0.4.0
+
+Changes:
+
+- Default log level of an ewoks worker is `INFO`
+
 ## 0.3.3
 
 - Update documentation
