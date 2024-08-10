@@ -28,8 +28,26 @@ test-3.10:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
+test-3.11:
+  extends: .test-3.11
+  before_script:
+    - !reference [.test-3.11, before_script]
+    - python -m pip install blissdata --ignore-requires-python
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
 test-3.7-slurm:
   extends: test-3.7
+  script:
+    - python -m pip install --pre .[test,orange]
+    - python -m gevent.monkey --module pytest . -v
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
+test-3.11-slurm:
+  extends: test-3.11
   script:
     - python -m pip install --pre .[test,orange]
     - python -m gevent.monkey --module pytest . -v
