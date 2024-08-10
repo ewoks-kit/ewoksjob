@@ -1,19 +1,19 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 
-ExecutorType = Optional[Callable]
-_GET_EXECUTOR: Optional[Callable[[], ExecutorType]] = None
+ExecuteType = Optional[Callable[[Callable, Any, Any], Any]]
+_GET_EXECUTE_METHOD: Optional[Callable[[], ExecuteType]] = None
 
 
-def set_executor_getter(get_executor: Callable[[], ExecutorType]) -> None:
+def set_execute_getter(get_execute_method: Callable[[], ExecuteType]) -> None:
     """Worker pools that need to wrap their tasks can implement a
-    `get_executor` function and register it here.
+    `get_execute_method` function and register it here.
     """
-    global _GET_EXECUTOR
-    _GET_EXECUTOR = get_executor
+    global _GET_EXECUTE_METHOD
+    _GET_EXECUTE_METHOD = get_execute_method
 
 
-def get_executor() -> ExecutorType:
-    if _GET_EXECUTOR is None:
+def get_execute_method() -> ExecuteType:
+    if _GET_EXECUTE_METHOD is None:
         return
-    return _GET_EXECUTOR()
+    return _GET_EXECUTE_METHOD()

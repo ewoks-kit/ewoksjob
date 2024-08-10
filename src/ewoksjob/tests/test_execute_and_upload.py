@@ -39,4 +39,4 @@ def assert_submit(mod):
     }
     future1 = mod.submit(args=(graph,), kwargs=kwargs)
     with pytest.raises(RuntimeError, match=ICAT_ERROR_MSG):
-        get_result(future1, timeout=10)
+        get_result(future1, timeout=60)

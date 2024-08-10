@@ -8,7 +8,7 @@ import ewoks
 from ewokscore import task_discovery
 
 from ..worker.options import add_options
-from ..worker.executor import get_executor
+from ..worker.executor import get_execute_method
 from .errors import replace_exception_for_client
 
 app = celery.Celery("ewoks")
@@ -39,9 +39,9 @@ def _task_wrapper(celery_task: Callable) -> Callable:
     @wraps(celery_task)
     def new_celery_task(*args, **kwargs) -> Any:
         with replace_exception_for_client():
-            executor = get_executor()
+            execute = get_execute_method()
 
-            if executor is None:
+            if execute is None:
                 return celery_task(*args, **kwargs)
 
             # Remove all references to ewoksjob
@@ -49,7 +49,7 @@ def _task_wrapper(celery_task: Callable) -> Callable:
             if _celery_task_is_bound(celery_task):
                 args = args[1:]  # remove `self`
 
-            return executor(ewoks_task, *args, **kwargs)
+            return execute(ewoks_task, *args, **kwargs)
 
     return new_celery_task
 

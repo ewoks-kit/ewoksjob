@@ -3,16 +3,18 @@
 import weakref
 import logging
 from functools import wraps
-from typing import Callable
+from typing import Callable, Any
 
 from celery.concurrency.gevent import TaskPool as _TaskPool
 
 try:
-    from pyslurmutils.client import SlurmPythonJobRestClient
+    from pyslurmutils.concurrent.futures import SlurmRestExecutor
+    from pyslurmutils.concurrent.futures import SlurmRestFuture
 except ImportError:
-    SlurmPythonJobRestClient = None
+    SlurmRestExecutor = None
+    SlurmRestFuture = None
 
-from .executor import set_executor_getter, ExecutorType
+from .executor import set_execute_getter, ExecuteType
 
 
 __all__ = ("TaskPool",)
@@ -26,75 +28,60 @@ class TaskPool(_TaskPool):
     EXECUTOR_OPTIONS = dict()
 
     def __init__(self, *args, **kwargs):
-        if SlurmPythonJobRestClient is None:
+        if SlurmRestExecutor is None:
             raise RuntimeError("requires pyslurmutils")
         super().__init__(*args, **kwargs)
-        self._create_slurm_client()
+        self._create_slurm_executor()
 
     def restart(self):
-        self._remove_slurm_client()
-        self._create_slurm_client()
+        self._remove_slurm_executor()
+        self._create_slurm_executor()
 
     def on_stop(self):
-        self._remove_slurm_client()
+        self._remove_slurm_executor()
         super().on_stop()
 
     def terminate_job(self, pid, signal=None):
         print("TODO: support job cancelling for the slurm pool")
 
-    def _create_slurm_client(self):
-        self._slurm_client = SlurmPythonJobRestClient(
+    def _create_slurm_executor(self):
+        self._slurm_executor = SlurmRestExecutor(
             max_workers=self.limit, **self.EXECUTOR_OPTIONS
         )
-        _set_slurm_client(self._slurm_client)
+        _set_slurm_executor(self._slurm_executor)
 
-    def _remove_slurm_client(self):
-        self._slurm_client.cleanup()
-        self._slurm_client = None
-
-
-_SLURM_CLIENT = None
+    def _remove_slurm_executor(self):
+        self._slurm_executor.__exit__()
+        self._slurm_executor = None
 
 
-def _set_slurm_client(slurm_client):
-    global _SLURM_CLIENT
-    _SLURM_CLIENT = weakref.proxy(slurm_client)
-    set_executor_getter(_get_executor)
+_SLURM_EXECUTOR = None
 
 
-def _get_executor() -> ExecutorType:
+def _set_slurm_executor(slurm_executor):
+    global _SLURM_EXECUTOR
+    _SLURM_EXECUTOR = weakref.proxy(slurm_executor)
+    set_execute_getter(_get_execute_method)
+
+
+def _get_execute_method() -> ExecuteType:
     try:
-        spawn = _SLURM_CLIENT.spawn
+        submit = _SLURM_EXECUTOR.submit
     except (AttributeError, ReferenceError):
         # TaskPool is not instantiated
         return
-    return _slurm_execute(spawn)
+    return _slurm_execute_method(submit)
 
 
-def _slurm_execute(spawn: Callable) -> Callable:
+_SubmitType = Callable[[Callable, Any, Any], SlurmRestFuture]
+
+
+def _slurm_execute_method(submit: _SubmitType) -> Callable[[_SubmitType], ExecuteType]:
     """Instead of executing the celery task, forward the ewoks task to Slurm."""
 
-    @wraps(spawn)
-    def executor(ewoks_task: Callable, *args, **kwargs):
-        future = spawn(ewoks_task, args=args, kwargs=kwargs)
-        try:
-            return future.result()
-        except BaseException:
-            future.client.log_stdout_stderr(
-                future.job_id, logger=logger, level=logging.ERROR
-            )
-            raise
-        else:
-            future.client.log_stdout_stderr(
-                future.job_id, logger=logger, level=logging.INFO
-            )
-        finally:
-            try:
-                status = future.job_status()
-                logger.info("Slurm job %s, %s", future.job_id, status)
-                if future.job_status() not in ("COMPLETED", "CANCELLED", "FAILED"):
-                    future.cancel_job()
-            finally:
-                future.cleanup_job()
+    @wraps(submit)
+    def execute(ewoks_task: Callable, *args, **kwargs):
+        future = submit(ewoks_task, *args, **kwargs)
+        return future.result()
 
-    return executor
+    return execute

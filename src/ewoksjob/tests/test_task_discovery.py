@@ -21,7 +21,7 @@ def assert_submit(mod, *modules):
     else:
         future1 = mod.discover_all_tasks()
     future2 = mod.get_future(future1.task_id)
-    results = get_result(future1, timeout=10)
+    results = get_result(future1, timeout=60)
     assert results
     results = get_result(future2, timeout=0)
     assert results

@@ -10,9 +10,10 @@ from concurrent.futures import Future
 
 try:
     from pyslurmutils.concurrent.futures import SlurmRestExecutor
-    from pyslurmutils.client.job_io.file_io import Future as SlurmFuture
+    from pyslurmutils.concurrent.futures import SlurmRestFuture
 except ImportError:
     SlurmRestExecutor = None
+    SlurmRestFuture = None
 
 
 __all__ = ["get_active_pool", "pool_context"]
@@ -112,7 +113,7 @@ class _LocalPool:
             raise RuntimeError(f"Job '{task_id}' already exists")
         return task_id
 
-    def get_future(self, task_id):
+    def get_future(self, task_id) -> Future:
         future = self._tasks.get(task_id)
         if future is None:
             return self._get_dummy_future(task_id)
@@ -120,7 +121,7 @@ class _LocalPool:
 
     def _get_dummy_future(self, task_id):
         if self.pool_type == "slurm":
-            future = SlurmFuture(0, "", self._executor.client.io_handler)
+            future = SlurmRestFuture()
         else:
             future = Future()
         self._patch_future(future, self.generate_task_id(task_id))
@@ -130,7 +131,7 @@ class _LocalPool:
         """Get all task ID's that are not finished"""
         return [task_id for task_id, future in self._tasks.items() if not future.done()]
 
-    def _patch_future(self, future, task_id):
+    def _patch_future(self, future: Future, task_id) -> None:
         if not task_id and self.pool_type == "slurm":
             future.task_id = str(future.job_id)
         else:
