@@ -2,6 +2,12 @@
 
 ## (unreleased)
 
+## 0.5.0
+
+Changes:
+
+- Use new `pyslurmutils` API
+
 ## 0.4.0
 
 Changes:
