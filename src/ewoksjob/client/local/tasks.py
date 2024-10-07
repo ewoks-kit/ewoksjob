@@ -1,4 +1,5 @@
 import os
+import warnings
 from typing import Callable, Mapping, Optional, Tuple
 from concurrent.futures import Future
 
@@ -12,6 +13,7 @@ from ..dummy_workflow import dummy_workflow
 __all__ = [
     "execute_graph",
     "execute_test_graph",
+    "convert_graph",
     "convert_workflow",
     "discover_tasks_from_modules",
     "discover_all_tasks",
@@ -37,11 +39,18 @@ def execute_test_graph(
     return execute_graph(args=args, kwargs=kwargs)
 
 
-def convert_workflow(
+def convert_graph(
     args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
 ) -> Future:
     pool = get_active_pool()
     return pool.submit(ewoks.convert_graph, args=args, kwargs=kwargs)
+
+
+def convert_workflow(**kw) -> Future:
+    warnings.warn(
+        "convert_workflow is deprecated, use convert_graph instead", stacklevel=2
+    )
+    return convert_graph(**kw)
 
 
 def discover_tasks_from_modules(
