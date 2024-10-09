@@ -51,7 +51,7 @@ class TaskPool(_TaskPool):
         _set_slurm_executor(self._slurm_executor)
 
     def _remove_slurm_executor(self):
-        self._slurm_executor.__exit__()
+        self._slurm_executor.__exit__(None, None, None)
         self._slurm_executor = None
 
 

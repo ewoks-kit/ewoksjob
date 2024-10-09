@@ -2,6 +2,17 @@
 
 ## (unreleased)
 
+## 0.6.0
+
+Changes:
+
+- Deprecate `ewoksjob.client.convert_workflow` in favor of `ewoksjob.client.convert_graph`
+- Pip `blissworker` extra installs `blissdata[tango]`
+
+Bug Fixes:
+
+- Fix `SlurmRestExecutor` exit call bug
+
 ## 0.5.0
 
 Changes:
