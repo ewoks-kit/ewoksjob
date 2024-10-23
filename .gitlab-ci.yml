@@ -7,122 +7,62 @@ variables:
   WARNING2: "ignore::DeprecationWarning:celery.utils.imports"
   WARNINGS: "-W ${WARNING1} -W ${WARNING2}"
 
-test-3.7:
-  extends: .test-3.7
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
-
-test-3.9:
-  extends: .test-3.9
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
-
-test-3.10:
-  extends: .test-3.10
-  before_script:
-    - !reference [.test-3.10, before_script]
-    - python -m pip install blissdata --ignore-requires-python
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
-
-test-3.11:
-  extends: .test-3.11
-  before_script:
-    - !reference [.test-3.11, before_script]
-    - python -m pip install blissdata --ignore-requires-python
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
-
-test-3.7-slurm:
-  extends: test-3.7
-  script:
-    - python -m pip install --pre .[test,orange]
-    - python -m gevent.monkey --module pytest . -v
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
-
-test-3.11-slurm:
-  extends: test-3.11
-  script:
-    - python -m pip install --pre .[test,orange]
-    - python -m gevent.monkey --module pytest . -v
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
-
-test-3.7-win:
-  extends: .test-3.7-win
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
-
-test-3.8-redis:
-  extends: .test-3.8-redis
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
-
-test-3.8-redis-slurm:
-  extends: test-3.8-redis
-  script:
-    - python -m pip install --pre .[test,orange]
-    - python -m gevent.monkey --module pytest . -v
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
-
 test-3.8-examples-sql:
   extends: .test-3.8
   script:
     - python -m pip install --pre .[test]
     - python -m pip install --pre ewoksppf
+    - python -m pip install git+https://github.com/celery/kombu.git
     - ./scripts/worker.sh --sql --pool=process &
     - ./scripts/runjobs.sh --sql
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
-test-3.8-examples-redis:
-  extends: .test-3.8-redis
+test-3.9-examples-sql:
+  extends: .test-3.9
   script:
     - python -m pip install --pre .[test]
     - python -m pip install --pre ewoksppf
-    - redis-server &
-    - ./scripts/worker.sh --redis --pool=process &
-    - ./scripts/runjobs.sh --redis
+    - python -m pip install git+https://github.com/celery/kombu.git
+    - ./scripts/worker.sh --sql --pool=process &
+    - ./scripts/runjobs.sh --sql
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
-build_sdist:
-  extends: .build_sdist
-
-test_sdist-3.9-redis:
-  extends: .test_sdist-3.9-redis
-  variables:
-    JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS} -W ignore::RuntimeWarning:networkx.utils.backends" # networkx #7372
-
-test_sdist-3.10-win:
-  extends: .test_sdist-3.10-win
-  before_script:
-    - !reference [.test_sdist-3.10-win, before_script]
-    - python -m pip install blissdata --ignore-requires-python
+test-3.10-examples-sql:
+  extends: .test-3.10
+  script:
+    - python -m pip install --pre .[test]
+    - python -m pip install --pre ewoksppf
+    - python -m pip install git+https://github.com/celery/kombu.git
+    - ./scripts/worker.sh --sql --pool=process &
+    - ./scripts/runjobs.sh --sql
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
-build_doc:
-  extends: .build_doc
+test-3.11-examples-sql:
+  extends: .test-3.11
+  script:
+    - python -m pip install --pre .[test]
+    - python -m pip install --pre ewoksppf
+    - python -m pip install git+https://github.com/celery/kombu.git
+    - ./scripts/worker.sh --sql --pool=process &
+    - ./scripts/runjobs.sh --sql
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
-pages:
-  extends: .pages
-
-assets:
-  extends: .assets
-
+test-3.12-examples-sql:
+  extends: .test-3.12
+  script:
+    - python -m pip install --pre .[test]
+    - python -m pip install --pre ewoksppf
+    - python -m pip install git+https://github.com/celery/kombu.git
+    - ./scripts/worker.sh --sql --pool=process &
+    - ./scripts/runjobs.sh --sql
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
