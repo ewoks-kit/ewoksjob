@@ -89,5 +89,5 @@ class LocalFuture(FutureInterface):
 
     def abort(self) -> bool:
         if self._is_slurm:
-            self._native_future.cancel_job()
+            self._native_future.abort()
         return self.aborted()

@@ -5,6 +5,10 @@ import logging
 from functools import wraps
 from typing import Callable, Any
 
+try:
+    from gevent import GreenletExit
+except ImportError:
+    GreenletExit = None
 from celery.concurrency.gevent import TaskPool as _TaskPool
 
 try:
@@ -12,7 +16,7 @@ try:
     from pyslurmutils.concurrent.futures import SlurmRestFuture
 except ImportError:
     SlurmRestExecutor = None
-    SlurmRestFuture = None
+    SlurmRestFuture = Any
 
 from .executor import set_execute_getter, ExecuteType
 
@@ -40,9 +44,6 @@ class TaskPool(_TaskPool):
     def on_stop(self):
         self._remove_slurm_executor()
         super().on_stop()
-
-    def terminate_job(self, pid, signal=None):
-        print("TODO: support job cancelling for the slurm pool")
 
     def _create_slurm_executor(self):
         self._slurm_executor = SlurmRestExecutor(
@@ -82,6 +83,21 @@ def _slurm_execute_method(submit: _SubmitType) -> Callable[[_SubmitType], Execut
     @wraps(submit)
     def execute(ewoks_task: Callable, *args, **kwargs):
         future = submit(ewoks_task, *args, **kwargs)
-        return future.result()
+        try:
+            return future.result()
+        except GreenletExit:
+            _ensure_cancel_job(future)
+            raise
 
     return execute
+
+
+def _ensure_cancel_job(future: SlurmRestFuture) -> None:
+    not_cancelled = True
+    while not_cancelled:
+        try:
+            logger.info("Cancel Slurm job %s", future.job_id)
+            future.abort()
+        except GreenletExit:
+            continue
+        not_cancelled = False

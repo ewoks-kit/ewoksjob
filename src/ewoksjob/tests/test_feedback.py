@@ -25,25 +25,25 @@ def generate_graph():
 
 @pytest.mark.skipif(not has_redis(), reason="redis-server not installed")
 @pytest.mark.parametrize("scheme", ("nexus", "json"))
-def test_redis(scheme, redis_ewoks_events, tmpdir):
+def test_redis(scheme, redis_ewoks_events, tmp_path):
     handlers, reader = redis_ewoks_events
-    assert_feedback(scheme, handlers, reader, tmpdir)
+    assert_feedback(scheme, handlers, reader, tmp_path)
 
 
 @pytest.mark.parametrize("scheme", ("nexus", "json"))
-def test_sqlite3(scheme, sqlite3_ewoks_events, tmpdir):
+def test_sqlite3(scheme, sqlite3_ewoks_events, tmp_path):
     handlers, reader = sqlite3_ewoks_events
-    assert_feedback(scheme, handlers, reader, tmpdir)
+    assert_feedback(scheme, handlers, reader, tmp_path)
 
 
-def assert_feedback(scheme, handlers, reader, tmpdir):
+def assert_feedback(scheme, handlers, reader, tmp_path):
     execinfo = {"handlers": handlers}
     graph = generate_graph()
 
     return_value = execute_graph(
         graph,
         execinfo=execinfo,
-        varinfo={"root_uri": str(tmpdir), "scheme": scheme},
+        varinfo={"root_uri": str(tmp_path), "scheme": scheme},
         inputs=[
             {"id": "task", "name": "a", "value": 1},
             {"id": "task", "name": "b", "value": 2},
