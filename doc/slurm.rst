@@ -54,13 +54,13 @@ Client side
 -----------
 
 The client does not have to do anything special. However you can overwrite Slurm job parameters
-specified by the worker or add additional parameters with the `_slurm_spawn_arguments` argument.
+specified by the worker or add additional parameters with the `slurm_arguments` argument.
 
 .. code:: python
 
     from ewoksjob.client import submit
 
-    kwargs["_slurm_spawn_arguments"] = {
+    kwargs["slurm_arguments"] = {
         "parameters": {
             "time_limit": 360,
             "current_working_directory": "/other/path/to/data",
