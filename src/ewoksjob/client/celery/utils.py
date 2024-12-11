@@ -1,3 +1,4 @@
+import warnings
 import logging
 from typing import Dict, List, Optional, Set
 from celery import current_app
@@ -9,6 +10,7 @@ __all__ = [
     "get_result",
     "get_not_finished_task_ids",
     "get_not_finished_futures",
+    "get_queues",
     "get_workers",
 ]
 
@@ -61,15 +63,22 @@ def get_not_finished_futures() -> List[AsyncResult]:
 
 
 def get_workers() -> List[str]:
-    queues_dict: Optional[Dict[str, List[dict]]] = (
+    warnings.warn(
+        "'get_workers' is deprecated in favor of 'get_queues'", DeprecationWarning
+    )
+    return get_queues()
+
+
+def get_queues() -> List[str]:
+    worker_info: Optional[Dict[str, List[dict]]] = (
         current_app.control.inspect().active_queues()
     )
-    if queues_dict is None:
+    if worker_info is None:
         return list()
 
-    workers: Set[str] = set()
-    for queue_infos in queues_dict.values():
+    queues: Set[str] = set()
+    for queue_infos in worker_info.values():
         for queue_info in queue_infos:
-            workers.add(queue_info["name"])
+            queues.add(queue_info["name"])
 
-    return list(workers)
+    return list(queues)
