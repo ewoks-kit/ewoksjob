@@ -39,20 +39,20 @@ def get_not_finished_task_ids() -> List[str]:
     inspect = current_app.control.inspect()
     task_ids = list()
 
-    workers = inspect.active()  # running
-    if workers is None:
+    worker_task_info: Optional[Dict[str, List[dict]]] = inspect.active()  # running
+    if worker_task_info is None:
         logger.warning("No Celery workers were detected")
-        workers = dict()
-    for tasks in workers.values():
-        for task in tasks:
-            task_ids.append(task["id"])
+        worker_task_info = dict()
+    for task_infos in worker_task_info.values():
+        for task_info in task_infos:
+            task_ids.append(task_info["id"])
 
-    workers = inspect.scheduled()  # pending
-    if workers is None:
-        workers = dict()
-    for tasks in workers.values():
-        for task in tasks:
-            task_ids.append(task["id"])
+    worker_task_info: Optional[Dict[str, List[dict]]] = inspect.scheduled()  # pending
+    if worker_task_info is None:
+        worker_task_info = dict()
+    for task_infos in worker_task_info.values():
+        for task_info in task_infos:
+            task_ids.append(task_info["id"])
 
     return task_ids
 
@@ -70,14 +70,14 @@ def get_workers() -> List[str]:
 
 
 def get_queues() -> List[str]:
-    worker_info: Optional[Dict[str, List[dict]]] = (
+    worker_queue_info: Optional[Dict[str, List[dict]]] = (
         current_app.control.inspect().active_queues()
     )
-    if worker_info is None:
+    if worker_queue_info is None:
         return list()
 
     queues: Set[str] = set()
-    for queue_infos in worker_info.values():
+    for queue_infos in worker_queue_info.values():
         for queue_info in queue_infos:
             queues.add(queue_info["name"])
 
