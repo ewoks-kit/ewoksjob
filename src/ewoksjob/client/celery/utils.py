@@ -18,17 +18,17 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
-def get_future(task_id:str) -> AsyncResult:
+def get_future(task_id: str) -> AsyncResult:
     return AsyncResult(task_id)
 
 
-def cancel(task_id:str) -> None:
+def cancel(task_id: str) -> None:
     future = get_future(task_id)
     if future is not None:
         future.revoke(terminate=True)
 
 
-def get_result(task_id:str, **kwargs) -> Any:
+def get_result(task_id: str, **kwargs) -> Any:
     kwargs.setdefault("interval", 0.1)
     future = AsyncResult(task_id)
     if future is not None:
@@ -64,7 +64,9 @@ def get_not_finished_futures() -> List[AsyncResult]:
 
 def get_workers() -> List[str]:
     warnings.warn(
-        "'get_workers' is deprecated in favor of 'get_queues'", DeprecationWarning, stacklevel=2
+        "'get_workers' is deprecated in favor of 'get_queues'",
+        DeprecationWarning,
+        stacklevel=2,
     )
     return get_queues()
 
