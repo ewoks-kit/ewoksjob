@@ -1,6 +1,6 @@
 import warnings
 import logging
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Any
 from celery import current_app
 from celery.result import AsyncResult
 
@@ -18,24 +18,24 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
-def get_future(task_id) -> AsyncResult:
+def get_future(task_id:str) -> AsyncResult:
     return AsyncResult(task_id)
 
 
-def cancel(task_id):
+def cancel(task_id:str) -> None:
     future = get_future(task_id)
     if future is not None:
         future.revoke(terminate=True)
 
 
-def get_result(task_id, **kwargs):
+def get_result(task_id:str, **kwargs) -> Any:
     kwargs.setdefault("interval", 0.1)
     future = AsyncResult(task_id)
     if future is not None:
         return future.get(**kwargs)
 
 
-def get_not_finished_task_ids():
+def get_not_finished_task_ids() -> List[str]:
     inspect = current_app.control.inspect()
     task_ids = list()
 
