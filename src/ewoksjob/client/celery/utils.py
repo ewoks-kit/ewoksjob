@@ -64,7 +64,7 @@ def get_not_finished_futures() -> List[AsyncResult]:
 
 def get_workers() -> List[str]:
     warnings.warn(
-        "'get_workers' is deprecated in favor of 'get_queues'", DeprecationWarning
+        "'get_workers' is deprecated in favor of 'get_queues'", DeprecationWarning, stacklevel=2
     )
     return get_queues()
 
