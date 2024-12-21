@@ -2,6 +2,13 @@
 
 ## (unreleased)
 
+## 0.6.1
+
+Changes:
+
+- `get_workers` is deprecated in favor of `get_queues`.
+- Remove `sqlalchemy` and `redis` version bounds.
+
 ## 0.6.0
 
 Changes:
