@@ -1,4 +1,4 @@
-"""Send a workflow to the ewoks Celery application and recieve the
+"""Send a workflow to the ewoks Celery application and receive the
 intermediate results (ewoks events) or final result (job return value)
 """
 
