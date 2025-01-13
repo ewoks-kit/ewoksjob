@@ -33,5 +33,5 @@ class Sqlite3EwoksEventReader(EwoksEventReader):
             "ewoks_events",
             field_types=FIELD_TYPES,
             sql_types=self.__sql_types,
-            **filters
+            **filters,
         )

@@ -138,7 +138,7 @@ class EwoksEventReader:
     def split_filter(
         starttime: Optional[datetime] = None,
         endtime: Optional[datetime] = None,
-        **is_equal_filter
+        **is_equal_filter,
     ) -> Tuple[dict, dict]:
         """Splits the filter
 
