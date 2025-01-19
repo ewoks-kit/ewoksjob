@@ -51,7 +51,7 @@ def celery_includes():
 def celery_worker_parameters(slurm_client_kwargs):
     if _use_slurm_pool():
         rmap = {v: k for k, v in worker_options.SLURM_NAME_MAP.items()}
-        options = {rmap[k]: v for k, v in slurm_client_kwargs.items()}
+        options = {rmap[k]: v for k, v in slurm_client_kwargs.items() if k in rmap}
         worker_options.apply_worker_options(options)
     return {"loglevel": "debug"}
 
