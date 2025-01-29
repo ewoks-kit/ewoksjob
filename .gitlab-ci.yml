@@ -88,6 +88,7 @@ build_sdist:
   extends: .build_sdist
 
 test_sdist-3.9-redis:
+  timeout: 15m
   extends: .test_sdist-3.9-redis
   variables:
     JUPYTER_PLATFORM_DIRS: 1
