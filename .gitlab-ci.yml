@@ -48,12 +48,14 @@ test-3.8-win:
 
 test-3.8-redis:
   extends: .test-3.8-redis
+  timeout: 15m
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.8-redis-slurm:
   extends: test-3.8-redis
+  timeout: 15m
   script:
     - python -m pip install --pre .[test,orange]
     - python -m gevent.monkey --module pytest . -v
@@ -74,6 +76,7 @@ test-3.8-examples-sql:
 
 test-3.8-examples-redis:
   extends: .test-3.8-redis
+  timeout: 15m
   script:
     - python -m pip install --pre .[test]
     - python -m pip install --pre ewoksppf
