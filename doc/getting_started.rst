@@ -48,6 +48,7 @@ like the serialization of results (json by default)
     accept_content = ["application/json", "application/x-python-serialize"]
     result_expires = 600
     task_remote_tracebacks = True
+    broker_connection_retry_on_startup = True
     enable_utc = False
 
 The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_

@@ -9,6 +9,7 @@ EXPECTED = {
     "accept_content": ["application/json", "application/x-python-serialize"],
     "result_expires": 600,
     "task_remote_tracebacks": True,
+    "broker_connection_retry_on_startup": True,
     "enable_utc": False,
 }
 
@@ -47,6 +48,7 @@ def py_config(tmpdir) -> str:
         "accept_content = ['application/json', 'application/x-python-serialize']\n",
         "result_expires = 600\n",
         "task_remote_tracebacks = True\n",
+        "broker_connection_retry_on_startup = True\n",
         "enable_utc = False\n",
     ]
     with open(filename, "w") as f:
@@ -64,8 +66,9 @@ def yaml_config(tmpdir) -> str:
         "  result_serializer: 'pickle'\n",
         "  accept_content: ['application/json', 'application/x-python-serialize']\n",
         "  result_expires: 600\n",
-        "  task_remote_tracebacks: True\n",
-        "  enable_utc: False\n",
+        "  task_remote_tracebacks: true\n",
+        "  broker_connection_retry_on_startup: true\n",
+        "  enable_utc: false\n",
     ]
     with open(filename, "w") as f:
         f.writelines(lines)
