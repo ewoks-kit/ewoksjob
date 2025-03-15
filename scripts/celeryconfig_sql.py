@@ -13,3 +13,22 @@ result_expires = 600
 task_remote_tracebacks = True
 broker_connection_retry_on_startup = True
 enable_utc = False
+
+_dbfile = os.path.join(_SCRIPT_DIR, "results", "ewoks", "ewoks_events.db")
+os.makedirs(os.path.dirname(_dbfile), exist_ok=True)
+
+ewoks_execute_arguments = {
+    "execinfo": {
+        "handlers": [
+            {
+                "class": "ewokscore.events.handlers.Sqlite3EwoksEventHandler",
+                "arguments": [
+                    {
+                        "name": "uri",
+                        "value": f"file://{_dbfile}",
+                    }
+                ],
+            }
+        ]
+    }
+}

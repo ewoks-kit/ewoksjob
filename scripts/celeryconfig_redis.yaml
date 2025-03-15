@@ -10,3 +10,10 @@ celery:
   task_remote_tracebacks: true
   broker_connection_retry_on_startup: true
   enable_utc: false
+ewoks_execute_arguments:
+  execinfo:
+    handlers:
+      - class: "ewokscore.events.handlers.RedisEwoksEventHandler"
+        arguments:
+          - name: "uri"
+            value: "redis://localhost:6379/2"

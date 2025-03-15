@@ -10,6 +10,7 @@ from ewokscore import task_discovery
 from ..worker.options import add_options
 from ..worker.executor import get_execute_method
 from .errors import replace_exception_for_client
+from .arguments import merge_execute_arguments
 
 app = celery.Celery("ewoks")
 add_options(app)
@@ -57,7 +58,9 @@ def _task_wrapper(celery_task: Callable) -> Callable:
 @app.task(bind=True)
 @_ensure_ewoks_job_id
 @_task_wrapper
-def execute_graph(self, *args, **kwargs) -> Dict:
+def execute_graph(self, *args, **client_execute_arguments) -> Dict:
+    worker_execute_arguments = self.app.conf.get("ewoks_execute_arguments")
+    kwargs = merge_execute_arguments(client_execute_arguments, worker_execute_arguments)
     return ewoks.execute_graph(*args, **kwargs)
 
 

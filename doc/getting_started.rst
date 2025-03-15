@@ -54,6 +54,22 @@ like the serialization of results (json by default)
 The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_
 describes the different parameters available.
 
+In addition to celery arguments the configuration can contain workflow execution arguments.
+
+.. code:: python
+
+    ewoks_execute_arguments = {
+        "engine": "ppf"
+        "execinfo": {
+            "handlers": [
+                {
+                    "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
+                    "arguments": [{"name": "url", "value": "redis://localhost:6379/2"}],
+                }
+            ]
+        }
+    }
+
 The configuration can be declared in a
 
 - Python module:
