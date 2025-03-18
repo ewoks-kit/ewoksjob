@@ -54,7 +54,7 @@ like the serialization of results (json by default)
 The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_
 describes the different parameters available.
 
-In addition to celery arguments the configuration can contain workflow execution arguments.
+In addition to celery arguments, workflow execution arguments can be defined through the `ewoks_execute_arguments` variable.
 
 .. code:: python
 
