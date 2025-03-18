@@ -13,7 +13,7 @@ celery:
 ewoks_execution:
   execinfo:
     handlers:
-      - class: "ewokscore.events.handlers.RedisEwoksEventHandler"
+      - class: "ewoksjob.events.handlers.RedisEwoksEventHandler"
         arguments:
-          - name: "uri"
+          - name: "url"
             value: "redis://localhost:6379/2"

@@ -39,22 +39,28 @@ and results are stored
     result_backend = "rpc://"
     result_persistent = True
 
-Other backends for results are supported (mongo, memcached). Other configurations as available,
+Other backends for results are supported (mongo, memcached). Other configurations are available,
 like the serialization of results (json by default)
 
 .. code:: python
 
-    result_serializer = "pickle"
-    accept_content = ["application/json", "application/x-python-serialize"]
-    result_expires = 600
-    task_remote_tracebacks = True
-    broker_connection_retry_on_startup = True
-    enable_utc = False
+    CELERY = {
+        "broker_url": "...",
+        "result_backend": "...",
+        "result_serializer": "pickle",
+        "accept_content: ["application/json", "application/x-python-serialize"],
+        "result_expires": 600,
+        "task_remote_tracebacks": True,
+        "broker_connection_retry_on_startup": True,
+        "enable_utc": False,
+    }
+
+It is recommended for all celery parameters to be grouped in a dictionary called `CELERY`.
 
 The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_
 describes the different parameters available.
 
-In addition to celery arguments, workflow execution arguments can be defined through the `EWOKS_EXECUTION` variable.
+In addition to celery parameters, workflow execution parameters can be defined through the `EWOKS_EXECUTION` variable.
 
 .. code:: python
 

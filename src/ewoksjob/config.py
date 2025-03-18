@@ -103,8 +103,7 @@ def read_configuration(cfg_uri: str) -> dict:
         raise ValueError(f"Configuration URL '{cfg_uri}' is not supported")
     # `celery.app.utils.Settings` converts all parameters to lower-case
     # but we are here before that happens.
-    if "CELERY" in config:
-        config["celery"] = config.pop("CELERY")
+    config = {k.lower(): v for k, v in config.items()}
     # Celery parameters need to be on the top level for `celery.app.utils.Settings`.
     if "celery" in config:
         celery_config = config.pop("celery")

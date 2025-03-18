@@ -4,15 +4,17 @@ import os
 _SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 _DATA_DIR = os.path.join(_SCRIPT_DIR, "results", "celery")
 os.makedirs(_DATA_DIR, exist_ok=True)
-broker_url = f"sqla+sqlite:///{os.path.join(_DATA_DIR, 'celery.db')}"
-result_backend = f"db+sqlite:///{os.path.join(_DATA_DIR, 'celery_results.db')}"
 
-result_serializer = "pickle"
-accept_content = ["application/json", "application/x-python-serialize"]
-result_expires = 600
-task_remote_tracebacks = True
-broker_connection_retry_on_startup = True
-enable_utc = False
+CELERY = {
+    "broker_url": f"sqla+sqlite:///{os.path.join(_DATA_DIR, 'celery.db')}",
+    "result_backend": f"db+sqlite:///{os.path.join(_DATA_DIR, 'celery_results.db')}",
+    "result_serializer": "pickle",
+    "accept_content": ["application/json", "application/x-python-serialize"],
+    "result_expires": 600,
+    "task_remote_tracebacks": True,
+    "broker_connection_retry_on_startup": True,
+    "enable_utc": False,
+}
 
 _dbfile = os.path.join(_SCRIPT_DIR, "results", "ewoks", "ewoks_events.db")
 os.makedirs(os.path.dirname(_dbfile), exist_ok=True)
