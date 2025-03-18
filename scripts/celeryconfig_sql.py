@@ -17,7 +17,7 @@ enable_utc = False
 _dbfile = os.path.join(_SCRIPT_DIR, "results", "ewoks", "ewoks_events.db")
 os.makedirs(os.path.dirname(_dbfile), exist_ok=True)
 
-ewoks_execute_arguments = {
+EWOKS_EXECUTION = {
     "execinfo": {
         "handlers": [
             {

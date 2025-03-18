@@ -54,11 +54,11 @@ like the serialization of results (json by default)
 The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_
 describes the different parameters available.
 
-In addition to celery arguments, workflow execution arguments can be defined through the `ewoks_execute_arguments` variable.
+In addition to celery arguments, workflow execution arguments can be defined through the `EWOKS_EXECUTION` variable.
 
 .. code:: python
 
-    ewoks_execute_arguments = {
+    EWOKS_EXECUTION = {
         "engine": "ppf"
         "execinfo": {
             "handlers": [

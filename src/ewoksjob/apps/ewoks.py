@@ -59,7 +59,7 @@ def _task_wrapper(celery_task: Callable) -> Callable:
 @_ensure_ewoks_job_id
 @_task_wrapper
 def execute_graph(self, *args, **client_execute_arguments) -> Dict:
-    worker_execute_arguments = self.app.conf.get("ewoks_execute_arguments")
+    worker_execute_arguments = self.app.conf.get("ewoks_execution")
     kwargs = merge_execute_arguments(client_execute_arguments, worker_execute_arguments)
     return ewoks.execute_graph(*args, **kwargs)
 

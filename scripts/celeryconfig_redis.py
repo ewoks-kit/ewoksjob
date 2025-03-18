@@ -7,7 +7,7 @@ task_remote_tracebacks = True
 broker_connection_retry_on_startup = True
 enable_utc = False
 
-ewoks_execute_arguments = {
+EWOKS_EXECUTION = {
     "execinfo": {
         "handlers": [
             {
