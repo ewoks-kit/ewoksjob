@@ -2,6 +2,10 @@
 
 ## (unreleased)
 
+New features:
+
+- Custom ewoksjob future interface independent of the backend technology.
+
 ## 0.7.0
 
 Changes:

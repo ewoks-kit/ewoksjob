@@ -1,5 +1,7 @@
-from typing import List
-from concurrent.futures import Future
+import warnings
+from typing import List, Optional
+
+from .futures import Future
 from .pool import get_active_pool
 
 
@@ -7,33 +9,43 @@ __all__ = [
     "get_future",
     "cancel",
     "get_result",
+    "get_not_finished_uuids",
     "get_not_finished_task_ids",
     "get_not_finished_futures",
 ]
 
 
-def get_future(task_id) -> Future:
+def get_future(uuid: str) -> Future:
     pool = get_active_pool()
-    return pool.get_future(task_id)
+    return pool.get_future(uuid)
 
 
-def cancel(task_id):
+def cancel(uuid: str):
     """The current implementation does not allow cancelling running tasks"""
-    future = get_future(task_id)
-    future.cancel()
+    future = get_future(uuid)
+    future.abort()
 
 
-def get_result(task_id, **kwargs):
-    future = get_future(task_id)
-    return future.result(**kwargs)
+def get_result(uuid: str, timeout: Optional[float] = None):
+    future = get_future(uuid)
+    return future.result(timeout=timeout)
 
 
-def get_not_finished_task_ids() -> list:
+def get_not_finished_uuids() -> list:
     """Get all task ID's that are not finished"""
     pool = get_active_pool()
-    return pool.get_not_finished_task_ids()
+    return pool.get_not_finished_uuids()
+
+
+def get_not_finished_task_ids() -> List[str]:
+    warnings.warn(
+        "get_not_finished_task_ids() is deprecated and will be removed in a future release. Use `get_not_finished_uuids()` instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return get_not_finished_uuids()
 
 
 def get_not_finished_futures() -> List[Future]:
     """Get all futures that are not finished"""
-    return [get_future(task_id) for task_id in get_not_finished_task_ids()]
+    return [get_future(uuid) for uuid in get_not_finished_uuids()]

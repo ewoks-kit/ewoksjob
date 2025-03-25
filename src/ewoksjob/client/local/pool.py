@@ -6,14 +6,18 @@ import multiprocessing
 import weakref
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import Future
+from concurrent.futures import Future as NativeFuture
 
 try:
-    from pyslurmutils.concurrent.futures import SlurmRestExecutor
+    from pyslurmutils.client.errors import RemoteExit
     from pyslurmutils.concurrent.futures import SlurmRestFuture
+    from pyslurmutils.concurrent.futures import SlurmRestExecutor
 except ImportError:
     SlurmRestExecutor = None
     SlurmRestFuture = None
+    RemoteExit = None
+
+from .futures import Future
 
 
 __all__ = ["get_active_pool", "pool_context"]
@@ -89,52 +93,29 @@ class _LocalPool:
     def submit(
         self,
         func,
-        task_id=None,
+        uuid: Optional[str] = None,
         args: Optional[Tuple] = tuple(),
         kwargs: Optional[Mapping] = None,
     ) -> Future:
         """Like celery.send_task"""
         if kwargs is None:
             kwargs = dict()
-        future = self._executor.submit(func, *args, **kwargs)
-        self._patch_future(future, task_id)
-        self._tasks[future.task_id] = future
+        if uuid is None:
+            uuid = str(uuid4())
+        native_future = self._executor.submit(func, *args, **kwargs)
+        future = Future(uuid, native_future)
+        self._tasks[uuid] = future
         return future
 
-    def generate_task_id(self, task_id=None):
-        if self.pool_type == "slurm":
-            return task_id
-        if task_id is None:
-            task_id = str(uuid4())
-            while task_id in self._tasks:
-                task_id = str(uuid4())
-            return task_id
-        if task_id in self._tasks:
-            raise RuntimeError(f"Job '{task_id}' already exists")
-        return task_id
-
-    def get_future(self, task_id) -> Future:
-        future = self._tasks.get(task_id)
-        if future is None:
-            return self._get_dummy_future(task_id)
-        return future
-
-    def _get_dummy_future(self, task_id):
+    def get_future(self, uuid: str) -> Future:
+        future = self._tasks.get(uuid)
+        if future is not None:
+            return future
         if self.pool_type == "slurm":
             future = SlurmRestFuture()
         else:
-            future = Future()
-        self._patch_future(future, self.generate_task_id(task_id))
-        return future
+            future = NativeFuture()
+        return Future(uuid, future)
 
-    def get_not_finished_task_ids(self) -> list:
-        """Get all task ID's that are not finished"""
-        return [task_id for task_id, future in self._tasks.items() if not future.done()]
-
-    def _patch_future(self, future: Future, task_id) -> None:
-        if not task_id and self.pool_type == "slurm":
-            future.task_id = str(future.job_id)
-        else:
-            future.task_id = task_id
-        # Warning: this causes the future to never be garbage collected
-        # future.get = future.result
+    def get_not_finished_uuids(self) -> list:
+        return [uuid for uuid, future in self._tasks.items() if not future.done()]

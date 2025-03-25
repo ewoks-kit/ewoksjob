@@ -1,6 +1,5 @@
 from ..client import celery
 from ..client import local
-from .utils import get_result
 
 
 def test_submit(ewoks_worker):
@@ -20,8 +19,8 @@ def assert_submit(mod, *modules):
         future1 = mod.discover_tasks_from_modules(args=modules)
     else:
         future1 = mod.discover_all_tasks()
-    future2 = mod.get_future(future1.task_id)
-    results = get_result(future1, timeout=60)
+    future2 = mod.get_future(future1.uuid)
+    results = future1.result(timeout=60)
     assert results
-    results = get_result(future2, timeout=0)
+    results = future2.result(timeout=0)
     assert results

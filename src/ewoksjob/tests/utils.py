@@ -1,6 +1,6 @@
-import os
 import time
 import logging
+import subprocess
 from types import ModuleType
 
 logger = logging.getLogger(__name__)
@@ -11,29 +11,31 @@ def has_redis() -> bool:
         import redis  # noqa F401
     except ImportError:
         return False
-    with os.popen("redis-server --version") as output:
-        return bool(output.read())
+    return _check_redis_server()
 
 
-def get_result(future, **kwargs):
-    if hasattr(future, "get"):
-        return future.get(**kwargs)
-    else:
-        return future.result(**kwargs)
+def _check_redis_server() -> bool:
+    try:
+        result = subprocess.run(
+            ["redis-server", "--version"], capture_output=True, text=True, check=True
+        )
+        return bool(result.stdout.strip())
+    except Exception:
+        return False
 
 
-def wait_not_finished(mod: ModuleType, expected_task_ids: set, timeout=3):
-    """Wait until all running task ID's are `expected_task_ids`"""
+def wait_not_finished(mod: ModuleType, expected_uuids: set, timeout=3):
+    """Wait until all running job ID's are `expected_uuids`"""
     if mod.__name__.endswith("celery") and not has_redis():
         time.sleep(0.1)
         logger.warning("memory and sqlite do not support task monitoring")
         return
     t0 = time.time()
     while True:
-        task_ids = set(mod.get_not_finished_task_ids())
-        if task_ids == expected_task_ids:
+        uuids = set(mod.get_not_finished_uuids())
+        if uuids == expected_uuids:
             return
         dt = time.time() - t0
         if dt > timeout:
-            assert task_ids == expected_task_ids, task_ids
+            assert uuids == expected_uuids, uuids
         time.sleep(0.2)

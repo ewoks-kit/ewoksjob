@@ -1,6 +1,6 @@
-import os
 import warnings
-from typing import Callable, Mapping, Optional, Tuple
+from uuid import uuid4
+from typing import Mapping, Optional, Tuple
 from concurrent.futures import Future
 
 import ewoks
@@ -23,7 +23,13 @@ __all__ = [
 def execute_graph(
     args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
 ) -> Future:
-    return _submit_with_jobid(ewoks.execute_graph, args=args, kwargs=kwargs)
+    pool = get_active_pool()
+    if kwargs is None:
+        kwargs = dict()
+    execinfo = kwargs.setdefault("execinfo", dict())
+    uuid = str(uuid4())
+    execinfo["job_id"] = uuid
+    return pool.submit(ewoks.execute_graph, uuid=uuid, args=args, kwargs=kwargs)
 
 
 def execute_test_graph(
@@ -67,19 +73,3 @@ def discover_all_tasks(
 ) -> Future:
     pool = get_active_pool()
     return pool.submit(task_discovery.discover_all_tasks, args=args, kwargs=kwargs)
-
-
-def _submit_with_jobid(
-    func: Callable, args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
-) -> Future:
-    pool = get_active_pool()
-    if kwargs is None:
-        kwargs = dict()
-    execinfo = kwargs.setdefault("execinfo", dict())
-    if not execinfo.get("job_id"):
-        job_id = os.environ.get("SLURM_JOB_ID", None)
-        if job_id:
-            execinfo["job_id"] = job_id
-    task_id = pool.generate_task_id(execinfo.get("job_id"))
-    execinfo["job_id"] = task_id
-    return pool.submit(func, task_id=task_id, args=args, kwargs=kwargs)
