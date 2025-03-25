@@ -27,20 +27,26 @@ and results are stored
 .. code:: python
 
     # SQLite backend
-    broker_url = f"sqla+sqlite:///path/to/celery.db"
-    result_backend = f"db+sqlite:///path/to/celery_results.db"
+    CELERY = {
+        "broker_url": "sqla+sqlite:///path/to/celery.db"
+        "result_backend": "db+sqlite:///path/to/celery_results.db"
+    }
 
     # Redis backend
-    broker_url = "redis://localhost:10003/3"
-    result_backend = "redis://localhost:10003/4"
+    CELERY = {
+        "broker_url": "redis://localhost:10003/3
+        "result_backend": "redis://localhost:10003/4"
+    }
 
     # RabbitMQ backend
-    broker_url = f"pyamqp://guest@localhost//"
-    result_backend = "rpc://"
-    result_persistent = True
+    CELERY = {
+        "broker_url": "pyamqp://guest@localhost//"
+        "result_backend": "rpc://"
+        "result_persistent": True
+    }
 
-Other backends for results are supported (mongo, memcached). Other configurations are available,
-like the serialization of results (json by default)
+Other backends for results are supported (mongo, memcached). Other configuration parameters
+are available, like for data serialization (json by default)
 
 .. code:: python
 
@@ -54,8 +60,6 @@ like the serialization of results (json by default)
         "broker_connection_retry_on_startup": True,
         "enable_utc": False,
     }
-
-It is recommended for all celery parameters to be grouped in a dictionary called `CELERY`.
 
 The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_
 describes the different parameters available.
