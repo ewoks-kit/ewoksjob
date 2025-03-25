@@ -60,7 +60,7 @@ It is recommended for all celery parameters to be grouped in a dictionary called
 The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_
 describes the different parameters available.
 
-In addition to celery parameters, workflow execution parameters can be defined through the `EWOKS_EXECUTION` variable.
+In addition to Celery parameters, workflow execution parameters can be defined through the `EWOKS_EXECUTION` variable.
 
 .. code:: python
 
