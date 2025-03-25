@@ -20,10 +20,18 @@ if [[ $? -ne 0 ]] ; then
     exit 1
 fi
 
-echo "RUN example_with_events.py --celery"
-python $SCRIPT_DIR/example_with_events.py --celery
-if [[ $? -ne 0 ]] ; then
-    exit 1
+if [[ $1 == "--redis" ]];then
+    echo "RUN example_with_events.py --celery --redis"
+    python $SCRIPT_DIR/example_with_events.py --celery --redis
+    if [[ $? -ne 0 ]] ; then
+        exit 1
+    fi
+else
+    echo "RUN example_with_events.py --celery"
+    python $SCRIPT_DIR/example_with_events.py --celery
+    if [[ $? -ne 0 ]] ; then
+        exit 1
+    fi
 fi
 
 if [[ $1 == "--redis" ]];then

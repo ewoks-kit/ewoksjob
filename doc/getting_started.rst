@@ -27,31 +27,58 @@ and results are stored
 .. code:: python
 
     # SQLite backend
-    broker_url = f"sqla+sqlite:///path/to/celery.db"
-    result_backend = f"db+sqlite:///path/to/celery_results.db"
+    CELERY = {
+        "broker_url": "sqla+sqlite:///path/to/celery.db"
+        "result_backend": "db+sqlite:///path/to/celery_results.db"
+    }
 
     # Redis backend
-    broker_url = "redis://localhost:10003/3"
-    result_backend = "redis://localhost:10003/4"
+    CELERY = {
+        "broker_url": "redis://localhost:10003/3
+        "result_backend": "redis://localhost:10003/4"
+    }
 
     # RabbitMQ backend
-    broker_url = f"pyamqp://guest@localhost//"
-    result_backend = "rpc://"
-    result_persistent = True
+    CELERY = {
+        "broker_url": "pyamqp://guest@localhost//"
+        "result_backend": "rpc://"
+        "result_persistent": True
+    }
 
-Other backends for results are supported (mongo, memcached). Other configurations as available,
-like the serialization of results (json by default)
+Other backends for results are supported (mongo, memcached). Other configuration parameters
+are available, like for data serialization (json by default)
 
 .. code:: python
 
-    result_serializer = "pickle"
-    accept_content = ["application/json", "application/x-python-serialize"]
-    result_expires = 600
-    task_remote_tracebacks = True
-    enable_utc = False
+    CELERY = {
+        "broker_url": "...",
+        "result_backend": "...",
+        "result_serializer": "pickle",
+        "accept_content: ["application/json", "application/x-python-serialize"],
+        "result_expires": 600,
+        "task_remote_tracebacks": True,
+        "broker_connection_retry_on_startup": True,
+        "enable_utc": False,
+    }
 
 The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_
 describes the different parameters available.
+
+In addition to Celery parameters, workflow execution parameters can be defined through the `EWOKS_EXECUTION` variable.
+
+.. code:: python
+
+    EWOKS_EXECUTION = {
+        "engine": "ppf"
+        "execinfo": {
+            "handlers": [
+                {
+                    "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
+                    "arguments": [{"name": "url", "value": "redis://localhost:6379/2"}],
+                }
+            ]
+        }
+    }
 
 The configuration can be declared in a
 

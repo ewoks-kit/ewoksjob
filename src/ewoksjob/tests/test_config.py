@@ -9,8 +9,65 @@ EXPECTED = {
     "accept_content": ["application/json", "application/x-python-serialize"],
     "result_expires": 600,
     "task_remote_tracebacks": True,
+    "broker_connection_retry_on_startup": True,
+    "enable_utc": False,
+    "ewoks_execution": {
+        "execinfo": {
+            "handlers": [
+                {
+                    "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
+                    "arguments": [{"name": "url", "value": "redis://localhost:6379/2"}],
+                }
+            ]
+        }
+    },
+}
+
+
+_PY_CONTENT = """
+CELERY = {
+    "broker_url": "redis://localhost:6379/3",
+    "result_backend": "redis://localhost:6379/4",
+    "result_serializer": "pickle",
+    "accept_content": ["application/json", "application/x-python-serialize"],
+    "result_expires": 600,
+    "task_remote_tracebacks": True,
+    "broker_connection_retry_on_startup": True,
     "enable_utc": False,
 }
+
+EWOKS_EXECUTION = {
+    "execinfo": {
+        "handlers": [
+            {
+                "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
+                "arguments": [{"name": "url", "value": "redis://localhost:6379/2"}],
+            }
+        ]
+    }
+}
+"""
+
+_YAML_CONTENT = """
+celery:
+  accept_content:
+  - application/json
+  - application/x-python-serialize
+  broker_url: redis://localhost:6379/3
+  result_backend: redis://localhost:6379/4
+  result_expires: 600
+  result_serializer: pickle
+  task_remote_tracebacks: true
+  broker_connection_retry_on_startup: true
+  enable_utc: false
+ewoks_execution:
+  execinfo:
+    handlers:
+      - class: "ewoksjob.events.handlers.RedisEwoksEventHandler"
+        arguments:
+          - name: "url"
+            value: "redis://localhost:6379/2"
+"""
 
 
 def test_pyfile_config(py_config: str):
@@ -40,35 +97,16 @@ def test_beacon_config(beacon_config: str):
 @pytest.fixture
 def py_config(tmpdir) -> str:
     filename = str(tmpdir / "celeryconfig.py")
-    lines = [
-        "broker_url = 'redis://localhost:6379/3'\n",
-        "result_backend = 'redis://localhost:6379/4'\n",
-        "result_serializer = 'pickle'\n",
-        "accept_content = ['application/json', 'application/x-python-serialize']\n",
-        "result_expires = 600\n",
-        "task_remote_tracebacks = True\n",
-        "enable_utc = False\n",
-    ]
     with open(filename, "w") as f:
-        f.writelines(lines)
+        f.write(_PY_CONTENT)
     return filename
 
 
 @pytest.fixture
 def yaml_config(tmpdir) -> str:
     filename = str(tmpdir / "ewoks.yaml")
-    lines = [
-        "celery:\n",
-        "  broker_url: 'redis://localhost:6379/3'\n",
-        "  result_backend: 'redis://localhost:6379/4'\n",
-        "  result_serializer: 'pickle'\n",
-        "  accept_content: ['application/json', 'application/x-python-serialize']\n",
-        "  result_expires: 600\n",
-        "  task_remote_tracebacks: True\n",
-        "  enable_utc: False\n",
-    ]
     with open(filename, "w") as f:
-        f.writelines(lines)
+        f.write(_YAML_CONTENT)
     return filename
 
 

@@ -14,17 +14,14 @@ from ewoksjob.events.readers import instantiate_reader
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-def ewoks_event(celery: Optional[bool] = None):
-    # Events during execution
+def ewoks_event(celery: Optional[bool] = None, redis: bool = True):
     if celery:
-        # Redis backend
-        events_url = "redis://localhost:6379/2"
-        handlers = [
-            {
-                "class": "ewoksjob.events.handlers.RedisEwoksEventHandler",
-                "arguments": [{"name": "url", "value": events_url}],
-            }
-        ]
+        handlers = []  # in worker configuration
+        if redis:
+            events_url = "redis://localhost:6379/2"
+        else:
+            dbfile = os.path.join(SCRIPT_DIR, "results", "ewoks", "ewoks_events.db")
+            events_url = f"file://{dbfile}"
     else:
         # SQLite backend
         dbfile = os.path.join(SCRIPT_DIR, "results", "ewoks", "ewoks_events.db")
@@ -69,8 +66,8 @@ def test_workflow():
     return workflow, inputs, varinfo
 
 
-def job_argument():
-    reader, execinfo = ewoks_event()
+def job_argument(celery: Optional[bool] = None, redis: bool = True):
+    reader, execinfo = ewoks_event(celery=celery, redis=redis)
     workflow, inputs, varinfo = test_workflow()
     args = (workflow,)
     kwargs = {
@@ -110,9 +107,15 @@ if __name__ == "__main__":
         action="store_true",
         help="Use celery worker",
     )
+    parser.add_argument(
+        "--redis",
+        dest="redis",
+        action="store_true",
+        help="Use celery with Redis",
+    )
     options = parser.parse_args()
 
-    reader, args, kwargs = job_argument()
+    reader, args, kwargs = job_argument(celery=options.celery, redis=options.redis)
 
     if options.celery:
         future = submit(args=args, kwargs=kwargs)
