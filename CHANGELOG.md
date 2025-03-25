@@ -2,6 +2,16 @@
 
 ## (unreleased)
 
+## 0.7.0
+
+Changes:
+
+- Drop support for python 3.7
+
+New features:
+
+- Add ewoks execute parameters to the worker configuration under `EWOKS_EXECUTION`.
+
 ## 0.6.1
 
 Changes:
