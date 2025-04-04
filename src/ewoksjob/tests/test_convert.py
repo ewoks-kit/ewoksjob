@@ -1,6 +1,5 @@
 from ..client import celery
 from ..client import local
-from .utils import get_result
 
 
 def test_convert(ewoks_worker, tmpdir):
@@ -16,6 +15,6 @@ def assert_convert(mod, tmpdir):
     args = {"graph": {"id": "testgraph", "schema_version": "1.0"}}, str(filename)
     kwargs = {"save_options": {"indent": 2}}
     future = mod.convert_graph(args=args, kwargs=kwargs)
-    results = get_result(future, timeout=60)
+    results = future.result(timeout=60)
     assert results == str(filename) or results is None  # TODO: None is deprecated
     assert filename.exists()

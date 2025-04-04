@@ -2,6 +2,7 @@ import pytest
 from ..client import celery
 from ..client import local
 from .utils import wait_not_finished
+from ..client.futures import CancelledError
 
 
 def test_normal(ewoks_worker, tmpdir):
@@ -25,8 +26,8 @@ def assert_normal(mod, tmpdir):
     timeout = 10
     filename = tmpdir / "finished.smf"
     future = mod.submit_test(seconds=seconds, filename=str(filename))
-    wait_not_finished(mod, {future.task_id}, timeout=timeout)
-    results = mod.get_result(future.task_id, timeout=timeout)
+    wait_not_finished(mod, {future.uuid}, timeout=timeout)
+    results = mod.get_result(future.uuid, timeout=timeout)
     assert results == {"return_value": True}
     assert filename.exists()
     wait_not_finished(mod, set(), timeout=timeout)
@@ -40,21 +41,21 @@ def assert_cancel(mod, tmpdir):
 
     if mod is local:
         # The current implementation does not allow cancelling running tasks
-        mod.cancel(future.task_id)
+        mod.cancel(future.uuid)
         try:
-            results = mod.get_result(future.task_id, timeout=timeout)
-        except mod.CancelledErrors:
+            results = mod.get_result(future.uuid, timeout=timeout)
+        except CancelledError:
             assert not filename.exists()
         else:
             assert results == {"return_value": True}
             assert filename.exists()
             pytest.xfail(f"{mod.__name__} ran until completion")
     else:
-        wait_not_finished(mod, {future.task_id}, timeout=timeout)
-        mod.cancel(future.task_id)
+        wait_not_finished(mod, {future.uuid}, timeout=timeout)
+        mod.cancel(future.uuid)
         try:
-            results = mod.get_result(future.task_id, timeout=timeout)
-        except mod.CancelledErrors:
+            results = mod.get_result(future.uuid, timeout=timeout)
+        except CancelledError:
             assert not filename.exists()
         else:
             assert results == {"return_value": True}

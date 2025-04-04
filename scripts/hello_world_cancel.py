@@ -1,5 +1,6 @@
 import time
-from ewoksjob.client import submit, CancelledErrors
+from ewoksjob.client import submit
+from ewoksjob.client.futures import CancelledError
 
 # Define a workflow with default inputs
 nodes = [
@@ -23,11 +24,11 @@ workflow = {"graph": {"id": "testworkflow"}, "nodes": nodes, "links": links}
 future = submit(args=(workflow,))
 time.sleep(1)
 
-future.revoke(terminate=True)
+future.abort()
 
 try:
     future.get(timeout=5)
-except CancelledErrors:
+except CancelledError:
     pass
 else:
     assert False, "Failed to cancel the job"

@@ -12,7 +12,6 @@ except ImportError:
 
 from ..client import celery
 from ..client import local
-from .utils import get_result
 
 
 def test_submit(ewoks_worker):
@@ -37,6 +36,6 @@ def assert_submit(mod):
             "raw": "/path/to/raw/dataset",
         }
     }
-    future1 = mod.submit(args=(graph,), kwargs=kwargs)
+    future = mod.submit(args=(graph,), kwargs=kwargs)
     with pytest.raises(RuntimeError, match=ICAT_ERROR_MSG):
-        get_result(future1, timeout=60)
+        _ = future.result(timeout=60)
