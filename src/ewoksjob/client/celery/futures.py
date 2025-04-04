@@ -35,7 +35,7 @@ from .. import async_state
 
 _RUNNING_STATES = frozenset(
     {states.RECEIVED, states.STARTED}
-)  # do nto include states.PENDING
+)  # do not include states.PENDING
 _DONE_STATES = frozenset({states.SUCCESS, states.FAILURE, states.REVOKED})
 
 
@@ -45,7 +45,7 @@ class Future(FutureInterface):
             async_result = AsyncResult(uuid)
         self._async_result = async_result
 
-    # Same API has `concurrent.futures.Future`
+    # Same API as `concurrent.futures.Future`
 
     def cancel(self) -> bool:
         self._async_result.revoke(terminate=False)
