@@ -117,5 +117,5 @@ class _LocalPool:
             future = NativeFuture()
         return Future(uuid, future)
 
-    def get_not_finished_uuids(self) -> list:
+    def get_unfinished_uuids(self) -> list:
         return [uuid for uuid, future in self._tasks.items() if not future.done()]

@@ -9,7 +9,7 @@ __all__ = [
     "get_future",
     "cancel",
     "get_result",
-    "get_not_finished_uuids",
+    "get_unfinished_uuids",
     "get_not_finished_task_ids",
     "get_not_finished_futures",
 ]
@@ -31,21 +31,21 @@ def get_result(uuid: str, timeout: Optional[float] = None):
     return future.result(timeout=timeout)
 
 
-def get_not_finished_uuids() -> list:
+def get_unfinished_uuids() -> list:
     """Get all task ID's that are not finished"""
     pool = get_active_pool()
-    return pool.get_not_finished_uuids()
+    return pool.get_unfinished_uuids()
 
 
 def get_not_finished_task_ids() -> List[str]:
     warnings.warn(
-        "get_not_finished_task_ids() is deprecated and will be removed in a future release. Use `get_not_finished_uuids()` instead.",
+        "get_not_finished_task_ids() is deprecated and will be removed in a future release. Use `get_unfinished_uuids()` instead.",
         DeprecationWarning,
         stacklevel=2,
     )
-    return get_not_finished_uuids()
+    return get_unfinished_uuids()
 
 
 def get_not_finished_futures() -> List[Future]:
     """Get all futures that are not finished"""
-    return [get_future(uuid) for uuid in get_not_finished_uuids()]
+    return [get_future(uuid) for uuid in get_unfinished_uuids()]

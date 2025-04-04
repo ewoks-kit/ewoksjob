@@ -32,7 +32,7 @@ def wait_not_finished(mod: ModuleType, expected_uuids: set, timeout=3):
         return
     t0 = time.time()
     while True:
-        uuids = set(mod.get_not_finished_uuids())
+        uuids = set(mod.get_unfinished_uuids())
         if uuids == expected_uuids:
             return
         dt = time.time() - t0

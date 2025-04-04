@@ -9,7 +9,7 @@ __all__ = [
     "get_future",
     "cancel",
     "get_result",
-    "get_not_finished_uuids",
+    "get_unfinished_uuids",
     "get_not_finished_task_ids",
     "get_not_finished_futures",
     "get_queues",
@@ -34,7 +34,7 @@ def get_result(uuid: str, timeout: Optional[float] = None, **kwargs) -> Any:
     return future.result(timeout=timeout, **kwargs)
 
 
-def get_not_finished_uuids() -> List[str]:
+def get_unfinished_uuids() -> List[str]:
     inspect = current_app.control.inspect()
     uuids = list()
 
@@ -58,15 +58,15 @@ def get_not_finished_uuids() -> List[str]:
 
 def get_not_finished_task_ids() -> List[str]:
     warnings.warn(
-        "get_not_finished_task_ids() is deprecated and will be removed in a future release. Use `get_not_finished_uuids()` instead.",
+        "get_not_finished_task_ids() is deprecated and will be removed in a future release. Use `get_unfinished_uuids()` instead.",
         DeprecationWarning,
         stacklevel=2,
     )
-    return get_not_finished_uuids()
+    return get_unfinished_uuids()
 
 
 def get_not_finished_futures() -> List[Future]:
-    lst = [get_future(uuid) for uuid in get_not_finished_uuids()]
+    lst = [get_future(uuid) for uuid in get_unfinished_uuids()]
     return [future for future in lst if future is not None]
 
 
