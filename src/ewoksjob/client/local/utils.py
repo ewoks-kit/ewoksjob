@@ -1,7 +1,7 @@
 import warnings
 from typing import List, Optional
 
-from .futures import Future
+from .futures import LocalFuture
 from .pool import get_active_pool
 
 
@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-def get_future(uuid: str) -> Future:
+def get_future(uuid: str) -> LocalFuture:
     pool = get_active_pool()
     return pool.get_future(uuid)
 
@@ -46,6 +46,6 @@ def get_not_finished_task_ids() -> List[str]:
     return get_unfinished_uuids()
 
 
-def get_not_finished_futures() -> List[Future]:
+def get_not_finished_futures() -> List[LocalFuture]:
     """Get all futures that are not finished"""
     return [get_future(uuid) for uuid in get_unfinished_uuids()]

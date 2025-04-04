@@ -23,7 +23,7 @@ from ..futures import CancelledError
 from ..futures import FutureInterface
 
 
-class Future(FutureInterface):
+class LocalFuture(FutureInterface):
 
     def __init__(self, uuid: str, future: Optional[NATIVE_FUTURE_TYPES] = None) -> None:
         if future is None:
@@ -38,7 +38,7 @@ class Future(FutureInterface):
             self._is_slurm = isinstance(future, SlurmRestFuture)
         self._uuid = uuid
 
-    # Same API has `concurrent.futures.Future`
+    # Same API has `concurrent.futures.LocalFuture`
 
     def cancel(self) -> bool:
         return self._native_future.cancel()
@@ -71,7 +71,7 @@ class Future(FutureInterface):
                 f"job '{self.uuid}' is not done with {timeout} seconds"
             ) from e
 
-    # API in addition to `concurrent.futures.Future`
+    # API in addition to `concurrent.futures.LocalFuture`
 
     @property
     def uuid(self) -> str:

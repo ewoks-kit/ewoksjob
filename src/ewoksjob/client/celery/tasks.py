@@ -2,7 +2,7 @@ import warnings
 
 from celery.execute import send_task
 
-from .futures import Future
+from .futures import CeleryFuture
 from ..dummy_workflow import dummy_workflow
 
 
@@ -16,14 +16,14 @@ __all__ = [
 ]
 
 
-def execute_graph(**kw) -> Future:
+def execute_graph(**kw) -> CeleryFuture:
     async_result = send_task("ewoksjob.apps.ewoks.execute_graph", **kw)
-    return Future(async_result.id, async_result)
+    return CeleryFuture(async_result.id, async_result)
 
 
 def execute_test_graph(
     seconds=0, filename=None, args=None, kwargs=None, **kw
-) -> Future:
+) -> CeleryFuture:
     if args:
         raise TypeError("execute_test_graph does not take position arguments")
     args = (dummy_workflow(),)
@@ -36,23 +36,23 @@ def execute_test_graph(
     return execute_graph(args=args, kwargs=kwargs, **kw)
 
 
-def convert_graph(**kw) -> Future:
+def convert_graph(**kw) -> CeleryFuture:
     async_result = send_task("ewoksjob.apps.ewoks.convert_graph", **kw)
-    return Future(async_result.id, async_result)
+    return CeleryFuture(async_result.id, async_result)
 
 
-def convert_workflow(**kw) -> Future:
+def convert_workflow(**kw) -> CeleryFuture:
     warnings.warn(
         "convert_workflow is deprecated, use convert_graph instead", stacklevel=2
     )
     return convert_graph(**kw)
 
 
-def discover_tasks_from_modules(**kw) -> Future:
+def discover_tasks_from_modules(**kw) -> CeleryFuture:
     async_result = send_task("ewoksjob.apps.ewoks.discover_tasks_from_modules", **kw)
-    return Future(async_result.id, async_result)
+    return CeleryFuture(async_result.id, async_result)
 
 
-def discover_all_tasks(**kw) -> Future:
+def discover_all_tasks(**kw) -> CeleryFuture:
     async_result = send_task("ewoksjob.apps.ewoks.discover_all_tasks", **kw)
-    return Future(async_result.id, async_result)
+    return CeleryFuture(async_result.id, async_result)

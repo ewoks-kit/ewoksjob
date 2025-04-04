@@ -17,7 +17,7 @@ except ImportError:
     SlurmRestFuture = None
     RemoteExit = None
 
-from .futures import Future
+from .futures import LocalFuture
 
 
 __all__ = ["get_active_pool", "pool_context"]
@@ -96,18 +96,18 @@ class _LocalPool:
         uuid: Optional[str] = None,
         args: Optional[Tuple] = tuple(),
         kwargs: Optional[Mapping] = None,
-    ) -> Future:
+    ) -> LocalFuture:
         """Like celery.send_task"""
         if kwargs is None:
             kwargs = dict()
         if uuid is None:
             uuid = str(uuid4())
         native_future = self._executor.submit(func, *args, **kwargs)
-        future = Future(uuid, native_future)
+        future = LocalFuture(uuid, native_future)
         self._tasks[uuid] = future
         return future
 
-    def get_future(self, uuid: str) -> Future:
+    def get_future(self, uuid: str) -> LocalFuture:
         future = self._tasks.get(uuid)
         if future is not None:
             return future
@@ -115,7 +115,7 @@ class _LocalPool:
             future = SlurmRestFuture()
         else:
             future = NativeFuture()
-        return Future(uuid, future)
+        return LocalFuture(uuid, future)
 
     def get_unfinished_uuids(self) -> list:
         return [uuid for uuid, future in self._tasks.items() if not future.done()]

@@ -39,7 +39,7 @@ _RUNNING_STATES = frozenset(
 _DONE_STATES = frozenset({states.SUCCESS, states.FAILURE, states.REVOKED})
 
 
-class Future(FutureInterface):
+class CeleryFuture(FutureInterface):
     def __init__(self, uuid: str, async_result: Optional[AsyncResult] = None):
         if async_result is None:
             async_result = AsyncResult(uuid)

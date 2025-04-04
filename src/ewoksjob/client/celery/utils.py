@@ -3,7 +3,7 @@ import logging
 from typing import Dict, List, Optional, Set, Any
 from celery import current_app
 
-from .futures import Future
+from .futures import CeleryFuture
 
 __all__ = [
     "get_future",
@@ -20,8 +20,8 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
-def get_future(uuid: str) -> Future:
-    return Future(uuid)
+def get_future(uuid: str) -> CeleryFuture:
+    return CeleryFuture(uuid)
 
 
 def cancel(uuid: str) -> None:
@@ -30,7 +30,7 @@ def cancel(uuid: str) -> None:
 
 
 def get_result(uuid: str, timeout: Optional[float] = None, **kwargs) -> Any:
-    future = Future(uuid)
+    future = CeleryFuture(uuid)
     return future.result(timeout=timeout, **kwargs)
 
 
@@ -65,7 +65,7 @@ def get_not_finished_task_ids() -> List[str]:
     return get_unfinished_uuids()
 
 
-def get_not_finished_futures() -> List[Future]:
+def get_not_finished_futures() -> List[CeleryFuture]:
     lst = [get_future(uuid) for uuid in get_unfinished_uuids()]
     return [future for future in lst if future is not None]
 
