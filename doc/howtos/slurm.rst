@@ -1,7 +1,5 @@
-.. _Slurm:
-
-Slurm
-=====
+How to submit jobs to Slurm via a worker
+========================================
 
 To distribute jobs to a Slurm cluster, one or more workers with the `--pool=slurm` option needs to be running.
 A client is in general unaware of this, unless it wants to specify Slurm job parameters for each job it submits.
