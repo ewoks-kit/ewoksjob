@@ -116,6 +116,12 @@ On the worker side, the configuration URI can also be provided as a CLI argument
 
     ewoksjob --config=myproject.config worker
 
+.. note::
+
+    The ``ewoksjob`` command line interface is a wrapper of the `Celery command line interface <https://docs.celeryq.dev/en/stable/reference/cli.html>`_.
+
+    For more information, see the `Ewoksjob commands reference <./cli.html>`_
+
 Worker side
 -----------
 

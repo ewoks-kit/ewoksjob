@@ -62,6 +62,7 @@ Documentation
 
     getting_started
     routing
+    cli
     slurm
     bliss
     api
