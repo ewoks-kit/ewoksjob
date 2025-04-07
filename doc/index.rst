@@ -61,8 +61,6 @@ Documentation
     :maxdepth: 2
 
     getting_started
-    routing
-    cli
-    slurm
-    bliss
-    api
+    explanations/index
+    howtos/index
+    reference/index
