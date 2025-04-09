@@ -12,4 +12,6 @@ else
     export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_sql.py
 fi
 
+export FLOWER_UNAUTHENTICATED_API=true
+
 (cd $SCRIPT_DIR; ewoksjob monitor "${@:2}")
