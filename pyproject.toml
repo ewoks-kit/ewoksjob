@@ -67,7 +67,8 @@ test = [
     "pytest-celery",
     "pytest-redis",
     "pytest-mock",
-    "tzdata",  # until kombu fix is released"
+    "tzdata",
+    "pytest-timeout",
 ]
 dev = [
     "ewoksjob[test]",
@@ -92,4 +93,7 @@ where = ["src"]
 omit = ['*/tests/*']
 
 [project.scripts]
-ewoksjob = "ewoksjob.__main__:main"
+"ewoksjob" = "ewoksjob.__main__:main"
+
+[tool.pytest.ini_options]
+timeout = 120
