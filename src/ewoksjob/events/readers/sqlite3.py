@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Generator
+from typing import Iterator
 from ewoksutils.event_utils import FIELD_TYPES
 from ewoksutils import sqlite3_utils
 from .base import EwoksEventReader, EventType
@@ -24,10 +24,10 @@ class Sqlite3EwoksEventReader(EwoksEventReader):
             self.__connection = sqlite3.connect(self._uri, uri=True)
         return self.__connection
 
-    def wait_events(self, **kwargs) -> Generator[EventType, None, None]:
+    def wait_events(self, **kwargs) -> Iterator[EventType]:
         yield from self.poll_events(**kwargs)
 
-    def get_events(self, **filters) -> Generator[EventType, None, None]:
+    def get_events(self, **filters) -> Iterator[EventType]:
         yield from sqlite3_utils.select(
             self._connection,
             "ewoks_events",
