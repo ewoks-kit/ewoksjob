@@ -1,5 +1,5 @@
 import time
-from typing import Dict, Iterable, Optional, Tuple
+from typing import Dict, Iterator, Optional, Tuple
 import json
 from datetime import datetime
 from threading import Event
@@ -26,13 +26,13 @@ class EwoksEventReader:
 
     def wait_events(
         self, timeout=None, stop_event: Optional[Event] = None, **filters
-    ) -> Iterable[EventType]:
+    ) -> Iterator[EventType]:
         """Yield events matching the filter until timeout is reached."""
         raise NotImplementedError
 
     def poll_events(
         self, timeout=None, stop_event: Optional[Event] = None, interval=0.1, **filters
-    ) -> Iterable[EventType]:
+    ) -> Iterator[EventType]:
         """Yield events matching the filter until timeout is reached."""
         start = time.time()
         n = 0
@@ -52,29 +52,29 @@ class EwoksEventReader:
                 return
             time.sleep(interval)
 
-    def get_events(self, **filters) -> Iterable[EventType]:
+    def get_events(self, **filters) -> Iterator[EventType]:
         """Returns all currently available events matching the filter."""
         raise NotImplementedError
 
-    def wait_events_with_variables(self, *args, **kwargs) -> Iterable[EventType]:
+    def wait_events_with_variables(self, *args, **kwargs) -> Iterator[EventType]:
         """`get_events` with URI dereferencing."""
         for event in self.wait_events(*args, **kwargs):
             self.dereference_data_uris(event)
             yield event
 
-    def poll_events_with_variables(self, *args, **kwargs) -> Iterable[EventType]:
+    def poll_events_with_variables(self, *args, **kwargs) -> Iterator[EventType]:
         """`get_events` with URI dereferencing."""
         for event in self.poll_events(*args, **kwargs):
             self.dereference_data_uris(event)
             yield event
 
-    def get_events_with_variables(self, *args, **kwargs) -> Iterable[EventType]:
+    def get_events_with_variables(self, *args, **kwargs) -> Iterator[EventType]:
         """`get_events` with URI dereferencing."""
         for event in self.get_events(*args, **kwargs):
             self.dereference_data_uris(event)
             yield event
 
-    def get_full_job_events(self, **filters) -> Iterable[Tuple[EventType]]:
+    def get_full_job_events(self, **filters) -> Iterator[Tuple[EventType]]:
         """Returns events grouped by "job_id". When one event matches the filter,
         all events with the "job_id" are returned.
         """
@@ -86,7 +86,7 @@ class EwoksEventReader:
 
     def get_full_job_events_with_variables(
         self, **filters
-    ) -> Iterable[Tuple[EventType]]:
+    ) -> Iterator[Tuple[EventType]]:
         """`get_full_job_events` with URI dereferencing."""
         job_id = None
         for event in self.get_events(**filters):
