@@ -51,6 +51,10 @@ slurm = [
 beacon = [
     "blissdata",
 ]
+blissclient = [
+    "ewoksjob[redis]",
+    "ewoksjob[beacon]",
+]
 blissworker = [
     "ewoksjob[worker]",
     "ewoksjob[redis]",
