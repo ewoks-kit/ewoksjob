@@ -1,7 +1,7 @@
 import os
 import json
 import socket
-from typing import Iterable
+from typing import Iterator
 import redis
 from .base import EwoksEventReader, EventType
 
@@ -12,10 +12,10 @@ class RedisEwoksEventReader(EwoksEventReader):
         self._proxy = redis.Redis.from_url(url, client_name=client_name)
         super().__init__()
 
-    def wait_events(self, **kwargs) -> Iterable[EventType]:
+    def wait_events(self, **kwargs) -> Iterator[EventType]:
         yield from self.poll_events(**kwargs)
 
-    def get_events(self, job_id=None, **filters) -> Iterable[EventType]:
+    def get_events(self, job_id=None, **filters) -> Iterator[EventType]:
         is_equal_filter, post_filter = self.split_filter(**filters)
 
         if job_id:
