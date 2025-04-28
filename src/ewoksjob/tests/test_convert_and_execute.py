@@ -3,20 +3,20 @@ from ..client import celery
 from ..client import local
 
 
-def test_submit(ewoks_worker, tmpdir):
-    assert_submit(celery, tmpdir)
-    assert_submit_test(celery, tmpdir)
+def test_submit(ewoks_worker, slurm_tmp_path):
+    assert_submit(celery, slurm_tmp_path)
+    assert_submit_test(celery, slurm_tmp_path)
 
 
-def test_submit_local(local_ewoks_worker, tmpdir):
-    assert_submit(local, tmpdir)
-    assert_submit_test(local, tmpdir)
+def test_submit_local(local_ewoks_worker, slurm_tmp_path):
+    assert_submit(local, slurm_tmp_path)
+    assert_submit_test(local, slurm_tmp_path)
 
 
-def assert_submit(mod, tmpdir):
+def assert_submit(mod, slurm_tmp_path):
     graph, expected = get_graph("acyclic1")
     expected = expected["task6"]
-    filename = tmpdir / "test.json"
+    filename = slurm_tmp_path / "test.json"
     args = (graph,)
     kwargs = {"save_options": {"indent": 2}, "convert_destination": str(filename)}
     future1 = mod.submit(args=args, kwargs=kwargs)
@@ -28,8 +28,8 @@ def assert_submit(mod, tmpdir):
     assert filename.exists()
 
 
-def assert_submit_test(mod, tmpdir):
-    filename = tmpdir / "test.json"
+def assert_submit_test(mod, slurm_tmp_path):
+    filename = slurm_tmp_path / "test.json"
     kwargs = {"save_options": {"indent": 2}, "convert_destination": str(filename)}
     future1 = mod.submit_test(kwargs=kwargs)
     future2 = mod.get_future(future1.uuid)

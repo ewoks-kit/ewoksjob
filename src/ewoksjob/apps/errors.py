@@ -9,6 +9,8 @@ _CLIENT_EXCEPTION_MODULES = (
     "multiprocessing",
     "kombu",
     "ewoksjob",
+    "gevent",
+    "greenlet",
 )
 
 

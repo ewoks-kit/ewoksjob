@@ -1,7 +1,7 @@
 import gc
 import os
-import pytest
 
+import pytest
 from ewokscore import events
 from ewoksjob.events.readers import instantiate_reader
 from ewoksjob.worker import options as worker_options
@@ -115,8 +115,8 @@ def local_ewoks_worker(slurm_client_kwargs):
 
 
 @pytest.fixture()
-def sqlite3_ewoks_events(tmpdir):
-    uri = f"file:{tmpdir / 'ewoks_events.db'}"
+def sqlite3_ewoks_events(tmp_path):
+    uri = f"file:{tmp_path / 'ewoks_events.db'}"
     handlers = [
         {
             "class": "ewokscore.events.handlers.Sqlite3EwoksEventHandler",

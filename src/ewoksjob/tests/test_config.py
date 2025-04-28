@@ -95,16 +95,16 @@ def test_beacon_config(beacon_config: str):
 
 
 @pytest.fixture
-def py_config(tmpdir) -> str:
-    filename = str(tmpdir / "celeryconfig.py")
+def py_config(tmp_path) -> str:
+    filename = str(tmp_path / "celeryconfig.py")
     with open(filename, "w") as f:
         f.write(_PY_CONTENT)
     return filename
 
 
 @pytest.fixture
-def yaml_config(tmpdir) -> str:
-    filename = str(tmpdir / "ewoks.yaml")
+def yaml_config(tmp_path) -> str:
+    filename = str(tmp_path / "ewoks.yaml")
     with open(filename, "w") as f:
         f.write(_YAML_CONTENT)
     return filename

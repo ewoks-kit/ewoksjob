@@ -65,11 +65,11 @@ class LocalFuture(FutureInterface):
         try:
             yield
         except (NativeCancelledError, RemoteExit) as e:
-            raise CancelledError(f"future of job '{self.uuid}' was cancelled") from e
+            err_msg = f"future of job '{self.uuid}' was cancelled"
+            raise CancelledError(err_msg) from e
         except NativeTimeoutError as e:
-            raise TimeoutError(
-                f"job '{self.uuid}' is not done with {timeout} seconds"
-            ) from e
+            err_msg = f"job '{self.uuid}' is not done with {timeout} seconds"
+            raise TimeoutError(err_msg) from e
 
     # API in addition to `concurrent.futures.LocalFuture`
 
@@ -89,5 +89,5 @@ class LocalFuture(FutureInterface):
 
     def abort(self) -> bool:
         if self._is_slurm:
-            self._native_future.cancel_job()
+            self._native_future.abort()
         return self.aborted()
