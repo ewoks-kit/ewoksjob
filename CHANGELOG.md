@@ -2,9 +2,12 @@
 
 ## (unreleased)
 
+## 1.0.0
+
 New features:
 
 - Custom ewoksjob future interface independent of the backend technology.
+- Support cancelling jobs executed by `--pool=slurm` workers.
 
 ## 0.7.0
 
