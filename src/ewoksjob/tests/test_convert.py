@@ -11,7 +11,6 @@ def test_convert_local(local_ewoks_worker, slurm_tmp_path):
 
 
 def assert_convert(mod, slurm_tmp_path):
-    print(slurm_tmp_path)
     filename = slurm_tmp_path / "test.json"
     args = {"graph": {"id": "testgraph", "schema_version": "1.0"}}, str(filename)
     kwargs = {"save_options": {"indent": 2}}
