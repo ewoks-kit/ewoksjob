@@ -1,16 +1,6 @@
-## Unit tests
+<a href="https://gitlab.esrf.fr/dau/ci/pyci/-/blob/main/CONTRIBUTING.md" target="_blank">CONTRIBUTING.md</a>
 
-Tests make use of [pytest](https://docs.pytest.org/en/stable/index.html) and can be run as follows
-
-```bash
-pytest .
-```
-
-Testing an installed project is done like this
-
-```bash
-pytest --pyargs <project_name>
-```
+## Production tests
 
 Testing against a Slurm production server is done like this
 
