@@ -6,6 +6,7 @@ variables:
   WARNING1: "ignore::DeprecationWarning:kombu.utils.compat"
   WARNING2: "ignore::DeprecationWarning:celery.utils.imports"
   WARNINGS: "-W ${WARNING1} -W ${WARNING2}"
+  WARNINGS_PY39: "${WARNINGS} -W ignore::RuntimeWarning:networkx.utils.backends" # https://github.com/networkx/networkx/issues/7372
 
 test-3.8:
   extends: .test-3.8
@@ -17,7 +18,7 @@ test-3.9:
   extends: .test-3.9
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS_PY39}"
 
 test-3.10:
   extends: .test-3.10
@@ -28,10 +29,19 @@ test-3.10:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
+test-3.11:
+  extends: .test-3.11
+  before_script:
+    - !reference [.test-3.11, before_script]
+    - python -m pip install blissdata --ignore-requires-python
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
 test-3.12:
   extends: .test-3.12
   before_script:
-    - !reference [.test-3.11, before_script]
+    - !reference [.test-3.12, before_script]
     - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
@@ -96,18 +106,97 @@ test-3.12-examples-redis:
 build_sdist:
   extends: .build_sdist
 
-test_sdist-3.9-redis:
-  timeout: 15m
-  extends: .test_sdist-3.9-redis
+test_sdist-3.8:
+  extends: .test_sdist-3.8
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS} -W ignore::RuntimeWarning:networkx.utils.backends" # networkx #7372
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
-test_sdist-3.11-win:
-  extends: .test_sdist-3.11-win
+test_sdist-3.9:
+  extends: .test_sdist-3.9
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS_PY39}"
+
+test_sdist-3.10:
+  extends: .test_sdist-3.10
   before_script:
-    - !reference [.test_sdist-3.11-win, before_script]
+    - !reference [.test_sdist-3.10, before_script]
     - python -m pip install blissdata --ignore-requires-python
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
+test_sdist-3.11:
+  extends: .test_sdist-3.11
+  before_script:
+    - !reference [.test_sdist-3.11, before_script]
+    - python -m pip install blissdata --ignore-requires-python
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
+test_sdist-3.12:
+  extends: .test_sdist-3.12
+  before_script:
+    - !reference [.test_sdist-3.12, before_script]
+    - python -m pip install blissdata --ignore-requires-python
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
+test_sdist-3.12-slurm:
+  extends: test_sdist-3.12
+  script:
+    - python -m pip install --pre .[test,orange]
+    - python -m gevent.monkey --module pytest . -v
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
+test_sdist-3.12-win:
+  extends: .test_sdist-3.12-win
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
+test_sdist-3.12-redis:
+  extends: .test_sdist-3.12-redis
+  timeout: 15m
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
+test_sdist-3.12-redis-slurm:
+  extends: test_sdist-3.12-redis
+  timeout: 15m
+  script:
+    - python -m pip install --pre .[test,orange]
+    - python -m gevent.monkey --module pytest . -v
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
+test_sdist-3.12-examples-sql:
+  extends: .test_sdist-3.12
+  script:
+    - python -m pip install --pre .[test]
+    - python -m pip install --pre ewoksppf
+    - ./scripts/worker.sh --sql --pool=process &
+    - ./scripts/runjobs.sh --sql
+  variables:
+    JUPYTER_PLATFORM_DIRS: 1
+    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+
+test_sdist-3.12-examples-redis:
+  extends: .test_sdist-3.12-redis
+  timeout: 15m
+  script:
+    - python -m pip install --pre .[test]
+    - python -m pip install --pre ewoksppf
+    - redis-server &
+    - ./scripts/worker.sh --redis --pool=process &
+    - ./scripts/runjobs.sh --redis
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
