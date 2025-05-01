@@ -3,7 +3,7 @@ import os
 
 import pytest
 from ewokscore import events
-from ewoksjob.events.readers import instantiate_reader
+from ewoksjob.events.readers import read_ewoks_events
 from ewoksjob.worker import options as worker_options
 
 from .utils import has_redis
@@ -123,10 +123,9 @@ def sqlite3_ewoks_events(tmp_path):
             "arguments": [{"name": "uri", "value": uri}],
         }
     ]
-    reader = instantiate_reader(uri)
-    yield handlers, reader
-    reader.close()
-    events.cleanup()
+    with read_ewoks_events(uri) as reader:
+        yield handlers, reader
+        events.cleanup()
 
 
 @pytest.fixture()
@@ -141,12 +140,11 @@ def redis_ewoks_events(redisdb):
             ],
         }
     ]
-    reader = instantiate_reader(url)
-    yield handlers, reader
+    with read_ewoks_events(url) as reader:
+        yield handlers, reader
 
-    connection = redis.Redis.from_url(url)
-    for key in connection.keys("ewoks:*"):
-        assert connection.ttl(key) >= 0, key
+        connection = redis.Redis.from_url(url)
+        for key in connection.keys("ewoks:*"):
+            assert connection.ttl(key) >= 0, key
 
-    reader.close()
-    events.cleanup()
+        events.cleanup()

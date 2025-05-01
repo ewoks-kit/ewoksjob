@@ -9,7 +9,7 @@ from typing import Optional
 from ewoksjob.client import submit
 from ewoksjob.client.local import submit as submit_local
 from ewoksjob.client.local import pool_context
-from ewoksjob.events.readers import instantiate_reader
+from ewoksjob.events.readers import read_ewoks_events
 
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -34,9 +34,9 @@ def ewoks_event(celery: Optional[bool] = None, redis: bool = True):
             }
         ]
 
-    reader = instantiate_reader(events_url)
-    execinfo = {"handlers": handlers}
-    return reader, execinfo
+    with read_ewoks_events(events_url) as reader:
+        execinfo = {"handlers": handlers}
+        return reader, execinfo
 
 
 def test_workflow():
