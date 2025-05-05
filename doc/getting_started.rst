@@ -156,7 +156,8 @@ Prepare for sending/receiving ewoks events
         }
     ]
 
-    reader = instantiate_reader(events_url)
+    with read_ewoks_events(events_url) as reader:
+        ...
 
 Test workflow
 

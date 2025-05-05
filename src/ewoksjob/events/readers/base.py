@@ -10,13 +10,18 @@ try:
 except ImportError:
     Variable = VariableContainer = None
 
-__all__ = ["EventType", "EwoksEventReader"]
 
 EventType = Dict[str, str]
 
 
 class EwoksEventReader:
     """Base class for receiving ewoks events on the client side."""
+
+    def __enter__(self) -> "EwoksEventReader":
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
     def __del__(self):
         self.close()
