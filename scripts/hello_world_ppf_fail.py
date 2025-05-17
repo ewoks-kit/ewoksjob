@@ -81,6 +81,6 @@ if __name__ == "__main__":
     try:
         future.get(timeout=5)
     except RuntimeError as e:
-        assert str(e) == "Task 'task2' failed"
+        assert "'str' object cannot be interpreted as an integer" in str(e)
     else:
         assert False, "Job did not fail"
