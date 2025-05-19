@@ -12,7 +12,7 @@ nodes = [
         "id": "task2",
         "task_type": "method",
         "task_identifier": "time.sleep",
-        "default_inputs": [{"name": 0, "value": "fail"}],
+        "default_inputs": [{"name": 0, "value": "wrongtype"}],
     },
 ]
 links = [{"source": "task1", "target": "task2"}]
@@ -23,6 +23,6 @@ future = submit(args=(workflow,))
 try:
     future.get(timeout=5)
 except RuntimeError as e:
-    assert str(e) == "Task 'task2' failed"
+    assert "'str' object cannot be interpreted as an integer" in str(e)
 else:
     assert False, "Job did not fail"
