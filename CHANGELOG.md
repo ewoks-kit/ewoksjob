@@ -2,6 +2,14 @@
 
 ## (unreleased)
 
+New features:
+
+- Add `--slurm-cleanup-job-artifacts` worker arguments.
+
+Changes:
+
+- Do not cleanup slurm job logs by defaults.
+
 ## 1.0.0
 
 New features:
