@@ -119,6 +119,15 @@ def _add_slurm_pool_options(app: Celery) -> None:
             help_group="Slurm Pool Options",
         )
     )
+    app.user_options["preload"].add(
+        CeleryOption(
+            ["--slurm-cleanup-job-artifacts"],
+            required=False,
+            is_flag=True,
+            help="Remove job logs when the job is finished",
+            help_group="Slurm Pool Options",
+        )
+    )
 
 
 def _add_process_pool_options(app: Celery) -> None:
@@ -154,6 +163,7 @@ SLURM_NAME_MAP = {
     "slurm_post_script": "post_script",
     "slurm_parameters": "parameters",
     "slurm_python_cmd": "python_cmd",
+    "slurm_cleanup_job_artifacts": "cleanup_job_artifacts",
 }
 
 
