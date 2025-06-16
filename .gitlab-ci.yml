@@ -23,36 +23,24 @@ test-3.9:
 
 test-3.10:
   extends: .test-3.10
-  before_script:
-    - !reference [.test-3.10, before_script]
-    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.11:
   extends: .test-3.11
-  before_script:
-    - !reference [.test-3.11, before_script]
-    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.12:
   extends: .test-3.12
-  before_script:
-    - !reference [.test-3.12, before_script]
-    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test-3.13:
   extends: .test-3.13
-  before_script:
-    - !reference [.test-3.13, before_script]
-    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
@@ -130,36 +118,24 @@ test_sdist-3.9:
 
 test_sdist-3.10:
   extends: .test_sdist-3.10
-  before_script:
-    - !reference [.test_sdist-3.10, before_script]
-    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test_sdist-3.11:
   extends: .test_sdist-3.11
-  before_script:
-    - !reference [.test_sdist-3.11, before_script]
-    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test_sdist-3.12:
   extends: .test_sdist-3.12
-  before_script:
-    - !reference [.test_sdist-3.12, before_script]
-    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
 
 test_sdist-3.13:
   extends: .test_sdist-3.13
-  before_script:
-    - !reference [.test_sdist-3.13, before_script]
-    - python -m pip install blissdata --ignore-requires-python
   variables:
     JUPYTER_PLATFORM_DIRS: 1
     PYTEST_WARNINGS: "-W error ${WARNINGS}"
