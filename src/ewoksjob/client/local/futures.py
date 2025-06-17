@@ -58,7 +58,7 @@ class LocalFuture(FutureInterface):
 
     def exception(self, timeout: Optional[float] = None) -> Optional[Exception]:
         with self._convert_exceptions(timeout):
-            return self._native_future.exception(imeout=timeout)
+            return self._native_future.exception(timeout=timeout)
 
     @contextmanager
     def _convert_exceptions(self, timeout):
