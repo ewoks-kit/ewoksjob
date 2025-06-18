@@ -6,7 +6,8 @@ variables:
   WARNING1: "ignore::DeprecationWarning:kombu.utils.compat"
   WARNING2: "ignore::DeprecationWarning:celery.utils.imports"
   WARNING3: "ignore::DeprecationWarning:kombu.transport.redis" # https://github.com/celery/kombu/issues/2293
-  WARNINGS: "-W ${WARNING1} -W ${WARNING2} -W ${WARNING3}"
+  WARNING4: "error::DeprecationWarning:redis.utils"  # In kombu: call to 'get_connection' deprecated since version 5.3.0.
+  WARNINGS: "-W ${WARNING1} -W ${WARNING2} -W ${WARNING3} -W ${WARNING4}"
   WARNINGS_PY39: "${WARNINGS} -W ignore::RuntimeWarning:networkx.utils.backends" # https://github.com/networkx/networkx/issues/7372
 
 test-3.8:
