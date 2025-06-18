@@ -2,6 +2,8 @@
 
 ## (unreleased)
 
+## 1.1.0
+
 New features:
 
 - Add `--slurm-cleanup-job-artifacts` worker arguments.
@@ -13,6 +15,7 @@ Changes:
 Bug fixes:
 
 - Add deprecated `AsyncResult` method `failed` to `FutureInterface`.
+- Fix typo in `LocalFuture.exception`.
 
 ## 1.0.0
 
