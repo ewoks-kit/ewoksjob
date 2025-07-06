@@ -17,7 +17,7 @@ if has_redis():
     def celery_config(redis_proc):
         url = f"redis://{redis_proc.host}:{redis_proc.port}"
         # celery -A ewoksjob.apps.ewoks --broker={url}/0 --result-backend={url}/1 inspect stats -t 5
-        return {
+        yield {
             "broker_url": f"{url}/0",
             "result_backend": f"{url}/1",
             "result_serializer": "pickle",
@@ -25,6 +25,14 @@ if has_redis():
             "task_remote_tracebacks": True,
             "enable_utc": False,
         }
+        # When the Redis server is down, `AsyncResult.__del__` will raise
+        #
+        #   redis.exceptions.ConnectionError: Connection refused
+        #
+        # So make sure all `AsyncResult` instances are garbage collected
+        # before the Redis server gets shut down by exiting fixture `redis_proc`.
+        while gc.collect():
+            pass
 
 else:
 
