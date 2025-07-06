@@ -65,7 +65,7 @@ test-3.12-redis:
   timeout: 15m
   variables:
     JUPYTER_PLATFORM_DIRS: 1
-    PYTEST_WARNINGS: "-W error ${WARNINGS}"
+    PYTEST_WARNINGS: "-W error ${WARNINGS} -s"
 
 test-3.12-redis-slurm:
   extends: test-3.12-redis

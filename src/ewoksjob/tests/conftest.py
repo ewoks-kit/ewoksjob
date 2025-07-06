@@ -1,13 +1,33 @@
 import gc
 import os
+import warnings
 
 import pytest
+import socket
+import traceback
 from ewokscore import events
 from ewoksjob.events.readers import read_ewoks_events
 from ewoksjob.worker import options as worker_options
 
 from .utils import has_redis
 from ..client import local
+
+_SOCKETS = []
+
+
+@pytest.fixture(autouse=True, scope="session")
+def track_socket_creation():
+    original_socket = socket.socket
+
+    def tracked_socket(*args, **kwargs):
+        sock = original_socket(*args, **kwargs)
+        s = "".join(traceback.format_stack(limit=20))
+        _SOCKETS.append(f"\n[Tracked Socket Created] {sock}:\n{s}")
+        return sock
+
+    socket.socket = tracked_socket
+    yield
+    socket.socket = original_socket
 
 
 if has_redis():
@@ -31,8 +51,15 @@ if has_redis():
         #
         # So make sure all `AsyncResult` instances are garbage collected
         # before the Redis server gets shut down by exiting fixture `redis_proc`.
-        while gc.collect():
-            pass
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("error", ResourceWarning)
+                while gc.collect():
+                    pass
+        finally:
+            print("_SOCKETS")
+            for s in _SOCKETS:
+                print(s)
 
 else:
 
