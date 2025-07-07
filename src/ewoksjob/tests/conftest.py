@@ -1,6 +1,5 @@
 import gc
 import os
-import warnings
 
 import pytest
 import socket
@@ -45,21 +44,7 @@ if has_redis():
             "task_remote_tracebacks": True,
             "enable_utc": False,
         }
-        # When the Redis server is down, `AsyncResult.__del__` will raise
-        #
-        #   redis.exceptions.ConnectionError: Connection refused
-        #
-        # So make sure all `AsyncResult` instances are garbage collected
-        # before the Redis server gets shut down by exiting fixture `redis_proc`.
-        try:
-            with warnings.catch_warnings():
-                warnings.simplefilter("error", ResourceWarning)
-                while gc.collect():
-                    pass
-        finally:
-            print("_SOCKETS")
-            for s in _SOCKETS:
-                print(s)
+        _wait_asyncresults_destroyed()
 
 else:
 
@@ -121,9 +106,46 @@ def skip_if_gevent():
         pytest.skip("not supported with gevent yet")
 
 
-@pytest.fixture()
-def ewoks_worker(celery_session_worker, celery_worker_pool):
+def _wait_asyncresults_destroyed():
+    # Garbage collection of `AsyncResult` tries to connect to
+    # Redis to unsubscribe. When the Redis server is down,
+    # `AsyncResult.__del__` will raise
+    #
+    #   redis.exceptions.ConnectionError: Connection refused
+    #
+    # So make sure all `AsyncResult` instances are garbage collected
+    # before the Redis server gets shut down by exiting fixture `redis_proc`.
+    try:
+        while gc.collect():
+            pass
+    finally:
+        print("_SOCKETS")
+        for s in _SOCKETS:
+            print(s)
+
+
+def _close_all_redis_sockets(app):
+    # Close all Redis connections to avoid garbage collection
+    # of unclosed sockets which gives a ResourceWarning and
+    # with "-W error" pytest fails.
+    app.backend.client.connection_pool.reset()
+
+
+@pytest.fixture(scope="session")
+def celery_session_app_clean(celery_session_app):
+    yield celery_session_app
+    # TODO: cannot call this when the _wait_asyncresults_destroyed is not called
+    # _close_all_redis_sockets(celery_session_app)
+
+
+@pytest.fixture(scope="session")
+def ewoks_session_worker(celery_session_app_clean, celery_session_worker):
     yield celery_session_worker
+
+
+@pytest.fixture()
+def ewoks_worker(ewoks_session_worker, celery_worker_pool):
+    yield ewoks_session_worker
     if celery_worker_pool == "solo":
         events.cleanup()
 
