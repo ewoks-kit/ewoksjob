@@ -114,6 +114,14 @@ class FutureInterface:
         )
         return self.done()
 
+    def failed(self) -> bool:
+        warnings.warn(
+            "failed() is deprecated and will be removed in a future release. Use `exception()` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.exception() is not None
+
     def revoke(self, terminate: bool = False) -> bool:
         warnings.warn(
             "revoke() is deprecated and will be removed in a future release. Use `cancel()` or `abort()` instead.",
