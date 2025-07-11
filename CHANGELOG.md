@@ -10,6 +10,10 @@ Changes:
 
 - Do not cleanup slurm job logs by defaults.
 
+Bug fixes:
+
+- Add deprecated `AsyncResult` method `failed` to `FutureInterface`.
+
 ## 1.0.0
 
 New features:
