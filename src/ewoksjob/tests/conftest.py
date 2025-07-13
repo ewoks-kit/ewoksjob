@@ -155,9 +155,9 @@ def _todo_cleanup(app):
     # of unclosed sockets which gives a ResourceWarning and
     # with "-W error" pytest fails.
     _wait_asyncresults_destroyed()
-    result_consumer = app.backend.result_consumer
-    for mapping in result_consumer._pending_results:
-        print("PENDING RESULTS", mapping)
+    # result_consumer = app.backend.result_consumer
+    # for mapping in result_consumer._pending_results:
+    #     print("PENDING RESULTS", mapping)
     # app.backend.client.connection_pool.reset()
 
 
