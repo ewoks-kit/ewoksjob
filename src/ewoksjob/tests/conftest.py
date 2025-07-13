@@ -16,6 +16,8 @@ _SOCKETS = []
 
 @pytest.fixture(autouse=True, scope="session")
 def track_socket_creation():
+    yield
+    return
     original_socket = socket.socket
 
     def tracked_socket(*args, **kwargs):
@@ -44,7 +46,7 @@ if has_redis():
             "task_remote_tracebacks": True,
             "enable_utc": False,
         }
-        _wait_asyncresults_destroyed()
+        # _wait_asyncresults_destroyed()
 
 else:
 
@@ -106,6 +108,29 @@ def skip_if_gevent():
         pytest.skip("not supported with gevent yet")
 
 
+def debug_asyncresults_on_teardown():
+    import objgraph
+    from celery.result import AsyncResult
+
+    async_results = [obj for obj in gc.get_objects() if isinstance(obj, AsyncResult)]
+
+    if not async_results:
+        return
+
+    output_dir = "asyncresult_graphs"
+    os.makedirs(output_dir, exist_ok=True)
+
+    for i, target in enumerate(async_results, 1):
+        filename = os.path.join(output_dir, f"asyncresult_{i}.png")
+        print(f"[leak debug] Saving backrefs graph: {filename}")
+        try:
+            objgraph.show_backrefs(
+                [target], filename=filename, max_depth=5, too_many=10
+            )
+        except Exception as e:
+            print(f"[error] Could not generate graph for AsyncResult #{i}: {e}")
+
+
 def _wait_asyncresults_destroyed():
     # Garbage collection of `AsyncResult` tries to connect to
     # Redis to unsubscribe. When the Redis server is down,
@@ -122,25 +147,24 @@ def _wait_asyncresults_destroyed():
         print("_SOCKETS")
         for s in _SOCKETS:
             print(s)
+    # debug_asyncresults_on_teardown()
 
 
-def _close_all_redis_sockets(app):
+def _todo_cleanup(app):
     # Close all Redis connections to avoid garbage collection
     # of unclosed sockets which gives a ResourceWarning and
     # with "-W error" pytest fails.
-    app.backend.client.connection_pool.reset()
+    _wait_asyncresults_destroyed()
+    result_consumer = app.backend.result_consumer
+    for mapping in result_consumer._pending_results:
+        print("PENDING RESULTS", mapping)
+    # app.backend.client.connection_pool.reset()
 
 
 @pytest.fixture(scope="session")
-def celery_session_app_clean(celery_session_app):
-    yield celery_session_app
-    # TODO: cannot call this when the _wait_asyncresults_destroyed is not called
-    # _close_all_redis_sockets(celery_session_app)
-
-
-@pytest.fixture(scope="session")
-def ewoks_session_worker(celery_session_app_clean, celery_session_worker):
+def ewoks_session_worker(celery_session_worker, celery_session_app):
     yield celery_session_worker
+    _todo_cleanup(celery_session_app)
 
 
 @pytest.fixture()

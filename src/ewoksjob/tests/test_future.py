@@ -10,6 +10,7 @@ def test_future(ewoks_worker):
     assert not future.running()
     with pytest.raises(TimeoutError):
         _ = future.result(timeout=0)
+    future._async_result.backend.remove_pending_result(future._async_result)
 
 
 def test_future_local(local_ewoks_worker):
