@@ -98,6 +98,19 @@ class FutureInterface:
         )
         return self.uuid
 
+    @property
+    def queue(self) -> str:
+        warnings.warn(
+            "queue is deprecated and will be removed in a future release.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._get_queue()
+
+    @abstractmethod
+    def _get_queue(self) -> str:
+        pass
+
     def get(self, timeout: Optional[float] = None, **kwargs) -> Any:
         warnings.warn(
             "get() is deprecated and will be removed in a future release. Use `result()` instead.",

@@ -91,3 +91,6 @@ class LocalFuture(FutureInterface):
         if self._is_slurm:
             self._native_future.abort()
         return self.aborted()
+
+    def _get_queue(self) -> str:
+        return "local"
