@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2025-08-02
+
 ### Fixed
 
 - Add deprecated `queue` attribute to `FutureInterface`.
@@ -162,7 +164,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - task discovery
 - Redis handler for ewoks events
 
-[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.1.0...HEAD
+[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.1.1...HEAD
+[1.1.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.1.0...v1.1.1
 [1.1.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.0.0...v1.1.0
 [1.0.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v0.7.0...v1.0.0
 [0.7.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v0.6.1...v0.7.0
