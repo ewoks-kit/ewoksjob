@@ -113,3 +113,6 @@ class CeleryFuture(FutureInterface):
     def abort(self) -> bool:
         self._async_result.revoke(terminate=True)
         return self.aborted
+
+    def _get_queue(self) -> str:
+        return self._async_result.queue
