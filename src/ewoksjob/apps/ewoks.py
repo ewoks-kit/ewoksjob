@@ -55,12 +55,25 @@ def _task_wrapper(celery_task: Callable) -> Callable:
     return new_celery_task
 
 
+def _merge_execute_arguments(celery_task: Callable) -> Callable:
+    """Inject ewoks execution parameters from the worker configuration."""
+
+    @wraps(celery_task)
+    def new_celery_task(self, *args, **client_execute_arguments) -> Any:
+        worker_execute_arguments = self.app.conf.get("ewoks_execution")
+        kwargs = merge_execute_arguments(
+            client_execute_arguments, worker_execute_arguments
+        )
+        return celery_task(self, *args, **kwargs)
+
+    return new_celery_task
+
+
 @app.task(bind=True)
 @_ensure_ewoks_job_id
+@_merge_execute_arguments
 @_task_wrapper
-def execute_graph(self, *args, **client_execute_arguments) -> Dict:
-    worker_execute_arguments = self.app.conf.get("ewoks_execution")
-    kwargs = merge_execute_arguments(client_execute_arguments, worker_execute_arguments)
+def execute_graph(self, *args, **kwargs) -> Dict:
     return ewoks.execute_graph(*args, **kwargs)
 
 
