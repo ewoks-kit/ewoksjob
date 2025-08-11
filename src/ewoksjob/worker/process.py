@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import signal
 import logging
@@ -36,20 +37,39 @@ class TaskPool(base.BasePool):
             logger.info("Start executor ...")
             mp_context = get_context(self.EXECUTOR_OPTIONS.get("context"))
             initargs = self.options["initargs"]
-            self._executor = ProcessPoolExecutor(
-                max_workers=self.limit,
-                initializer=process_initializer,
-                initargs=initargs,
-                mp_context=mp_context,
-            )
+            maxtasksperchild = self.options["maxtasksperchild"]
+
+            kwargs = {
+                "max_workers": self.limit,
+                "initializer": process_initializer,
+                "initargs": initargs,
+                "mp_context": mp_context,
+            }
+
+            if sys.version_info >= (3, 11):
+                kwargs["max_tasks_per_child"] = maxtasksperchild
+            elif maxtasksperchild:
+                logger.warning(
+                    "'max_tasks_per_child' requires Python 3.11 or newer and will be ignored"
+                )
+
+            self._executor = ProcessPoolExecutor(**kwargs)
+
             if self.EXECUTOR_OPTIONS.get("precreate"):
-                timeout = self.EXECUTOR_OPTIONS.get("timeout", 10)
-                logger.info("Pre-create workers ...")
-                try:
-                    self._executor.submit(os.getpid).result(timeout=timeout)
-                except TimeoutError:
-                    logger.error(f"Cannot pre-create workers within {timeout} seconds")
-                    raise
+                if maxtasksperchild:
+                    logger.warning(
+                        "Pre-creating processes is ignored because 'max_tasks_per_child' is used. Use '--process-no-precreate' to remove this warning."
+                    )
+                else:
+                    timeout = self.EXECUTOR_OPTIONS.get("timeout", 10)
+                    logger.info("Pre-create workers ...")
+                    try:
+                        self._executor.submit(os.getpid).result(timeout=timeout)
+                    except TimeoutError:
+                        logger.error(
+                            f"Cannot pre-create workers within {timeout} seconds"
+                        )
+                        raise
             logger.info("Executor started")
         return self._executor
 

@@ -46,9 +46,18 @@ class TaskPool(_TaskPool):
         super().on_stop()
 
     def _create_slurm_executor(self):
-        self._slurm_executor = SlurmRestExecutor(
-            max_workers=self.limit, **self.EXECUTOR_OPTIONS
-        )
+        maxtasksperchild = self.options["maxtasksperchild"]
+        if maxtasksperchild is None:
+            logger.warning(
+                "The 'slurm' pool does not support Slurm jobs which execute an unlimited number of celery jobs."
+            )
+            maxtasksperchild = 1
+        kwargs = {
+            "max_workers": self.limit,
+            "max_tasks_per_worker": maxtasksperchild,
+            **self.EXECUTOR_OPTIONS,
+        }
+        self._slurm_executor = SlurmRestExecutor(**kwargs)
         _set_slurm_executor(self._slurm_executor)
 
     def _remove_slurm_executor(self):
