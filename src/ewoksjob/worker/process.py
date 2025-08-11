@@ -3,15 +3,20 @@ import sys
 import time
 import signal
 import logging
-from threading import Thread
+from queue import Queue
+from threading import Thread, Timer
 from multiprocessing import Manager
 from multiprocessing import get_context
+from contextlib import contextmanager
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import wait
 from concurrent.futures import Future
 from concurrent.futures.process import BrokenProcessPool
+from typing import Optional, Callable, Any
+
 from celery.concurrency import base
 from celery.concurrency import prefork
+from celery.exceptions import SoftTimeLimitExceeded
 from celery.exceptions import Terminated
 from billiard.einfo import ExceptionInfo
 from billiard.common import reset_signals
@@ -179,13 +184,19 @@ class TaskPool(base.BasePool):
 
         executor = self._ensure_executor()
         if accept_callback is None:
-            return executor.submit(target, *args, **kwargs)
+            queue = None
+        else:
+            queue = self._manager.Queue()
+            thread = Thread(target=accept_callback_main, args=(queue, accept_callback))
+            thread.daemon = True
+            thread.start()
 
-        queue = self._manager.Queue()
-        t = Thread(target=accept_callback_main, args=(queue, accept_callback))
-        t.daemon = True
-        t.start()
-        return executor.submit(subprocess_main, queue, target, args, kwargs)
+        timeout = self.options["timeout"]
+        soft_timeout = self.options["soft_timeout"]
+
+        return executor.submit(
+            subprocess_main, queue, target, args, kwargs, timeout, soft_timeout
+        )
 
     def _get_info(self):
         if self._executor is None:
@@ -213,21 +224,35 @@ def process_initializer(*args):
     prefork.process_initializer(*args)
     reset_signals(full=True)
     try:
+        signal.signal(signal.SIGUSR1, soft_timeout_sighandler)
+    except AttributeError:
+        pass
+    try:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
     except AttributeError:
         pass
 
 
-def subprocess_main(queue, target, args, kwargs):
+def subprocess_main(
+    queue: Optional[Queue],
+    target: Callable,
+    args: tuple,
+    kwargs: dict,
+    timeout: Optional[float],
+    soft_timeout: Optional[float],
+) -> Any:
     """Main function called in a child process"""
     try:
-        queue.put(os.getpid())
-        return target(*args, **kwargs)
+        if queue is not None:
+            queue.put(os.getpid())
+        with apply_time_limit(signal.SIGKILL, timeout):
+            with apply_time_limit(signal.SIGUSR1, soft_timeout):
+                return target(*args, **kwargs)
     except SystemExit as e:
         raise Terminated(e)
 
 
-def accept_callback_main(queue, accept_callback):
+def accept_callback_main(queue: Queue, accept_callback: Callable) -> None:
     """Background task that wait for the start of job execution in a child process"""
     try:
         pid = queue.get()
@@ -256,3 +281,21 @@ class ApplyResult:
 
     def terminate(self, signum):
         raise NotImplementedError
+
+
+def soft_timeout_sighandler(signum, frame):
+    raise SoftTimeLimitExceeded()
+
+
+@contextmanager
+def apply_time_limit(sig: int, timeout: Optional[float] = None):
+    timer = None
+    if timeout is not None:
+        pid = os.getpid()
+        timer = Timer(timeout, lambda: os.kill(pid, sig))
+        timer.start()
+    try:
+        yield
+    finally:
+        if timer:
+            timer.cancel()
