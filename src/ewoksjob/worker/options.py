@@ -147,6 +147,7 @@ def _add_process_pool_options(app: Celery) -> None:
             ["--process-no-precreate"],
             required=False,
             default=False,
+            is_flag=True,
             help="Child processes not created on startup",
             help_group="Process Pool Options",
         )
