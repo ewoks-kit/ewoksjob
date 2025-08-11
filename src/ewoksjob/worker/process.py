@@ -187,9 +187,9 @@ class TaskPool(base.BasePool):
             queue = None
         else:
             queue = self._manager.Queue()
-            t = Thread(target=accept_callback_main, args=(queue, accept_callback))
-            t.daemon = True
-            t.start()
+            thread = Thread(target=accept_callback_main, args=(queue, accept_callback))
+            thread.daemon = True
+            thread.start()
 
         timeout = self.options["timeout"]
         soft_timeout = self.options["soft_timeout"]
