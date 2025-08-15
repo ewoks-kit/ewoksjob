@@ -84,7 +84,7 @@ if __name__ == "__main__":
     future.abort()
 
     try:
-        future.get(timeout=5)
+        future.result(timeout=5)
     except CancelledError:
         pass
     else:

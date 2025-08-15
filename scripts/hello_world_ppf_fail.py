@@ -79,7 +79,7 @@ if __name__ == "__main__":
     )
 
     try:
-        future.get(timeout=5)
+        future.result(timeout=5)
     except RuntimeError as e:
         assert "'str' object cannot be interpreted as an integer" in str(e)
     else:

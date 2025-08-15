@@ -38,7 +38,7 @@ Start a workflow from python, possible from another machine
 
     workflow = {"graph": {"id": "mygraph"}}
     future = submit(args=(workflow,))
-    result = future.get()
+    result = future.result(timeout=None)
 
 Start a web server for monitoring jobs
 

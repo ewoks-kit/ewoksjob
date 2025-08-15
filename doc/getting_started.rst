@@ -206,7 +206,7 @@ Execute workflow and get results
     future = submit(args=args, kwargs=kwargs)
     job_id = future.uuid
     # events could be received in the mean time (see below)
-    workflow_results = future.get(timeout=3)
+    workflow_results = future.result(timeout=3)
     assert workflow_results == {"return_value": 6}
 
 

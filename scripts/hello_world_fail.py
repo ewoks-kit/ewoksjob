@@ -21,7 +21,7 @@ workflow = {"graph": {"id": "testworkflow"}, "nodes": nodes, "links": links}
 # Execute a workflow (use a proper Ewoks task scheduler in production)
 future = submit(args=(workflow,))
 try:
-    future.get(timeout=5)
+    future.result(timeout=5)
 except RuntimeError as e:
     assert "'str' object cannot be interpreted as an integer" in str(e)
 else:

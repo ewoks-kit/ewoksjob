@@ -41,7 +41,7 @@ from ewoksjob.client import submit
 
 workflow = {"graph": {"id": "mygraph"}}
 future = submit(args=(workflow,))
-result = future.get()
+result = future.result(timeout=None)
 ```
 
 Note that both environments need to be able to import `celeryconfig` which

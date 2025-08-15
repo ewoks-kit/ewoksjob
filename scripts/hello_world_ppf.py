@@ -76,5 +76,5 @@ if __name__ == "__main__":
             "max_workers": 5,  # when scaling_workers=False
         },
     )
-    result = future.get(timeout=3)
+    result = future.result(timeout=3)
     assert result == {"result": 10}, result
