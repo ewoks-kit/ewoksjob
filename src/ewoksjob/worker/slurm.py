@@ -1,5 +1,6 @@
 """Pool that redirects tasks to a Slurm cluster."""
 
+import atexit
 import weakref
 import logging
 import datetime
@@ -14,6 +15,7 @@ except ImportError:
     gevent = NotImplemented
     GreenletExit = NotImplemented
 
+from celery import signals
 from celery.concurrency.gevent import TaskPool as _TaskPool
 
 try:
@@ -36,10 +38,21 @@ class TaskPool(_TaskPool):
 
     EXECUTOR_OPTIONS = dict()
 
+    SLURM_SHUTDOWN_TIMEOUT = 60.0
+
     def __init__(self, *args, **kwargs):
         if SlurmRestExecutor is None:
             raise RuntimeError("requires pyslurmutils")
         super().__init__(*args, **kwargs)
+
+        self._slurm_executor = None
+        self._slurm_cleanup_task = None
+
+        signals.worker_shutdown.connect(
+            self._blocking_wait_for_slurm_cleanup, weak=False
+        )
+        atexit.register(self._blocking_wait_for_slurm_cleanup)
+
         self._create_slurm_executor()
 
     def restart(self):
@@ -51,21 +64,54 @@ class TaskPool(_TaskPool):
         super().on_stop()
 
     def _safe_remove_slurm_executor(self):
+        """
+        Initiate cleanup. If we're NOT in a gevent hub callback, block until
+        the executor is fully cleaned up. If we ARE in a hub callback, only
+        kick off cleanup and return immediately; final waiting happens in
+        worker_shutdown/atexit.
+        """
+        self._start_slurm_cleanup()
+        self._wait_for_slurm_cleanup(timeout=self.SLURM_SHUTDOWN_TIMEOUT)
+
+    def _wait_for_slurm_cleanup(self, timeout=None):
+        """
+        Wait until the cleanup thread signals completion. Safe to call outside
+        gevent hub callbacks. If called inside a hub callback, it just returns.
+        """
         if self._is_in_gevent_callback():
-            g = gevent.spawn(self._remove_slurm_executor)
-            g.join()
-        else:
-            self._remove_slurm_executor()
+            return
+
+        task = self._slurm_cleanup_task
+        if task:
+            task.join(timeout=timeout)
+            if task:
+                logger.warning(
+                    "Timed out waiting for SLURM executor cleanup (%.1fs).",
+                    timeout or -1,
+                )
+
+    def _blocking_wait_for_slurm_cleanup(self, **_):
+        """
+        Runs on Celery's worker_shutdown signal and at process exit.
+        Not a gevent hub callback → can block safely.
+        """
+        self._wait_for_slurm_cleanup(timeout=self.SLURM_SHUTDOWN_TIMEOUT)
 
     def _is_in_gevent_callback(self):
-        hub = gevent.get_hub()
-        return gevent.getcurrent() is hub
+        if gevent is None:
+            return False
+        try:
+            hub = gevent.get_hub()
+            return gevent.getcurrent() is hub
+        except Exception:
+            return False
 
     def _create_slurm_executor(self):
         maxtasksperchild = self.options["maxtasksperchild"]
         if maxtasksperchild is None:
             logger.warning(
-                "The 'slurm' pool does not support Slurm jobs which execute an unlimited number of celery jobs. Use '--max-tasks-per-child=1' to remove this warning."
+                "The 'slurm' pool does not support Slurm jobs which execute an unlimited number of celery jobs. "
+                "Use '--max-tasks-per-child=1' to remove this warning."
             )
             maxtasksperchild = 1
         kwargs = {
@@ -77,10 +123,40 @@ class TaskPool(_TaskPool):
         self._slurm_executor._celery_options = dict(self.options)
         _set_slurm_executor(self._slurm_executor)
 
-    def _remove_slurm_executor(self):
-        if self._slurm_executor is not None:
-            self._slurm_executor.__exit__(None, None, None)
-            self._slurm_executor = None
+    def _start_slurm_cleanup(self):
+        """
+        Start cleanup if not already running. Never blocks.
+        """
+        # If nothing to clean or already cleaning, just ensure the event reflects state
+        if self._slurm_executor is None:
+            self._slurm_cleanup_task = None
+            return
+
+        # If a previous cleanup greenlet is still around, don't start another
+        if self._slurm_cleanup_task:
+            return
+
+        # Request non-blocking shutdown
+        self._slurm_executor.shutdown(wait=False)
+
+        # Do the blocking part in a greenlet
+        self._slurm_cleanup_task = gevent.spawn(self._blocking_cleanup_main)
+
+    def _blocking_cleanup_main(self):
+        """
+        Runs in a greenlet; allowed to block (e.g., Thread.join inside executor).
+        """
+        try:
+            if self._slurm_executor is not None:
+                try:
+                    # __exit__ may perform blocking joins internally; that's fine here.
+                    self._slurm_executor.__exit__(None, None, None)
+                finally:
+                    self._slurm_executor = None
+        except Exception:
+            logger.exception("Error while cleaning up SLURM executor")
+        finally:
+            logger.debug("SLURM executor cleanup complete")
 
 
 _SLURM_EXECUTOR = None
