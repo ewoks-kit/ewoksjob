@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
     if options.celery:
         future = submit(args=args, kwargs=kwargs)
-        workflow_results = future.get(timeout=3)
+        workflow_results = future.result(timeout=3)
     else:
         with pool_context():
             future = submit_local(args=args, kwargs=kwargs)

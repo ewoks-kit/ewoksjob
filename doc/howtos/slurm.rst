@@ -67,4 +67,4 @@ specified by the worker or add additional parameters with the `slurm_arguments` 
     }
 
     future = submit(args=("/path/to/workflow.json",), kwargs=kwargs)
-    result = future.get(timeout=None)
+    result = future.result(timeout=None)

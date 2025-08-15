@@ -27,7 +27,7 @@ time.sleep(1)
 future.abort()
 
 try:
-    future.get(timeout=5)
+    future.result(timeout=5)
 except CancelledError:
     pass
 else:
