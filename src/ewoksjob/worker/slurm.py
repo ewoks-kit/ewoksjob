@@ -38,7 +38,7 @@ class TaskPool(_TaskPool):
 
     EXECUTOR_OPTIONS = dict()
 
-    SLURM_SHUTDOWN_TIMEOUT = 60.0
+    SLURM_SHUTDOWN_TIMEOUT = 60.0  # seconds
 
     def __init__(self, *args, **kwargs):
         if SlurmRestExecutor is None:
@@ -100,11 +100,8 @@ class TaskPool(_TaskPool):
     def _is_in_gevent_callback(self):
         if gevent is None:
             return False
-        try:
-            hub = gevent.get_hub()
-            return gevent.getcurrent() is hub
-        except Exception:
-            return False
+        hub = gevent.get_hub()
+        return gevent.getcurrent() is hub
 
     def _create_slurm_executor(self):
         maxtasksperchild = self.options["maxtasksperchild"]
@@ -146,17 +143,16 @@ class TaskPool(_TaskPool):
         """
         Runs in a greenlet; allowed to block (e.g., Thread.join inside executor).
         """
-        try:
-            if self._slurm_executor is not None:
-                try:
-                    # __exit__ may perform blocking joins internally; that's fine here.
-                    self._slurm_executor.__exit__(None, None, None)
-                finally:
-                    self._slurm_executor = None
-        except Exception:
-            logger.exception("Error while cleaning up SLURM executor")
-        finally:
-            logger.debug("SLURM executor cleanup complete")
+        if self._slurm_executor is not None:
+            try:
+                # __exit__ may perform blocking joins internally; that's fine here.
+                self._slurm_executor.__exit__(None, None, None)
+            except Exception:
+                logger.exception("Error while cleaning up SLURM executor")
+            finally:
+                self._slurm_executor = None
+
+        logger.debug("SLURM executor cleanup complete")
 
 
 _SLURM_EXECUTOR = None
