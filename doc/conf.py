@@ -13,24 +13,25 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
+    "sphinx_copybutton",
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
 
 always_document_param_types = True
 
-html_theme = "classic"
-html_static_path = []
-
 autosummary_generate = True
 autodoc_default_flags = ["members", "undoc-members", "show-inheritance"]
+
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
-# To renable when adding static resources
-# html_static_path = ["_static"]
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 html_theme_options = {
     "icon_links": [
         {
