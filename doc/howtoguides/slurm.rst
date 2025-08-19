@@ -10,7 +10,7 @@ Worker side
 When started with the `--pool=slurm` the worker redirects jobs to a Slurm cluster.
 
 
-.. code:: bash
+.. code-block:: bash
 
     export SLURM_URL="http://..."
     export SLURM_USER="myname"
@@ -26,7 +26,7 @@ Environment variables `SLURM_URL`, `SLURM_USER` and `SLURM_TOKEN` are needed to 
 and authenticate with the Slurm frontend. These variables can also be specified through the
 command line interface like this
 
-.. code:: bash
+.. code-block:: bash
 
     ewoksjob worker --pool=slurm -Q slurm -n slurm@id00 \
         --slurm-url=http://... \
@@ -54,17 +54,24 @@ Client side
 The client does not have to do anything special. However you can overwrite Slurm job parameters
 specified by the worker or add additional parameters with the `slurm_arguments` argument.
 
-.. code:: python
+.. code-block:: python
 
     from ewoksjob.client import submit
 
     kwargs["slurm_arguments"] = {
         "parameters": {
-            "time_limit": 360,
+            "partition": "pname",
+            "cpus_per_task": 8,
+            "memory_per_cpu": "8GB",
+            "time_limit": "02:00:00",
+            "gpus_per_node": 1,
             "current_working_directory": "/other/path/to/data",
         },
         "pre_script": "module load myotherenv",
+        "python_cmd": "python"
     }
 
     future = submit(args=("/path/to/workflow.json",), kwargs=kwargs)
     result = future.result(timeout=None)
+
+A description of all possible Slurm parameters can be found `here <https://pyslurmutils.readthedocs.io>`_.
