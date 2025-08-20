@@ -60,14 +60,22 @@ class CeleryFuture(FutureInterface):
     def done(self) -> bool:
         return self._async_result.state in _DONE_STATES
 
-    def result(self, timeout: Optional[float] = None, **kwargs) -> Any:
+    def result(
+        self,
+        timeout: Optional[float] = None,
+        interval: Optional[float] = None,
+        **kwargs,
+    ) -> Any:
         if kwargs:
             warnings.warn(
                 f"arguments {list(kwargs)} are deprecated and will be removed in a future release.",
                 DeprecationWarning,
                 stacklevel=2,
             )
-        interval = max(kwargs.pop("interval", 0.1), 0.001)
+        if interval is None:
+            interval = 0.1
+        else:
+            interval = max(interval, 0.001)
 
         if async_state.GEVENT_WITHOUT_THREAD_PATCHING:
             t0 = time.time()

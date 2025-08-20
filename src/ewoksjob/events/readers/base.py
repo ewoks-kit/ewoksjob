@@ -36,9 +36,17 @@ class EwoksEventReader:
         raise NotImplementedError
 
     def poll_events(
-        self, timeout=None, stop_event: Optional[Event] = None, interval=0.1, **filters
+        self,
+        timeout=None,
+        stop_event: Optional[Event] = None,
+        interval: Optional[float] = None,
+        **filters,
     ) -> Iterator[EventType]:
         """Yield events matching the filter until timeout is reached."""
+        if interval is None:
+            interval = 0.1
+        else:
+            interval = max(interval, 0.001)
         start = time.time()
         n = 0
         while True:
