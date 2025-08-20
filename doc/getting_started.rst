@@ -6,13 +6,13 @@ Installation
 
 Install on the client side
 
-.. code:: bash
+.. code-block:: bash
 
     pip install ewoksjob[redis,sql]
 
 Install on the worker side
 
-.. code:: bash
+.. code-block:: bash
 
     pip install ewoksjob[worker,redis,sql]
 
@@ -24,7 +24,7 @@ Configuration
 Both the client and the worker(s) need to know where the *celery* messages
 and results are stored
 
-.. code:: python
+.. code-block:: python
 
     # SQLite backend
     CELERY = {
@@ -48,7 +48,7 @@ and results are stored
 Other backends for results are supported (mongo, memcached). Other configuration parameters
 are available, like for data serialization (json by default)
 
-.. code:: python
+.. code-block:: python
 
     CELERY = {
         "broker_url": "...",
@@ -66,7 +66,7 @@ describes the different parameters available.
 
 In addition to Celery parameters, workflow execution parameters can be defined through the `EWOKS_EXECUTION` variable.
 
-.. code:: python
+.. code-block:: python
 
     EWOKS_EXECUTION = {
         "engine": "ppf"
@@ -94,25 +94,25 @@ The configuration can be declared in a
 
 The configuration URI can be provided as an environment variable
 
-.. code:: bash
+.. code-block:: bash
 
     export EWOKS_CONFIG_URI=myproject.config
 
 In case of a Beacon URL that has `/ewoks/config.yml`
 
-.. code:: bash
+.. code-block:: bash
 
     export EWOKS_CONFIG_URI=beacon://hostname:25000/ewoks/config.yml
 
 it is enough to specify the `BEACON_HOST` environment variable
 
-.. code:: bash
+.. code-block:: bash
 
     export BEACON_HOST=hostname:25000
 
 On the worker side, the configuration URI can also be provided as a CLI argument
 
-.. code:: bash
+.. code-block:: bash
 
     ewoksjob --config=myproject.config worker
 
@@ -127,7 +127,7 @@ Worker side
 
 Launch a worker which serves the ewoks application
 
-.. code:: bash
+.. code-block:: bash
 
     ewoksjob worker
 
@@ -136,7 +136,7 @@ Client side
 
 Prepare for sending/receiving ewoks events
 
-.. code:: python
+.. code-block:: python
 
     # Redis backend
     events_url = "redis://localhost:10003/2"
@@ -161,7 +161,7 @@ Prepare for sending/receiving ewoks events
 
 Test workflow
 
-.. code:: python
+.. code-block:: python
 
     workflow = {
         "graph": {"id": "mygraph"},
@@ -180,7 +180,7 @@ Test workflow
 
 Job arguments are the same as the arguments of `ewoks.execute_graph`
 
-.. code:: python
+.. code-block:: python
 
     varinfo = {"root_uri": ..., "scheme": "nexus"}
     inputs = [
@@ -201,7 +201,7 @@ Job arguments are the same as the arguments of `ewoks.execute_graph`
 
 Execute workflow and get results
 
-.. code:: python
+.. code-block:: python
 
     future = submit(args=args, kwargs=kwargs)
     job_id = future.uuid
@@ -212,7 +212,7 @@ Execute workflow and get results
 
 Get intermediate results from ewoks events
 
-.. code:: python
+.. code-block:: python
 
     results_during_execution = list(reader.get_events(job_id=job_id))
     assert len(results_during_execution) == 8  # start/stop for job, workflow and node
@@ -233,7 +233,7 @@ Install brokers
 
 Redis can be installed using the system package manager or conda
 
-.. code:: bash
+.. code-block:: bash
 
     apt install redis-server    # system package
     conda install redis-server  # conda package
@@ -241,7 +241,7 @@ Redis can be installed using the system package manager or conda
 
 RabbitMQ can be installed using the system package manager or conda
 
-.. code:: bash
+.. code-block:: bash
 
     apt install rabbitmq-server    # system package
     conda install rabbitmq-server  # conda package

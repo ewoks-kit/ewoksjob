@@ -14,7 +14,7 @@ For the rest, see the `Celery command line interface documentation <https://docs
 ewoksjob monitor
 ----------------
 
-.. code::
+.. code-block::
 
     ewoksjob [OPTIONS] monitor [FLOWER OPTIONS]
 
@@ -26,7 +26,7 @@ Alias of ``celery flower``. Full details in the `Flower documentation <https://f
 ewoksjob worker
 ---------------
 
-.. code::
+.. code-block::
 
     ewoksjob worker [OPTIONS]
 
@@ -39,7 +39,7 @@ In addition, the log level is set to `INFO` by default (``-l/--loglevel``).
 
 In short, this is equivalent of running
 
-.. code::
+.. code-block::
 
     celery worker -A ewoksjob.apps.ewoks -l INFO
 
@@ -47,7 +47,7 @@ In short, this is equivalent of running
 ewoksjob purge
 ---------------
 
-.. code::
+.. code-block::
 
     ewoksjob purge [OPTIONS]
 

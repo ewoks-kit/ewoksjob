@@ -1,5 +1,5 @@
-How-tos
-=======
+How-to Guides
+=============
 
 .. toctree::
     :maxdepth: 1

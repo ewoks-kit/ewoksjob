@@ -10,13 +10,13 @@ Getting started
 
 Install on the client side
 
-.. code:: bash
+.. code-block:: bash
 
     pip install ewoksjob[redis]
 
 Install on the worker side
 
-.. code:: bash
+.. code-block:: bash
 
     pip install ewoksjob[worker,redis,monitor]
 
@@ -26,13 +26,13 @@ worker need access to a configuration that specifies the URL of the database and
 
 Start a worker that can execute *ewoks* graphs
 
-.. code:: bash
+.. code-block:: bash
 
     ewoksjob worker
 
 Start a workflow from python, possible from another machine
 
-.. code:: python
+.. code-block:: python
 
     from ewoksjob.client import submit
 
@@ -42,14 +42,14 @@ Start a workflow from python, possible from another machine
 
 Start a web server for monitoring jobs
 
-.. code:: bash
+.. code-block:: bash
 
     export FLOWER_UNAUTHENTICATED_API=true  # allow canceling jobs
     ewoksjob monitor
 
 Run the tests
 
-.. code:: bash
+.. code-block:: bash
 
     pip install ewoksjob[test]
     pytest --pyargs ewoksjob.tests
@@ -62,5 +62,5 @@ Documentation
 
     getting_started
     explanations/index
-    howtos/index
+    howtoguides/index
     reference/index
