@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Prevent “warm” shutdown of Slurm workers from hanging by avoiding blocking
   the gevent loop on worker exit.
+- Handle `interval=None` in `CeleryFuture.result` and `EwoksEventReader.poll_events`.
 
 ## [1.1.2] - 2025-08-08
 
