@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-08-20
+
+### Added
+
+- Support celery worker option `--max-tasks-per-child` in "slurm" and "process" pool.
+
 ### Fixed
 
 - Prevent “warm” shutdown of Slurm workers from hanging by avoiding blocking
@@ -176,7 +182,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - task discovery
 - Redis handler for ewoks events
 
-[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.1.2...HEAD
+[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.2.0...HEAD
+[1.2.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.1.2...v1.2.0
 [1.1.2]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.1.1...v1.1.2
 [1.1.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.1.0...v1.1.1
 [1.1.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.0.0...v1.1.0
