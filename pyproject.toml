@@ -43,7 +43,7 @@ monitor = [
 ]
 slurm = [
     "pyslurmutils >=1.0",
-    "gevent",
+    "gevent !=25.8.1",
 ]
 beacon = [
     "blissdata",
