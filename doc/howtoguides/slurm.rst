@@ -64,7 +64,7 @@ specified by the worker or add additional parameters with the `slurm_arguments` 
             "cpus_per_task": 8,
             "memory_per_cpu": "8GB",
             "time_limit": "02:00:00",
-            "gpus_per_node": 1,
+            "tres_per_node": "gres/gpu=1",
             "current_working_directory": "/other/path/to/data",
         },
         "pre_script": "module load myotherenv",
