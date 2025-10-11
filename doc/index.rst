@@ -3,64 +3,13 @@ ewoksjob |version|
 
 ewoksjob provides utilities for job scheduling of `ewoks <https://ewoks.readthedocs.io/>`_ workflows.
 
-ewoksjob has been developed by the `Software group <http://www.esrf.eu/Instrumentation/software>`_ of the `European Synchrotron <https://www.esrf.eu/>`_.
-
-Getting started
----------------
-
-Install on the client side
-
-.. code-block:: bash
-
-    pip install ewoksjob[redis]
-
-Install on the worker side
-
-.. code-block:: bash
-
-    pip install ewoksjob[worker,redis,monitor]
-
-The communication between client and worker goes through *Redis*, *RabbitMQ* or *Sqlite3*.
-Depending on which one you choose, the `redis` installation option may vary. Both client and
-worker need access to a configuration that specifies the URL of the database and/or broker.
-
-Start a worker that can execute *ewoks* graphs
-
-.. code-block:: bash
-
-    ewoksjob worker
-
-Start a workflow from python, possible from another machine
-
-.. code-block:: python
-
-    from ewoksjob.client import submit
-
-    workflow = {"graph": {"id": "mygraph"}}
-    future = submit(args=(workflow,))
-    result = future.result(timeout=None)
-
-Start a web server for monitoring jobs
-
-.. code-block:: bash
-
-    export FLOWER_UNAUTHENTICATED_API=true  # allow canceling jobs
-    ewoksjob monitor
-
-Run the tests
-
-.. code-block:: bash
-
-    pip install ewoksjob[test]
-    pytest --pyargs ewoksjob.tests
-
-Documentation
--------------
+ewoksjob has been developed by the `Software group <http://www.esrf.eu/Instrumentation/software>`_
+of the `European Synchrotron <https://www.esrf.eu/>`_.
 
 .. toctree::
-    :maxdepth: 2
+    :hidden:
 
-    getting_started
-    explanations/index
+    tutorials/index
     howtoguides/index
+    explanations/index
     reference/index

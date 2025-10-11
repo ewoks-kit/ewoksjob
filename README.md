@@ -34,7 +34,7 @@ Start a worker pool that can execute ewoks graphs
 ewoksjob worker
 ```
 
-Start a workflow on the client side
+Submit a workflow on the client side
 
 ```python
 from ewoksjob.client import submit
