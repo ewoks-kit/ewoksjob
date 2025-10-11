@@ -1,5 +1,7 @@
-Ewoksjob commands reference
-===========================
+.. _cli:
+
+CLI reference
+=============
 
 The ``ewoksjob`` command line interface is a wrapper of the `Celery command line interface <https://docs.celeryq.dev/en/stable/reference/cli.html>`_.
 
