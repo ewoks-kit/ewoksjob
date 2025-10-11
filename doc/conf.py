@@ -45,7 +45,8 @@ html_theme_options = {
             "icon": "fa-brands fa-python",
         },
     ],
-    "navbar_start": ["navbar_start"],
     "footer_start": ["copyright"],
     "footer_end": ["footer_end"],
+    "pygments_light_style": "github-light",
+    "pygments_dark_style": "github-dark",
 }
