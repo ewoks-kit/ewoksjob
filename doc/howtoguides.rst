@@ -4,4 +4,4 @@ How-to Guides
 .. toctree::
     :maxdepth: 1
 
-    slurm
+    howtoguides/slurm
