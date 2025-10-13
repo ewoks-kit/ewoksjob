@@ -1,16 +1,20 @@
 """Celery ewoks application executed on the worker side."""
 
 from functools import wraps
-from typing import Dict, List, Union, Callable, Any
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Union
 
 import celery
 import ewoks
 from ewokscore import task_discovery
 
-from ..worker.options import add_options
 from ..worker.executor import get_execute_method
-from .errors import replace_exception_for_client
+from ..worker.options import add_options
 from .arguments import merge_execute_arguments
+from .errors import replace_exception_for_client
 
 app = celery.Celery("ewoks")
 add_options(app)

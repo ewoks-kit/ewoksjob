@@ -1,6 +1,6 @@
-import time
 import logging
 import subprocess
+import time
 from types import ModuleType
 
 logger = logging.getLogger(__name__)

@@ -3,12 +3,12 @@ import os
 
 import pytest
 from ewokscore import events
+
 from ewoksjob.events.readers import read_ewoks_events
 from ewoksjob.worker import options as worker_options
 
-from .utils import has_redis
 from ..client import local
-
+from .utils import has_redis
 
 if has_redis():
     import redis

@@ -1,7 +1,8 @@
 import pytest
+from ewoks import execute_graph
 from ewokscore import Task
 from ewoksutils.import_utils import qualname
-from ewoks import execute_graph
+
 from .utils import has_redis
 
 

@@ -2,13 +2,13 @@
 intermediate results (ewoks events) or final result (job return value)
 """
 
-import os
 import argparse
+import os
 from typing import Optional
 
 from ewoksjob.client import submit
-from ewoksjob.client.local import submit as submit_local
 from ewoksjob.client.local import pool_context
+from ewoksjob.client.local import submit as submit_local
 from ewoksjob.events.readers import read_ewoks_events
 
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))

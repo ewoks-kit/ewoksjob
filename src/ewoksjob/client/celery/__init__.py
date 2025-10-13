@@ -15,13 +15,13 @@ if async_state.GEVENT_WITHOUT_THREAD_PATCHING:
 
     # The real solution is to patch threads.
 
-from .tasks import *  # noqa F403
-from .utils import *  # noqa F403
+from .futures import CancelledError  # noqa F401
 from .futures import CeleryFuture as Future  # noqa F403
 from .futures import TimeoutError  # noqa F401
-from .futures import CancelledError  # noqa F401
+from .tasks import *  # noqa F403
 from .tasks import execute_graph as submit  # noqa F401
 from .tasks import execute_test_graph as submit_test  # noqa F401
+from .utils import *  # noqa F403
 
 # For clients (workers need it in the environment before starting the python process)
 os.environ.setdefault("CELERY_LOADER", "ewoksjob.config.EwoksLoader")

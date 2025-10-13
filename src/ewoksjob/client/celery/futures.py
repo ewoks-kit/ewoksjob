@@ -1,17 +1,18 @@
 import time
 import warnings
-from typing import Any, Optional
+from typing import Any
+from typing import Optional
 
-from celery import states
-from celery.result import AsyncResult
 from billiard.exceptions import Terminated
+from celery import states
 from celery.exceptions import TaskRevokedError
 from celery.exceptions import TimeoutError as CeleryTimeoutError
+from celery.result import AsyncResult
 
-from ..futures import TimeoutError
+from .. import async_state
 from ..futures import CancelledError
 from ..futures import FutureInterface
-from .. import async_state
+from ..futures import TimeoutError
 
 # From celery.states
 #: Task state is unknown (assumed pending since you know the id).

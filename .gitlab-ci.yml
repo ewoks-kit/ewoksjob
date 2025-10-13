@@ -9,6 +9,9 @@ variables:
   WARNINGS: "-W ${WARNING1} -W ${WARNING2} -W ${WARNING3}"
   WARNINGS_PY39: "${WARNINGS} -W ignore::RuntimeWarning:networkx.utils.backends" # https://github.com/networkx/networkx/issues/7372
 
+isort:
+  extends: .isort
+
 test-3.8:
   extends: .test-3.8
   variables:

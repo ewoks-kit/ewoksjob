@@ -1,14 +1,15 @@
+import importlib
+import logging
 import os
 import sys
 import types
-import logging
-import importlib
 from pathlib import Path
 from typing import Tuple
-from urllib.parse import urlparse, ParseResult
+from urllib.parse import ParseResult
+from urllib.parse import urlparse
 
-from celery.loaders.default import Loader
 from celery import Celery
+from celery.loaders.default import Loader
 
 try:
     from blissdata.beacon.files import read_config as bliss_read_config

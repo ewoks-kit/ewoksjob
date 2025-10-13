@@ -1,19 +1,21 @@
-import os
 import getpass
 import json
-from typing import Dict, Tuple, Any
-from multiprocessing import get_context
+import os
 from multiprocessing import get_all_start_methods
+from multiprocessing import get_context
+from typing import Any
+from typing import Dict
+from typing import Tuple
 
-from click import Choice
 from celery import Celery
 from celery import bootsteps
 from celery import concurrency
 from celery.bin import worker
 from celery.bin.base import CeleryOption
+from click import Choice
 
-from .slurm import TaskPool as SlurmTaskPool
 from .process import TaskPool as ProcessTaskPool
+from .slurm import TaskPool as SlurmTaskPool
 
 ALL_MP_CONTEXTS = list(get_all_start_methods())
 DEFAULT_MP_CONTEXT = get_context()._name

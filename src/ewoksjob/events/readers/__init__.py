@@ -1,5 +1,5 @@
-from typing import Iterator
 from contextlib import contextmanager
+from typing import Iterator
 
 from .base import EventType  # noqa F401
 from .base import EwoksEventReader

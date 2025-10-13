@@ -1,11 +1,13 @@
 """Pool that redirects tasks to a Slurm cluster."""
 
 import atexit
-import weakref
-import logging
 import datetime
+import logging
+import weakref
 from functools import wraps
-from typing import Callable, Any, Optional
+from typing import Any
+from typing import Callable
+from typing import Optional
 
 try:
     import gevent
@@ -25,8 +27,8 @@ except ImportError:
     SlurmRestExecutor = None
     SlurmRestFuture = Any
 
-from .executor import set_execute_getter, ExecuteType
-
+from .executor import ExecuteType
+from .executor import set_execute_getter
 
 __all__ = ("TaskPool",)
 

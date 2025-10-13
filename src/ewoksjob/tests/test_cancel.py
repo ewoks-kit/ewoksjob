@@ -1,13 +1,12 @@
-import sys
 import pathlib
+import sys
 
 import pytest
 
+from ..client import CancelledError
+from ..client import TimeoutError
 from ..client import celery
 from ..client import local
-from ..client import TimeoutError
-from ..client import CancelledError
-
 from .utils import wait_not_finished
 
 

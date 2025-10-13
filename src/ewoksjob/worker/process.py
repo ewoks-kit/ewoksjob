@@ -1,26 +1,28 @@
+import logging
 import os
+import signal
 import sys
 import time
-import signal
-import logging
-from queue import Queue
-from threading import Thread, Timer
-from multiprocessing import Manager
-from multiprocessing import get_context
-from contextlib import contextmanager
+from concurrent.futures import Future
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import wait
-from concurrent.futures import Future
 from concurrent.futures.process import BrokenProcessPool
-from typing import Optional, Callable, Any
+from contextlib import contextmanager
+from multiprocessing import Manager
+from multiprocessing import get_context
+from queue import Queue
+from threading import Thread
+from threading import Timer
+from typing import Any
+from typing import Callable
+from typing import Optional
 
+from billiard.common import reset_signals
+from billiard.einfo import ExceptionInfo
 from celery.concurrency import base
 from celery.concurrency import prefork
 from celery.exceptions import SoftTimeLimitExceeded
 from celery.exceptions import Terminated
-from billiard.einfo import ExceptionInfo
-from billiard.common import reset_signals
-
 
 logger = logging.getLogger(__name__)
 

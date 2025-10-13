@@ -1,9 +1,9 @@
 import warnings
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
 from .futures import LocalFuture
 from .pool import get_active_pool
-
 
 __all__ = [
     "get_future",
