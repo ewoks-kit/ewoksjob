@@ -1,12 +1,17 @@
-import time
-from typing import Dict, Iterator, Optional, Tuple
 import json
+import time
 from datetime import datetime
 from threading import Event
+from typing import Dict
+from typing import Iterator
+from typing import Optional
+from typing import Tuple
+
 from ewoksutils.datetime_utils import fromisoformat
 
 try:
-    from ewokscore.variable import Variable, VariableContainer
+    from ewokscore.variable import Variable
+    from ewokscore.variable import VariableContainer
 except ImportError:
     Variable = VariableContainer = None
 

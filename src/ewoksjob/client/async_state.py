@@ -1,6 +1,6 @@
 try:
-    from gevent.monkey import is_module_patched
     from gevent.monkey import is_anything_patched
+    from gevent.monkey import is_module_patched
 except ImportError:
     GEVENT = False
     GEVENT_WITHOUT_THREAD_PATCHING = False

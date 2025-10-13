@@ -2,9 +2,8 @@ import warnings
 
 from celery.execute import send_task
 
-from .futures import CeleryFuture
 from ..dummy_workflow import dummy_workflow
-
+from .futures import CeleryFuture
 
 __all__ = [
     "execute_graph",

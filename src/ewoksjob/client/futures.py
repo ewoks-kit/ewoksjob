@@ -1,9 +1,9 @@
 import warnings
-from typing import Any, Optional
 from abc import abstractmethod
-
-from concurrent.futures import TimeoutError  # noqa F401
 from concurrent.futures import CancelledError  # noqa F401
+from concurrent.futures import TimeoutError  # noqa F401
+from typing import Any
+from typing import Optional
 
 
 class FutureInterface:

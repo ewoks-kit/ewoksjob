@@ -1,9 +1,10 @@
-from contextlib import contextmanager
-from typing import Any, Optional, Union
-
+from concurrent.futures import CancelledError as NativeCancelledError
 from concurrent.futures import Future as NativeFuture
 from concurrent.futures import TimeoutError as NativeTimeoutError
-from concurrent.futures import CancelledError as NativeCancelledError
+from contextlib import contextmanager
+from typing import Any
+from typing import Optional
+from typing import Union
 
 try:
     from pyslurmutils.client.errors import RemoteExit
@@ -18,9 +19,9 @@ except ImportError:
     SlurmRestFuture = None
     NATIVE_FUTURE_TYPES = Union[NativeFuture]
 
-from ..futures import TimeoutError
 from ..futures import CancelledError
 from ..futures import FutureInterface
+from ..futures import TimeoutError
 
 
 class LocalFuture(FutureInterface):

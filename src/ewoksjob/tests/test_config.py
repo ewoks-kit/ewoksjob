@@ -1,5 +1,7 @@
 import os
+
 import pytest
+
 from ..config import read_configuration
 
 EXPECTED = {

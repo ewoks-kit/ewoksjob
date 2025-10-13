@@ -1,6 +1,7 @@
+import functools
 import os
 import sys
-import functools
+
 import celery
 
 

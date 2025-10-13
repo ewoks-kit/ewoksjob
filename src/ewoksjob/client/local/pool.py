@@ -1,24 +1,25 @@
-import sys
-from contextlib import contextmanager
-from typing import Mapping, Optional, Tuple
-from uuid import uuid4
 import multiprocessing
+import sys
 import weakref
+from concurrent.futures import Future as NativeFuture
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import Future as NativeFuture
+from contextlib import contextmanager
+from typing import Mapping
+from typing import Optional
+from typing import Tuple
+from uuid import uuid4
 
 try:
     from pyslurmutils.client.errors import RemoteExit
-    from pyslurmutils.concurrent.futures import SlurmRestFuture
     from pyslurmutils.concurrent.futures import SlurmRestExecutor
+    from pyslurmutils.concurrent.futures import SlurmRestFuture
 except ImportError:
     SlurmRestExecutor = None
     SlurmRestFuture = None
     RemoteExit = None
 
 from .futures import LocalFuture
-
 
 __all__ = ["get_active_pool", "pool_context"]
 

@@ -1,14 +1,15 @@
 import warnings
+from typing import Mapping
+from typing import Optional
+from typing import Tuple
 from uuid import uuid4
-from typing import Mapping, Optional, Tuple
 
 import ewoks
 from ewokscore import task_discovery
 
-from .pool import get_active_pool
-from .futures import LocalFuture
 from ..dummy_workflow import dummy_workflow
-
+from .futures import LocalFuture
+from .pool import get_active_pool
 
 __all__ = [
     "execute_graph",

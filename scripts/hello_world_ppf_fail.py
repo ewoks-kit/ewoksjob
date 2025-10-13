@@ -1,15 +1,15 @@
 import time
 
 if True:
+    from multiprocessing import current_process
     from multiprocessing import get_context
     from multiprocessing.pool import Pool
-    from multiprocessing import current_process
 
     pool_type = "process"
 else:
+    from billiard import current_process
     from billiard import get_context
     from billiard.pool import Pool
-    from billiard import current_process
 
     pool_type = "billiard"
 

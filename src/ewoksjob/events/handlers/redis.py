@@ -1,13 +1,14 @@
-import os
 import json
-import socket
 import logging
+import os
+import socket
+from typing import Dict
+from typing import Optional
+from typing import Tuple
+
 import redis
-from typing import Dict, Optional, Tuple
-
-from ewoksutils.logging_utils.connection import ConnectionHandler
 from ewokscore.events.handlers import EwoksEventHandlerMixIn
-
+from ewoksutils.logging_utils.connection import ConnectionHandler
 
 RedisRecordType = Tuple[str, Dict[str, str]]
 

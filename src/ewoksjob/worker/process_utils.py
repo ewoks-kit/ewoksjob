@@ -1,7 +1,8 @@
 import os
 import signal
-from celery.concurrency import prefork
+
 from billiard.common import reset_signals
+from celery.concurrency import prefork
 
 
 def process_initializer(*args):

@@ -1,4 +1,5 @@
 from ewokscore.tests.examples.graphs import get_graph
+
 from ..client import celery
 from ..client import local
 

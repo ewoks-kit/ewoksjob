@@ -75,6 +75,7 @@ dev = [
     "ewoksjob[test]",
     "black >=25",
     "flake8 >=4",
+    "isort",
 ]
 doc = [
     "ewoksjob[worker]",
@@ -99,3 +100,7 @@ omit = ['*/tests/*']
 
 [tool.pytest.ini_options]
 timeout = 120
+
+[tool.isort]
+profile = "black"
+force_single_line = "True"

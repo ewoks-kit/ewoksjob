@@ -1,9 +1,12 @@
-import os
 import json
+import os
 import socket
 from typing import Iterator
+
 import redis
-from .base import EwoksEventReader, EventType
+
+from .base import EventType
+from .base import EwoksEventReader
 
 
 class RedisEwoksEventReader(EwoksEventReader):

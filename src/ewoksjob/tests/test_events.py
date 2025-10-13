@@ -1,7 +1,9 @@
-import pytest
 import datetime
 import threading
+
+import pytest
 from ewokscore import events
+
 from .utils import has_redis
 
 

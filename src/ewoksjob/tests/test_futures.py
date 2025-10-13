@@ -1,8 +1,9 @@
 import pytest
+
 from ..client import celery
 from ..client import local
-from .utils import wait_not_finished
 from .utils import has_redis
+from .utils import wait_not_finished
 
 
 @pytest.mark.skip(reason="working in manual testing")

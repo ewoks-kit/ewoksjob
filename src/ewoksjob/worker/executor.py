@@ -1,5 +1,6 @@
-from typing import Callable, Optional, Any
-
+from typing import Any
+from typing import Callable
+from typing import Optional
 
 ExecuteType = Optional[Callable[[Callable, Any, Any], Any]]
 _GET_EXECUTE_METHOD: Optional[Callable[[], ExecuteType]] = None
