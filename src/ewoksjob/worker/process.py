@@ -143,7 +143,7 @@ class TaskPool(base.BasePool):
         callback=None,
         error_callback=None,
         **_,
-    ):
+    ) -> "ApplyResult":
         future = self._safe_submit(target, args, kwargs, accept_callback)
 
         if callback is not None or error_callback is not None:
