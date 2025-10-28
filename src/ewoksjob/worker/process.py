@@ -168,7 +168,8 @@ class TaskPool(base.BasePool):
                     if callback is not None:
                         callback(result)
 
-        future.add_done_callback(done_callback)
+            future.add_done_callback(done_callback)
+
         return ApplyResult(future)
 
     def _safe_submit(self, target, args, kwargs, accept_callback) -> Future:
