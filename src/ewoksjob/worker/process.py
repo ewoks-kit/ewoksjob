@@ -41,8 +41,9 @@ class TaskPool(base.BasePool):
 
     def _ensure_executor(self):
         if self._executor is None:
-            logger.info("Start executor ...")
-            mp_context = get_context(self.EXECUTOR_OPTIONS.get("context"))
+            context = self.EXECUTOR_OPTIONS.get("context")
+            logger.info("Start %r executor ...", context)
+            mp_context = get_context(context)
             initargs = self.options["initargs"]
             maxtasksperchild = self.options["maxtasksperchild"]
 
