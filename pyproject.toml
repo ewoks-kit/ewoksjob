@@ -17,7 +17,7 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
     "celery[tblib] >= 5.5",
-    "ewoksutils >=0.1.1",
+    "ewoksutils >=1.6.0",
 ]
 
 [project.urls]
@@ -29,7 +29,7 @@ Changelog = "https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/-/blob/main/CHANGELO
 
 [project.optional-dependencies]
 worker = [
-    "ewokscore >=0.5",
+    "ewokscore >=3.0.0",
     "ewoks >=0.3",
 ]
 redis = [
@@ -67,6 +67,7 @@ test = [
     "pytest >=7",
     "pytest-celery",
     "pytest-redis",
+    "mirakuru<3; python_version < '3.10'",  # dependency of pytest-redis
     "pytest-mock",
     "tzdata",
     "pytest-timeout",

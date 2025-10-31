@@ -41,8 +41,9 @@ class TaskPool(base.BasePool):
 
     def _ensure_executor(self):
         if self._executor is None:
-            logger.info("Start executor ...")
-            mp_context = get_context(self.EXECUTOR_OPTIONS.get("context"))
+            context = self.EXECUTOR_OPTIONS.get("context")
+            logger.info("Start %r executor ...", context)
+            mp_context = get_context(context)
             initargs = self.options["initargs"]
             maxtasksperchild = self.options["maxtasksperchild"]
 
@@ -142,14 +143,14 @@ class TaskPool(base.BasePool):
         callback=None,
         error_callback=None,
         **_,
-    ):
-        f = self._safe_submit(target, args, kwargs, accept_callback)
+    ) -> "ApplyResult":
+        future = self._safe_submit(target, args, kwargs, accept_callback)
 
         if callback is not None or error_callback is not None:
 
-            def done_callback(f):
+            def done_callback(future):
                 try:
-                    result = f.result()
+                    result = future.result()
                 except BrokenProcessPool:
                     # Child process was killed
                     # TODO: prefork.process_destructor(pid, exitcode)
@@ -167,8 +168,9 @@ class TaskPool(base.BasePool):
                     if callback is not None:
                         callback(result)
 
-        f.add_done_callback(done_callback)
-        return ApplyResult(f)
+            future.add_done_callback(done_callback)
+
+        return ApplyResult(future)
 
     def _safe_submit(self, target, args, kwargs, accept_callback) -> Future:
         while True:
