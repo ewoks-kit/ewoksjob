@@ -23,7 +23,7 @@ def _assert_normal(mod, slurm_tmp_path):
     future = mod.submit_test(seconds=5, filename=str(filename))
     wait_not_finished(mod, {future.uuid}, timeout=3)
 
-    # Do not use future.result() so we test geting the result from the uuid.
+    # Do not use future.result() so we test getting the result from the uuid.
     results = mod.get_result(future.uuid, timeout=30)
 
     assert results == {"return_value": True}
@@ -59,7 +59,7 @@ def _assert_cancel(mod, slurm_tmp_path):
 
     # Check whether the job is cancelled.
     with pytest.raises(CancelledError):
-        # Do not use future.result() so we test geting the result from the uuid.
+        # Do not use future.result() so we test getting the result from the uuid.
         _ = mod.get_result(future.uuid, timeout=30)
 
     _nfs_cache_refresh(filename)
@@ -75,7 +75,7 @@ def _assert_cannot_be_cancelled(mod, slurm_tmp_path):
 
     # Check that the job cannot be cancelled.
     with pytest.raises(TimeoutError):
-        # Do not use future.result() so we test geting the result from the uuid.
+        # Do not use future.result() so we test getting the result from the uuid.
         _ = mod.get_result(future.uuid, timeout=3)
 
     _ = future.result(timeout=30)

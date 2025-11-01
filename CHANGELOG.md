@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add `ewoksjob submit` and `ewoksjob cancel` CLI commands.
+
 ## [1.2.0] - 2025-08-20
 
 ### Added
