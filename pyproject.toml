@@ -17,7 +17,8 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
     "celery[tblib] >= 5.5",
-    "ewoksutils >=1.6.0",
+    "ewoksutils[full] >=1.6.0",
+    "pyyaml",
 ]
 
 [project.urls]
@@ -98,6 +99,10 @@ omit = ['*/tests/*']
 
 [project.scripts]
 "ewoksjob" = "ewoksjob.__main__:main"
+
+[project.entry-points."celery.commands"]
+submit = "ewoksjob.cli_utils.submit:submit"
+cancel = "ewoksjob.cli_utils.cancel:cancel"
 
 [tool.pytest.ini_options]
 timeout = 120
