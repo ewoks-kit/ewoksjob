@@ -18,7 +18,9 @@ from ..bindings import submit_graph
 @add_click_options(cli_submit_utils.submit_arguments(shell=True))
 def submit(cli_args: Namespace) -> Union[List[dict], Literal[0, 1]]:
     """Submit an Ewoks workflow."""
-    return command_submit(cli_args, shell=True)
+    result = command_submit(cli_args, shell=True)
+    if result:
+        raise click.Exit(result)
 
 
 def command_submit(
