@@ -13,7 +13,9 @@ from .. import client
 @add_click_options(cli_cancel_utils.cancel_arguments(shell=True))
 def cancel(cli_args: Namespace) -> Optional[Literal[0, 1]]:
     """Abort an Ewoks job."""
-    return command_cancel(cli_args, shell=True)
+    result = command_cancel(cli_args, shell=True)
+    if result:
+        raise click.Exit(result)
 
 
 def command_cancel(cli_args, shell: bool = False) -> Optional[Literal[0, 1]]:

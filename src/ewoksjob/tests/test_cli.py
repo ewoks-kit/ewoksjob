@@ -27,6 +27,18 @@ def test_submit(ewoks_worker) -> str:
     assert future.done()
 
 
+def test_submit_exit_code(ewoks_worker) -> str:
+    runner = click.testing.CliRunner()
+
+    argv = ["demo", "--test", "--wait", "60"]
+    result = runner.invoke(submit, argv)
+    assert result.exit_code == 0, result.stdout
+
+    argv = ["demo", "--test", "--wait", "60", "-p", "a='wrong_type'"]
+    result = runner.invoke(submit, argv)
+    assert result.exit_code == 1, result.stdout
+
+
 @pytest.mark.skipif(
     sys.platform == "win32", reason="Cancelling a Celery job on Windows does not work"
 )
