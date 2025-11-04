@@ -20,7 +20,7 @@ def submit(cli_args: Namespace) -> Union[List[dict], Literal[0, 1]]:
     """Submit an Ewoks workflow."""
     result = command_submit(cli_args, shell=True)
     if result:
-        raise click.Exit(result)
+        click.get_current_context().exit(result)
 
 
 def command_submit(

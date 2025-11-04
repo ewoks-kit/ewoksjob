@@ -15,7 +15,7 @@ def cancel(cli_args: Namespace) -> Optional[Literal[0, 1]]:
     """Abort an Ewoks job."""
     result = command_cancel(cli_args, shell=True)
     if result:
-        raise click.Exit(result)
+        click.get_current_context().exit(result)
 
 
 def command_cancel(cli_args, shell: bool = False) -> Optional[Literal[0, 1]]:
