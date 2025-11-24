@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `gevent` patching done too late for `gevent` and `slurm` workers with `blissdata 2.3.0`.
+
 ## [1.3.2] - 2025-11-04
 
 ### Fixed
