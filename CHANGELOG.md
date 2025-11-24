@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.3] - 2025-11-24
+
 ### Fixed
 
 - Fix `gevent` patching done too late for `gevent` and `slurm` workers with `blissdata 2.3.0`.
@@ -204,7 +206,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - task discovery
 - Redis handler for ewoks events
 
-[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.2...HEAD
+[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.3...HEAD
+[1.3.3]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.2...v1.3.3
 [1.3.2]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.1...v1.3.2
 [1.3.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.0...v1.3.1
 [1.3.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.2.0...v1.3.0
