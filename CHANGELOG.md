@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.4] - 2025-11-24
+
+### Fixed
+
+- Replace the `gevent` monkey patching done by `celery` because it causes
+  the celery app to be instantiated during patching.
+
 ## [1.3.3] - 2025-11-24
 
 ### Fixed
@@ -206,7 +213,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - task discovery
 - Redis handler for ewoks events
 
-[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.3...HEAD
+[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.4...HEAD
+[1.3.4]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.3...v1.3.4
 [1.3.3]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.2...v1.3.3
 [1.3.2]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.1...v1.3.2
 [1.3.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/compare/v1.3.0...v1.3.1
