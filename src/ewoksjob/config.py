@@ -11,10 +11,7 @@ from urllib.parse import urlparse
 from celery import Celery
 from celery.loaders.default import Loader
 
-try:
-    from blissdata.beacon.files import read_config as bliss_read_config
-except ImportError:
-    bliss_read_config = None
+# WARNING: import as little as possible because gevent-patching might be done too late
 
 logger = logging.getLogger(__name__)
 
@@ -142,10 +139,12 @@ def _url_to_filename(presult: ParseResult) -> str:
 
 
 def _read_yaml_config(resource: str) -> dict:
-    if bliss_read_config is None:
+    try:
+        from blissdata.beacon.files import read_config as bliss_read_config
+    except ImportError as e:
         raise RuntimeError(
             f"Cannot get celery configuration '{resource}' from Beacon: blissdata is not installed"
-        )
+        ) from e
     return bliss_read_config(resource)
 
 
