@@ -1,40 +1,14 @@
-import functools
 import os
 import sys
 
-import celery
-
-
-def _patch_eventlet():
-    import eventlet.debug
-
-    eventlet.monkey_patch()
-    blockdetect = float(os.environ.get("EVENTLET_NOBLOCK", 0))
-    if blockdetect:
-        eventlet.debug.hub_blocking_detection(blockdetect, blockdetect)
-
-
-def _patch_gevent():
-    import gevent.monkey
-    import gevent.signal
-
-    gevent.monkey.patch_all()
-
-
-_PATCHES = {
-    "eventlet": _patch_eventlet,
-    "gevent": _patch_gevent,
-    "slurm": _patch_gevent,
-}
-
-celery.maybe_patch_concurrency = functools.partial(
-    celery.maybe_patch_concurrency, patches=_PATCHES
-)
+from ._patch import patch_environment
 
 
 def main(argv=None) -> None:
     if argv is None:
         argv = sys.argv
+
+    # Modify arguments
     if "worker" in argv:
         if "-A" not in argv:
             argv = argv[:1] + ["-A", "ewoksjob.apps.ewoks"] + argv[1:]
@@ -42,9 +16,17 @@ def main(argv=None) -> None:
             argv += ["--loglevel", "INFO"]
     elif "monitor" in argv:
         argv[argv.index("monitor")] = "flower"
+
+    # Celery does not support explicit argv passing
     sys.argv = argv
+
+    # When needed, patch the environment
+    patch_environment(argv)
+
+    # Ewoksjob loader when no loader defined
     os.environ.setdefault("CELERY_LOADER", "ewoksjob.config.EwoksLoader")
 
+    # Call celery main
     from celery.__main__ import main as _main
 
     sys.exit(_main())
