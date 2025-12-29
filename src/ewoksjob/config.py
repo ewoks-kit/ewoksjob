@@ -5,11 +5,10 @@ import sys
 import types
 from pathlib import Path
 from typing import Tuple
-from urllib.parse import ParseResult
-from urllib.parse import urlparse
 
 from celery import Celery
 from celery.loaders.default import Loader
+from ewoksutils import uri_utils
 
 # WARNING: import as little as possible because gevent-patching might be done too late
 
@@ -67,13 +66,12 @@ def get_cfg_uri() -> str:
 
 
 def get_cfg_type(cfg_uri: str) -> str:
-    presult = _parse_url(cfg_uri)
-    if presult.scheme == "beacon":
+    parsed = uri_utils.parse_uri(cfg_uri)
+    if parsed.scheme == "beacon":
         return "yaml"
-    if presult.scheme in ("file", ""):
-        cfg_uri = _url_to_filename(presult)
-        ext = os.path.splitext(cfg_uri)[-1]
-        if ext in (".yaml", ".yml"):
+    if parsed.scheme == "file":
+        file_path = uri_utils.path_from_uri(cfg_uri)
+        if file_path.suffix in (".yaml", ".yml"):
             return "yaml"
         return "python"
     return ""
@@ -99,6 +97,7 @@ def read_configuration(cfg_uri: str) -> dict:
         config = _read_py_config(cfg_uri)
     else:
         raise ValueError(f"Configuration URL '{cfg_uri}' is not supported")
+
     # `celery.app.utils.Settings` converts all parameters to lower-case
     # but we are here before that happens.
     config = {k.lower(): v for k, v in config.items()}
@@ -109,35 +108,6 @@ def read_configuration(cfg_uri: str) -> dict:
     return config
 
 
-def _parse_url(url: str) -> ParseResult:
-    presult = urlparse(url)
-    if presult.scheme == "beacon":
-        # beacon:///path/to/file.yml
-        # beacon://id00:25000/path/to/file.yml
-        return presult
-    elif presult.scheme in ("file", ""):
-        # /path/to/file.yaml
-        # file:///path/to/file.yaml
-        return presult
-    elif sys.platform == "win32" and len(presult.scheme) == 1:
-        # c:\\path\\to\\file.yaml
-        return urlparse(f"file://{url}")
-    else:
-        return presult
-
-
-def _url_to_filename(presult: ParseResult) -> str:
-    if presult.netloc and presult.path:
-        # urlparse("file://c:/a/b")
-        return presult.netloc + presult.path
-    elif presult.netloc:
-        # urlparse("file://c:\\a\\b")
-        return presult.netloc
-    else:
-        # urlparse("file:///a/b")
-        return presult.path
-
-
 def _read_yaml_config(resource: str) -> dict:
     try:
         from blissdata.beacon.files import read_config as bliss_read_config
@@ -145,30 +115,33 @@ def _read_yaml_config(resource: str) -> dict:
         raise RuntimeError(
             f"Cannot get celery configuration '{resource}' from Beacon: blissdata is not installed"
         ) from e
+    if sys.platform == "win32" and resource.startswith("file:///"):
+        # Bug in blissdata. See https://gitlab.esrf.fr/bliss/blissdata/-/issues/22.
+        resource = resource.replace("file:///", "file://")
     return bliss_read_config(resource)
 
 
 def _read_py_config(cfg_uri: str) -> dict:
     """Warning: this is not thread-safe and it has side-effects during execution"""
-    presult = _parse_url(cfg_uri)
-    sys_path, module = _get_config_module(_url_to_filename(presult))
+    file_path = uri_utils.path_from_uri(cfg_uri)
+    sys_path, module = _get_config_module(file_path)
+
     keep_sys_path = list(sys.path)
     sys.path.insert(0, sys_path)
     try:
         config = vars(importlib.import_module(module))
-        config = {
-            k: v
-            for k, v in config.items()
-            if not k.startswith("_") and not isinstance(v, types.ModuleType)
-        }
-        return config
     finally:
         sys.path = keep_sys_path
 
+    config = {
+        k: v
+        for k, v in config.items()
+        if not k.startswith("_") and not isinstance(v, types.ModuleType)
+    }
+    return config
 
-def _get_config_module(cfg_uri: str) -> Tuple[str, str]:
-    path = Path(cfg_uri)
+
+def _get_config_module(path: Path) -> Tuple[str, str]:
     if path.is_file():
-        parent = str(path.parent.resolve())
-        return parent, path.stem
-    return os.getcwd(), cfg_uri
+        return str(path.parent.resolve()), path.stem
+    return os.getcwd(), str(path)
