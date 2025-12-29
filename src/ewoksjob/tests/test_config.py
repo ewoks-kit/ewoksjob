@@ -1,4 +1,5 @@
 import os
+import sys
 
 import pytest
 
@@ -74,7 +75,11 @@ ewoks_execution:
 
 def test_pyfile_config(py_config: str):
     assert read_configuration(py_config) == EXPECTED
-    assert read_configuration(f"file://{py_config}") == EXPECTED
+    if sys.platform == "win32":
+        uri = f"file:///{py_config}"
+    else:
+        uri = f"file://{py_config}"
+    assert read_configuration(uri) == EXPECTED
 
 
 def test_pymodule_config(py_config: str):
@@ -89,7 +94,11 @@ def test_pymodule_config(py_config: str):
 
 def test_yaml_config(yaml_config: str):
     assert read_configuration(yaml_config) == EXPECTED
-    assert read_configuration(f"file://{yaml_config}") == EXPECTED
+    if sys.platform == "win32":
+        uri = f"file:///{yaml_config}"
+    else:
+        uri = f"file://{yaml_config}"
+    assert read_configuration(uri) == EXPECTED
 
 
 def test_beacon_config(beacon_config: str):
