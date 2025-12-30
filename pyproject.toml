@@ -17,7 +17,7 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
     "celery[tblib] >= 5.5",
-    "ewoksutils[full] >=1.8.1",
+    "ewoksutils[full] >=1.9.1",
     "pyyaml",
 ]
 

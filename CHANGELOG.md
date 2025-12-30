@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Parse configuration URI's with `ewoksutils`.
+
 ## [1.3.4] - 2025-11-24
 
 ### Fixed
