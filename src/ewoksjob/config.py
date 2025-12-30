@@ -36,15 +36,14 @@ class EwoksLoader(Loader):
             # Load from the module "celeryconfig" if available
             return super().read_configuration()
 
+        file_type = get_cfg_type(cfg_uri)
         try:
-            file_type = get_cfg_type(cfg_uri)
             logger.info(f"Loading celery configuration '{cfg_uri}' (type: {file_type})")
-            config = read_configuration(cfg_uri=cfg_uri)
-        except Exception:
+            return read_configuration(cfg_uri=cfg_uri)
+        except Exception as e:
             raise RuntimeError(
                 f"Cannot load celery configuration from '{cfg_uri}' (type: {file_type})"
-            )
-        return config
+            ) from e
 
 
 def get_cfg_uri() -> str:
@@ -69,12 +68,12 @@ def get_cfg_type(cfg_uri: str) -> str:
     parsed = uri_utils.parse_uri(cfg_uri)
     if parsed.scheme == "beacon":
         return "yaml"
-    if parsed.scheme == "file":
+    if parsed.scheme in "file":
         file_path = uri_utils.path_from_uri(cfg_uri)
         if file_path.suffix in (".yaml", ".yml"):
             return "yaml"
         return "python"
-    return ""
+    return parsed.scheme
 
 
 def read_configuration(cfg_uri: str) -> dict:
