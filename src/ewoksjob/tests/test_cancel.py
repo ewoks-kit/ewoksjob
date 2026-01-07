@@ -1,13 +1,17 @@
+import importlib.metadata
 import pathlib
 import sys
 
 import pytest
+from packaging.version import Version
 
 from ..client import CancelledError
 from ..client import TimeoutError
 from ..client import celery
 from ..client import local
 from .utils import wait_not_finished
+
+CELERY_VERSION = Version(importlib.metadata.version("celery"))
 
 
 def test_normal(ewoks_worker, slurm_tmp_path):
@@ -37,7 +41,11 @@ def test_cancel(ewoks_worker, slurm_tmp_path):
     if on_windows:
         # Cancelling a Celery job on Windows does not work.
         # https://docs.celeryq.dev/en/stable/faq.html#does-celery-support-windows
-        _assert_cannot_be_cancelled(celery, slurm_tmp_path)
+
+        if CELERY_VERSION >= Version("5.6.2"):
+            _assert_cancelled_but_completes(celery, slurm_tmp_path)
+        else:
+            _assert_cannot_be_cancelled(celery, slurm_tmp_path)
     else:
         _assert_cancel(celery, slurm_tmp_path)
 
@@ -51,6 +59,7 @@ def test_cancel_local(local_ewoks_worker, slurm_tmp_path):
 
 
 def _assert_cancel(mod, slurm_tmp_path):
+    """Check that the job got cancelled and the workflow did not complete."""
     filename = slurm_tmp_path / "finished.smf"
     future = mod.submit_test(seconds=12, filename=str(filename))
     wait_not_finished(mod, {future.uuid}, timeout=3)
@@ -63,10 +72,11 @@ def _assert_cancel(mod, slurm_tmp_path):
         _ = mod.get_result(future.uuid, timeout=30)
 
     _nfs_cache_refresh(filename)
-    assert not filename.exists()
+    assert not filename.exists(), "Workflow was completed unexpectedly"
 
 
 def _assert_cannot_be_cancelled(mod, slurm_tmp_path):
+    """Check that the job cannot be cancelled and the workflow completes."""
     filename = slurm_tmp_path / "finished.smf"
     future = mod.submit_test(seconds=12, filename=str(filename))
     wait_not_finished(mod, {future.uuid}, timeout=3)
@@ -80,7 +90,24 @@ def _assert_cannot_be_cancelled(mod, slurm_tmp_path):
 
     _ = future.result(timeout=30)
     _nfs_cache_refresh(filename)
-    assert filename.exists()
+    assert filename.exists(), "Workflow was not completed unexpectedly"
+
+
+def _assert_cancelled_but_completes(mod, slurm_tmp_path):
+    """Check that the job can be cancelled and the workflow completes."""
+    filename = slurm_tmp_path / "finished.smf"
+    future = mod.submit_test(seconds=12, filename=str(filename))
+    wait_not_finished(mod, {future.uuid}, timeout=3)
+
+    _ = mod.cancel(future.uuid)
+
+    # Check whether the job is cancelled.
+    with pytest.raises(CancelledError):
+        # Do not use future.result() so we test getting the result from the uuid.
+        _ = mod.get_result(future.uuid, timeout=30)
+
+    _nfs_cache_refresh(filename)
+    assert filename.exists(), "Workflow was completed unexpectedly"
 
 
 def _nfs_cache_refresh(filename: pathlib.Path):
