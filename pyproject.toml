@@ -71,6 +71,7 @@ test = [
     "pytest-mock",
     "tzdata",
     "pytest-timeout",
+    "packaging",
 ]
 dev = [
     "ewoksjob[test]",
