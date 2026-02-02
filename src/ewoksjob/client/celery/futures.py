@@ -83,7 +83,7 @@ class CeleryFuture(FutureInterface):
             while not self._async_result.ready():
                 if timeout is not None and time.time() - t0 >= timeout:
                     raise TimeoutError(
-                        f"job '{self.uuid}' is not done with {timeout} seconds"
+                        f"job '{self.uuid}' did not complete within within {timeout} seconds"
                     )
                 if interval is not None:
                     time.sleep(interval)
@@ -95,11 +95,14 @@ class CeleryFuture(FutureInterface):
             timeout = interval
         try:
             return self._async_result.get(timeout=timeout, interval=interval, **kwargs)
-        except (TaskRevokedError, Terminated) as e:
-            err_msg = f"job '{self.uuid}' was cancelled or terminated"
+        except TaskRevokedError as e:
+            err_msg = f"job '{self.uuid}' was revoked"
+            raise CancelledError(err_msg) from e
+        except Terminated as e:
+            err_msg = f"job '{self.uuid}' was terminated"
             raise CancelledError(err_msg) from e
         except CeleryTimeoutError as e:
-            err_msg = f"job '{self.uuid}' is not done with {timeout} seconds"
+            err_msg = f"job '{self.uuid}' did not complete within {timeout} seconds"
             raise TimeoutError(err_msg) from e
 
     def exception(self, timeout: Optional[float] = None) -> Optional[Exception]:
