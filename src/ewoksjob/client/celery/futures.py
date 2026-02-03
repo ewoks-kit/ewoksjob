@@ -83,7 +83,7 @@ class CeleryFuture(FutureInterface):
             while not self._async_result.ready():
                 if timeout is not None and time.time() - t0 >= timeout:
                     raise TimeoutError(
-                        f"job '{self.uuid}' did not complete within within {timeout} seconds"
+                        f"job '{self.uuid}' did not complete within {timeout} seconds"
                     )
                 if interval is not None:
                     time.sleep(interval)
