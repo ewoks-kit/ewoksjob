@@ -65,11 +65,14 @@ class LocalFuture(FutureInterface):
     def _convert_exceptions(self, timeout):
         try:
             yield
-        except (NativeCancelledError, RemoteExit) as e:
-            err_msg = f"future of job '{self.uuid}' was cancelled"
+        except NativeCancelledError as e:
+            err_msg = f"job '{self.uuid}' was cancelled before it started"
+            raise CancelledError(err_msg) from e
+        except RemoteExit as e:
+            err_msg = f"job '{self.uuid}' was terminated while it was running"
             raise CancelledError(err_msg) from e
         except NativeTimeoutError as e:
-            err_msg = f"job '{self.uuid}' is not done with {timeout} seconds"
+            err_msg = f"job '{self.uuid}' did not complete within {timeout} seconds"
             raise TimeoutError(err_msg) from e
 
     # API in addition to `concurrent.futures.LocalFuture`
