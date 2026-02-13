@@ -22,11 +22,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/"
+Homepage = "https://github.com/ewoks-kit/ewoksjob/"
 Documentation = "https://ewoksjob.readthedocs.io/"
-Repository = "https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/"
-Issues = "https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/issues"
-Changelog = "https://gitlab.esrf.fr/workflow/ewoks/ewoksjob/-/blob/main/CHANGELOG.md"
+Repository = "https://github.com/ewoks-kit/ewoksjob/"
+Issues = "https://github.com/ewoks-kit/ewoksjob/issues"
+Changelog = "https://github.com/ewoks-kit/ewoksjob/-/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 worker = [

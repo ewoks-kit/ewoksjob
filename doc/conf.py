@@ -40,7 +40,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "github",
-            "url": "https://gitlab.esrf.fr/workflow/ewoks/ewoksjob",
+            "url": "https://github.com/ewoks-kit/ewoksjob",
             "icon": "fa-brands fa-github",
         },
         {

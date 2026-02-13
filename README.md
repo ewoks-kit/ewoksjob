@@ -8,7 +8,7 @@ Note that *ewoksjob* distributes the execution of workflows while [ewoksdask](ht
 distributes the execution of tasks in a workflow. So in the context of workflows, job scheduling exists on two levels.
 
 The primary clients that need to schedule workflows are
-* [Ewoksserver](https://gitlab.esrf.fr/workflow/ewoks/ewoksserver): web backend for ewoks.
+* [Ewoksserver](https://github.com/ewoks-kit/ewoksserver): web backend for ewoks.
 * [Bliss](https://gitlab.esrf.fr/bliss/bliss): the ESRF beamline control system.
 * [Daiquiri](https://gitlab.esrf.fr/ui/daiquiri): web backend for Bliss.
 
