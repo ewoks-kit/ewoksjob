@@ -20,27 +20,38 @@ jobs:
       matrix:
         include:
           - python-version: "3.8"
+            os: ubuntu-latest
             enable-coverage: "false"
             extra-pytest-warnings: ""
           - python-version: "3.9"
+            os: ubuntu-latest
             enable-coverage: "false"
             extra-pytest-warnings: "-W ignore::RuntimeWarning:networkx.utils.backends"
           - python-version: "3.10"
+            os: ubuntu-latest
             enable-coverage: "false"
             extra-pytest-warnings: ""
           - python-version: "3.11"
+            os: ubuntu-latest
             enable-coverage: "false"
             extra-pytest-warnings: ""
           - python-version: "3.12"
+            os: ubuntu-latest
             enable-coverage: "true"
             extra-pytest-warnings: ""
           - python-version: "3.13"
+            os: ubuntu-latest
+            enable-coverage: "false"
+            extra-pytest-warnings: ""
+          - python-version: "3.12"
+            os: windows-latest
             enable-coverage: "false"
             extra-pytest-warnings: ""
     uses: ewoks-kit/.github/.github/workflows/python-tests.yml@add-coverage
     secrets:
       codecov_token: ${{ secrets.CODECOV_TOKEN }}
     with:
+      os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
       qt-api: PyQt6
       enable-coverage: ${{ matrix.enable-coverage }}
