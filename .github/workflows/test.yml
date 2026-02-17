@@ -63,7 +63,7 @@ jobs:
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
         ${{ matrix.extra-pytest-warnings }}
 
-  test-3.12-slurm:
+  test-3-12-slurm:
     needs: build
     runs-on: ubuntu-latest
     env:
@@ -83,7 +83,7 @@ jobs:
       - run: python -m pip install --pre .[test,orange]
       - run: python -m gevent.monkey --module pytest . -v $PYTEST_WARNINGS
 
-  test-3.12-redis:
+  test-3-12-redis:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -105,7 +105,7 @@ jobs:
       - run: redis-server &
       - run: pytest -v -ra $PYTEST_WARNINGS
 
-  test-3.12-redis-slurm:
+  test-3-12-redis-slurm:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -127,7 +127,7 @@ jobs:
       - run: redis-server &
       - run: python -m gevent.monkey --module pytest . -v $PYTEST_WARNINGS
 
-  test-3.12-examples-sql:
+  test-3-12-examples-sql:
     needs: build
     runs-on: ubuntu-latest
     env:
@@ -149,7 +149,7 @@ jobs:
       - run: ./scripts/worker.sh --sql --pool=process &
       - run: ./scripts/runjobs.sh --sql
 
-  test-3.12-examples-redis:
+  test-3-12-examples-redis:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
