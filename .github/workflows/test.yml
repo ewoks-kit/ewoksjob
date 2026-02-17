@@ -1,0 +1,62 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  # Build Python package
+  build:
+    uses: ewoks-kit/.github/.github/workflows/python-build.yml@main
+
+  # Run tests
+  tests:
+    needs: build
+    strategy:
+      matrix:
+        include:
+          - python-version: "3.8"
+            enable-coverage: "false"
+            extra-pytest-warnings: ""
+          - python-version: "3.9"
+            enable-coverage: "false"
+            extra-pytest-warnings: "-W ignore::RuntimeWarning:networkx.utils.backends"
+          - python-version: "3.10"
+            enable-coverage: "false"
+            extra-pytest-warnings: ""
+          - python-version: "3.11"
+            enable-coverage: "false"
+            extra-pytest-warnings: ""
+          - python-version: "3.12"
+            enable-coverage: "true"
+            extra-pytest-warnings: ""
+          - python-version: "3.13"
+            enable-coverage: "false"
+            extra-pytest-warnings: ""
+    uses: ewoks-kit/.github/.github/workflows/python-tests.yml@add-coverage
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
+    with:
+      python-version: ${{ matrix.python-version }}
+      qt-api: PyQt6
+      enable-coverage: ${{ matrix.enable-coverage }}
+      pytest-args: >-
+        -v -ra -W error
+        -W ignore::DeprecationWarning:kombu.utils.compat
+        -W ignore::DeprecationWarning:celery.utils.imports
+        -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+        ${{ matrix.extra-pytest-warnings }}
+
+  # Run linter / checks
+  checks:
+    uses: ewoks-kit/.github/.github/workflows/python-check.yml@main
+
+  # Build documentation
+  docs:
+    needs: build
+    uses: ewoks-kit/.github/.github/workflows/python-docs.yml@main
