@@ -43,7 +43,7 @@ jobs:
             os: ubuntu-latest
             enable-coverage: "false"
             extra-pytest-warnings: ""
-    uses: ewoks-kit/.github/.github/workflows/python-tests.yml@add-coverage
+    uses: ewoks-kit/.github/.github/workflows/python-tests.yml@main
     secrets:
       codecov_token: ${{ secrets.CODECOV_TOKEN }}
     with:
