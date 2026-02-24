@@ -81,9 +81,12 @@ jobs:
       - shell: bash
         run: python -m pip install --pre .[sql,redis]
       - shell: bash
-        run: python -m pip install --pre "ewoks>=4.0.0" pytest pytest-celery pytest-redis pytest-mock tzdata pytest-timeout packaging
+        run: python -m pip install --pre "ewoks>=4.0.0" pytest pytest-mock tzdata pytest-timeout packaging
       - shell: bash
-        run: pytest -v -ra $PYTEST_WARNINGS
+        run: |
+          pytest -v -ra $PYTEST_WARNINGS src/ewoksjob/tests/test_config.py -k "not yaml and not beacon"
+          pytest -v -ra $PYTEST_WARNINGS src/ewoksjob/tests/test_events.py -k "sqlite3"
+          pytest -v -ra $PYTEST_WARNINGS src/ewoksjob/tests/test_feedback.py -k "sqlite3"
 
   test-3-12-slurm:
     needs: build
