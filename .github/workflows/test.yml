@@ -1,0 +1,216 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  # Build Python package
+  build:
+    uses: ewoks-kit/.github/.github/workflows/python-build.yml@main
+
+  # Run tests
+  tests:
+    needs: build
+    strategy:
+      matrix:
+        include:
+          - python-version: "3.8"
+            os: ubuntu-latest
+            enable-coverage: "false"
+            extra-pytest-warnings: ""
+          - python-version: "3.9"
+            os: ubuntu-latest
+            enable-coverage: "false"
+            extra-pytest-warnings: "-W ignore::RuntimeWarning:networkx.utils.backends"
+          - python-version: "3.10"
+            os: ubuntu-latest
+            enable-coverage: "false"
+            extra-pytest-warnings: ""
+          - python-version: "3.11"
+            os: ubuntu-latest
+            enable-coverage: "false"
+            extra-pytest-warnings: ""
+          - python-version: "3.12"
+            os: ubuntu-latest
+            enable-coverage: "true"
+            extra-pytest-warnings: ""
+          - python-version: "3.13"
+            os: ubuntu-latest
+            enable-coverage: "false"
+            extra-pytest-warnings: ""
+    uses: ewoks-kit/.github/.github/workflows/python-tests.yml@main
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      qt-api: PyQt6
+      enable-coverage: ${{ matrix.enable-coverage }}
+      pytest-args: >-
+        -v -ra -W error
+        -W ignore::DeprecationWarning:kombu.utils.compat
+        -W ignore::DeprecationWarning:celery.utils.imports
+        -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+        ${{ matrix.extra-pytest-warnings }}
+
+  test-3-12-windows:
+    needs: build
+    runs-on: windows-latest
+    env:
+      JUPYTER_PLATFORM_DIRS: 1
+      PYTEST_WARNINGS: >-
+        -W error
+        -W ignore::DeprecationWarning:kombu.utils.compat
+        -W ignore::DeprecationWarning:celery.utils.imports
+        -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+        -W ignore::RuntimeWarning:networkx.utils.backends
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ewoks-kit/.github/.github/actions/setup-python-package@main
+        with:
+          python-version: "3.12"
+          install-extras: "test"
+      - shell: bash
+        run: |
+          pytest -v -ra $PYTEST_WARNINGS src/ewoksjob/tests/test_config.py -k "not yaml and not beacon"
+          pytest -v -ra $PYTEST_WARNINGS src/ewoksjob/tests/test_events.py -k "sqlite3"
+          pytest -v -ra $PYTEST_WARNINGS src/ewoksjob/tests/test_feedback.py -k "sqlite3"
+
+  test-3-12-slurm:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      JUPYTER_PLATFORM_DIRS: 1
+      PYTEST_WARNINGS: >-
+        -W error
+        -W ignore::DeprecationWarning:kombu.utils.compat
+        -W ignore::DeprecationWarning:celery.utils.imports
+        -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ewoks-kit/.github/.github/actions/setup-python-package@main
+        with:
+          python-version: "3.12"
+          install-extras: "test,orange"
+      - run: python -m gevent.monkey --module pytest . -v $PYTEST_WARNINGS
+
+  test-3-12-redis:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      JUPYTER_PLATFORM_DIRS: 1
+      PYTEST_WARNINGS: >-
+        -W error
+        -W ignore::DeprecationWarning:kombu.utils.compat
+        -W ignore::DeprecationWarning:celery.utils.imports
+        -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ewoks-kit/.github/.github/actions/setup-python-package@main
+        with:
+          python-version: "3.12"
+          install-extras: "test"
+      - run: redis-server &
+      - run: pytest -v -ra $PYTEST_WARNINGS
+
+  test-3-12-redis-slurm:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      JUPYTER_PLATFORM_DIRS: 1
+      PYTEST_WARNINGS: >-
+        -W error
+        -W ignore::DeprecationWarning:kombu.utils.compat
+        -W ignore::DeprecationWarning:celery.utils.imports
+        -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ewoks-kit/.github/.github/actions/setup-python-package@main
+        with:
+          python-version: "3.12"
+          install-extras: "test,orange"
+      - run: redis-server &
+      - run: python -m gevent.monkey --module pytest . -v $PYTEST_WARNINGS
+
+  test-3-12-examples-sql:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      JUPYTER_PLATFORM_DIRS: 1
+      PYTEST_WARNINGS: >-
+        -W error
+        -W ignore::DeprecationWarning:kombu.utils.compat
+        -W ignore::DeprecationWarning:celery.utils.imports
+        -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ewoks-kit/.github/.github/actions/setup-python-package@main
+        with:
+          python-version: "3.12"
+          install-extras: "test"
+      - run: python -m pip install --pre ewoksppf
+      - run: ./scripts/worker.sh --sql --pool=process &
+      - run: ./scripts/runjobs.sh --sql
+
+  test-3-12-examples-redis:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      JUPYTER_PLATFORM_DIRS: 1
+      PYTEST_WARNINGS: >-
+        -W error
+        -W ignore::DeprecationWarning:kombu.utils.compat
+        -W ignore::DeprecationWarning:celery.utils.imports
+        -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ewoks-kit/.github/.github/actions/setup-python-package@main
+        with:
+          python-version: "3.12"
+          install-extras: "test"
+      - run: python -m pip install --pre ewoksppf
+      - run: ./scripts/worker.sh --redis --pool=process --loglevel=info > /tmp/ewoks-worker.log 2>&1 &
+      - run: |
+          for i in {1..30}; do
+            if grep -q "ready" /tmp/ewoks-worker.log; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/ewoks-worker.log
+          exit 1
+      - run: ./scripts/runjobs.sh --redis
+
+  # Run linter / checks
+  checks:
+    uses: ewoks-kit/.github/.github/workflows/python-check.yml@main
+
+  # Build documentation
+  docs:
+    needs: build
+    uses: ewoks-kit/.github/.github/workflows/python-docs.yml@main
