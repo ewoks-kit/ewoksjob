@@ -1,5 +1,12 @@
 # ewoksjob
 
+[![Pipeline](https://github.com/ewoks-kit/ewoksjob/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/ewoks-kit/ewoksjob/actions/workflows/test.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![License](https://img.shields.io/github/license/ewoks-kit/ewoksjob)](https://github.com/ewoks-kit/ewoksjob/blob/main/LICENSE.md)
+[![Coverage](https://codecov.io/gh/ewoks-kit/ewoksjob/branch/main/graph/badge.svg)](https://codecov.io/gh/ewoks-kit/ewoksjob)
+[![Docs](https://readthedocs.org/projects/ewoksjob/badge/?version=latest)](https://ewoksjob.readthedocs.io/en/latest/?badge=latest)
+[![PyPI](https://img.shields.io/pypi/v/ewoksjob)](https://pypi.org/project/ewoksjob/)
+
 Utilities for job scheduling of [ewoks](https://ewoks.readthedocs.io/) workflows.
 
 Ewoksjob provides an ewoks interface for asynchronous and distributed scheduling of [ewoks](https://ewoks.readthedocs.io/) from python.
