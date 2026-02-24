@@ -43,10 +43,6 @@ jobs:
             os: ubuntu-latest
             enable-coverage: "false"
             extra-pytest-warnings: ""
-          - python-version: "3.12"
-            os: windows-latest
-            enable-coverage: "false"
-            extra-pytest-warnings: ""
     uses: ewoks-kit/.github/.github/workflows/python-tests.yml@add-coverage
     secrets:
       codecov_token: ${{ secrets.CODECOV_TOKEN }}
@@ -62,6 +58,32 @@ jobs:
         -W ignore::DeprecationWarning:kombu.transport.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
         ${{ matrix.extra-pytest-warnings }}
+
+  test-3-12-windows:
+    needs: build
+    runs-on: windows-latest
+    env:
+      JUPYTER_PLATFORM_DIRS: 1
+      PYTEST_WARNINGS: >-
+        -W error
+        -W ignore::DeprecationWarning:kombu.utils.compat
+        -W ignore::DeprecationWarning:celery.utils.imports
+        -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+        -W ignore::RuntimeWarning:networkx.utils.backends
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - shell: bash
+        run: python -m pip install --upgrade pip
+      - shell: bash
+        run: python -m pip install --pre .[sql,redis]
+      - shell: bash
+        run: python -m pip install --pre "ewoks>=4.0.0" pytest pytest-celery pytest-redis pytest-mock tzdata pytest-timeout packaging
+      - shell: bash
+        run: pytest -v -ra $PYTEST_WARNINGS
 
   test-3-12-slurm:
     needs: build
@@ -153,6 +175,16 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
     env:
       JUPYTER_PLATFORM_DIRS: 1
       PYTEST_WARNINGS: >-
@@ -169,8 +201,16 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: python -m pip install --pre .[test]
       - run: python -m pip install --pre ewoksppf
-      - run: redis-server &
-      - run: ./scripts/worker.sh --redis --pool=process &
+      - run: ./scripts/worker.sh --redis --pool=process --loglevel=info > /tmp/ewoks-worker.log 2>&1 &
+      - run: |
+          for i in {1..30}; do
+            if grep -q "ready" /tmp/ewoks-worker.log; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/ewoks-worker.log
+          exit 1
       - run: ./scripts/runjobs.sh --redis
 
   # Run linter / checks
