@@ -92,7 +92,7 @@ class EwoksEventReader:
             self.dereference_data_uris(event)
             yield event
 
-    def get_full_job_events(self, **filters) -> Iterator[Tuple[EventType]]:
+    def get_full_job_events(self, **filters) -> Iterator[Tuple[EventType, ...]]:
         """Returns events grouped by "job_id". When one event matches the filter,
         all events with the "job_id" are returned.
         """
@@ -104,7 +104,7 @@ class EwoksEventReader:
 
     def get_full_job_events_with_variables(
         self, **filters
-    ) -> Iterator[Tuple[EventType]]:
+    ) -> Iterator[Tuple[EventType, ...]]:
         """`get_full_job_events` with URI dereferencing."""
         job_id = None
         for event in self.get_events(**filters):
