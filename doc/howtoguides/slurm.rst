@@ -1,14 +1,13 @@
 How to submit jobs to Slurm via a worker
 ========================================
 
-To distribute jobs to a Slurm cluster, one or more workers with the `--pool=slurm` option needs to be running.
+To distribute jobs to a Slurm cluster, one or more workers with the ``--pool=slurm`` option needs to be running.
 A client is in general unaware of this, unless it wants to specify Slurm job parameters for each job it submits.
 
 Worker side
 -----------
 
-When started with the `--pool=slurm` the worker redirects jobs to a Slurm cluster.
-
+When started with the ``--pool=slurm`` the worker redirects jobs to a Slurm cluster.
 
 .. code-block:: bash
 
@@ -21,8 +20,10 @@ When started with the `--pool=slurm` the worker redirects jobs to a Slurm cluste
         --slurm-log-directory='/tmp_14_days/{user_name}/slurm_logs'
         -sp time_limit=240
         -sp current_working_directory=/path/to/data
+        -se VAR1
+        -se VAR2=VALUE2
 
-Environment variables `SLURM_URL`, `SLURM_USER` and `SLURM_TOKEN` are needed to communicate
+Environment variables ``SLURM_URL``, ``SLURM_USER`` and ``SLURM_TOKEN`` are needed to communicate
 and authenticate with the Slurm frontend. These variables can also be specified through the
 command line interface like this
 
@@ -36,23 +37,64 @@ command line interface like this
         --slurm-log-directory='/tmp_14_days/{user_name}/slurm_logs'
         -sp time_limit=240
         -sp current_working_directory=/path/to/data
+        -se VAR1
+        -se VAR2=VALUE2
 
-The option `--slurm-pre-script='module load myenv'` can be provided to activate a specific environment
+The option ``--slurm-pre-script='module load myenv'`` can be provided to activate a specific environment
 on Slurm in which the execute the workflows. This can be any command like `conda activate myenv`,
-`source /path/to/bin/activate`, ... The environment selected in this way needs to be setup like any
+``source /path/to/bin/activate`, ... The environment selected in this way needs to be setup like any
 other worker environment.
 
-The option `--slurm-log-directory='/tmp_14_days/{user_name}/slurm_logs'` can be provided when Slurm jobs
-should be logged. The `{user_name}` is the only string template variable available.
+The option ``--slurm-log-directory='/tmp_14_days/{user_name}/slurm_logs'`` can be provided when Slurm jobs
+should be logged. The ``{user_name}`` is the only string template variable available.
 
-Slurm job parameters can be provided with `-sp <name>=<value>`. A description of all possible Slurm
+Slurm job parameters can be provided with ``-sp <name>=<value>``. A description of all possible Slurm
 parameters can be found `here <https://pyslurmutils.readthedocs.io>`_.
+
+Slurm job environment variables can be provided separately with ``-se <name>[=<value>]``. When the value is omitted
+the variables is loaded from the local environment. In addition enviroment variables ``SLURM_ENV_HELLO=world``
+are loaded by `pyslurmutils` and send to slurm as ``HELLO=world``.
+
+Environment variables
+^^^^^^^^^^^^^^^^^^^^^
+
+Slurm job environment variables can be passed in three ways. For example:
+
+.. code-block:: bash
+
+    export MYVAR3=MYVALUE3
+    export SLURM_ENV_MYVAR5=MYVALUE5
+
+    ewoksjob worker --pool=slurm \
+            -sp environment='{"MYVAR1":"MYVALUE1", "MYVAR2":"MYVALUE2"}'
+            -se MYVAR3
+            -se MYVAR4=MYVALUE4
+
+In this example, the final Slurm job parameter ``environment`` will be:
+
+.. code-block:: bash
+
+    environment = {
+        "MYVAR1": "MYVALUE1",   # from -sp JSON
+        "MYVAR2": "MYVALUE2",   # from -sp JSON
+        "MYVAR3": "MYVALUE3",   # from local env, referenced by -se
+        "MYVAR4": "MYVALUE4",   # from -se argument
+        "MYVAR5": "MYVALUE5",   # from SLURM_ENV_*
+    }
+
+Priority of environment variables from high to low:
+
+1. ``-se`` (explicit Slurm environment variable argument)
+2. ``-sp`` (parameters JSON environment)
+3. ``SLURM_ENV_*`` (local environment variables prefixed with `SLURM_ENV_`)
+
+Variables from a higher-priority source override those from lower-priority sources.
 
 Client side
 -----------
 
 The client does not have to do anything special. However you can overwrite Slurm job parameters
-specified by the worker or add additional parameters with the `slurm_arguments` argument.
+specified by the worker or add additional parameters with the ``slurm_arguments`` argument.
 
 .. code-block:: python
 
