@@ -42,7 +42,7 @@ monitor = [
     "flower",
 ]
 slurm = [
-    "pyslurmutils >=1.0",
+    "pyslurmutils >=1.5",
     "gevent",
 ]
 beacon = [
