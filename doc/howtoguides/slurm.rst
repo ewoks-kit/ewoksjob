@@ -82,6 +82,13 @@ In this example, the final Slurm job parameter ``environment`` will be:
         "MYVAR5": "MYVALUE5",   # from SLURM_ENV_*
     }
 
+Note that ``MYVAR3`` needs to be referenced by ``-se`` to be passed to SLURM.
+
+Other environment variables do not get passed automatically unless they start
+with the prefix ``SLURM_ENV_`` in which case the prefix is stripped before passing
+the variable to SLURM. For example the local environment variable ``SLURM_ENV_FOO=bar``
+becomes SLURM job environment variable ``FOO=bar``.
+
 Priority of environment variables from high to low:
 
 1. ``-se`` (explicit Slurm environment variable argument)
