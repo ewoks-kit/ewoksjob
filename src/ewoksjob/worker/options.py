@@ -188,13 +188,11 @@ def _extract_slurm_options(options: Dict) -> dict:
         name: options.get(option) for option, name in SLURM_NAME_MAP.items()
     }
 
-    slurm_parameters = options.get("slurm_parameters", None)
-    if slurm_parameters:
-        slurm_parameters = dict(_parse_slurm_parameter(p) for p in slurm_parameters)
+    slurm_parameters = options.get("slurm_parameters", None) or {}
+    slurm_parameters = dict(_parse_slurm_parameter(p) for p in slurm_parameters)
 
     slurm_environment = options.get("slurm_environment")
     if slurm_environment:
-        slurm_parameters = slurm_parameters or {}
         from_parameters = slurm_parameters.pop("environment", None) or {}
 
         from_arguments = dict(
@@ -205,7 +203,8 @@ def _extract_slurm_options(options: Dict) -> dict:
 
         slurm_parameters["environment"] = {**from_parameters, **from_arguments}
 
-    slurm_options["parameters"] = slurm_parameters
+    if slurm_parameters:
+        slurm_options["parameters"] = slurm_parameters
     return slurm_options
 
 
