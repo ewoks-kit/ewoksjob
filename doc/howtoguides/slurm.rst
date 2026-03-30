@@ -72,7 +72,7 @@ Slurm job environment variables can be passed in three ways. For example:
 
 In this example, the final Slurm job parameter ``environment`` will be:
 
-.. code-block:: bash
+.. code-block:: python
 
     environment = {
         "MYVAR1": "MYVALUE1",   # from -sp JSON
