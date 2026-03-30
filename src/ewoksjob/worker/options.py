@@ -1,10 +1,12 @@
 import getpass
 import json
+import logging
 import os
 from multiprocessing import get_all_start_methods
 from multiprocessing import get_context
 from typing import Any
 from typing import Dict
+from typing import Optional
 from typing import Tuple
 
 from celery import Celery
@@ -16,6 +18,8 @@ from click import Choice
 
 from .process import TaskPool as ProcessTaskPool
 from .slurm import TaskPool as SlurmTaskPool
+
+logger = logging.getLogger(__name__)
 
 ALL_MP_CONTEXTS = list(get_all_start_methods())
 DEFAULT_MP_CONTEXT = get_context()._name
@@ -115,6 +119,16 @@ def _add_slurm_pool_options(app: Celery) -> None:
     )
     app.user_options["preload"].add(
         CeleryOption(
+            ["-se", "--slurm-environment-variable", "slurm_environment"],
+            required=False,
+            multiple=True,
+            help="SLURM job environment variable (-se NAME[=VALUE]). "
+            " When the value is omitted it is loaded from the loacal environment.",
+            help_group="Slurm Pool Options",
+        )
+    )
+    app.user_options["preload"].add(
+        CeleryOption(
             ["--slurm-python-cmd"],
             required=False,
             help="Python command (Default: python3)",
@@ -164,7 +178,6 @@ SLURM_NAME_MAP = {
     "slurm_data_directory": "data_directory",
     "slurm_pre_script": "pre_script",
     "slurm_post_script": "post_script",
-    "slurm_parameters": "parameters",
     "slurm_python_cmd": "python_cmd",
     "slurm_cleanup_job_artifacts": "cleanup_job_artifacts",
 }
@@ -174,11 +187,24 @@ def _extract_slurm_options(options: Dict) -> dict:
     slurm_options = {
         name: options.get(option) for option, name in SLURM_NAME_MAP.items()
     }
-    parameters = slurm_options.pop("parameters", None)
-    if parameters:
-        slurm_options["parameters"] = dict(
-            _parse_slurm_parameter(p) for p in parameters
+
+    slurm_parameters = options.get("slurm_parameters", None) or {}
+    slurm_parameters = dict(_parse_slurm_parameter(p) for p in slurm_parameters)
+
+    slurm_environment = options.get("slurm_environment")
+    if slurm_environment:
+        from_parameters = slurm_parameters.pop("environment", None) or {}
+
+        from_arguments = dict(
+            _parse_slurm_environment_variable(variable)
+            for variable in slurm_environment
         )
+        from_arguments = {k: v for k, v in from_arguments.items() if v is not None}
+
+        slurm_parameters["environment"] = {**from_parameters, **from_arguments}
+
+    if slurm_parameters:
+        slurm_options["parameters"] = slurm_parameters
     return slurm_options
 
 
@@ -192,6 +218,18 @@ def _parse_value(value: str) -> Any:
         return json.loads(value)
     except Exception:
         return value
+
+
+def _parse_slurm_environment_variable(variable: str) -> Tuple[str, Optional[str]]:
+    name, sep, value = variable.partition("=")
+    if sep:
+        return name, value
+    value = os.environ.get(name, None)
+    if value is None:
+        logger.warning(
+            "Environment variable %r is not defined (not passed to Slurm)", name
+        )
+    return name, value
 
 
 PROCESS_NAME_MAP = {

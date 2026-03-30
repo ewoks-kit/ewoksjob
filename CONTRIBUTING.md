@@ -1,4 +1,6 @@
-<a href="https://github.com/ewoks-kit/.github/blob/main/shared/CONTRIBUTING.md" target="_blank">CONTRIBUTING.md</a>
+# Contribution guide
+
+You can find the common Python package contribution guide [here](https://gitlab.esrf.fr/dau/ci/pyci/-/blob/main/CONTRIBUTING.md).
 
 ## Production tests
 
