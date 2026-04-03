@@ -17,3 +17,6 @@ ewoks_execution:
         arguments:
           - name: "url"
             value: "redis://localhost:6379/2"
+ewoksjob_options:
+  log_memory_usage: true
+  detect_memory_leaks: true
