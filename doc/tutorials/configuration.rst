@@ -47,7 +47,7 @@ are available, like for data serialization (json by default)
 The `Celery documentation <https://docs.celeryq.dev/en/stable/userguide/configuration.html>`_
 describes the different parameters available.
 
-In addition to Celery parameters, workflow execution parameters can be defined through the `EWOKS_EXECUTION` variable.
+Workflow execution parameters can be defined through the `EWOKS_EXECUTION` variable.
 
 .. code-block:: python
 
@@ -62,6 +62,16 @@ In addition to Celery parameters, workflow execution parameters can be defined t
             ]
         }
     }
+
+Ewoksjob options can be defined through the `EWOKSJOB_OPTIONS` variable.
+
+.. code-block:: python
+
+    EWOKSJOB_OPTIONS = {
+        "log_memory_usage": True,
+        "detect_memory_leaks": True,
+    }
+
 
 The configuration can be declared in a
 

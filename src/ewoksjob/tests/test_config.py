@@ -24,6 +24,10 @@ EXPECTED = {
             ]
         }
     },
+    "ewoksjob_options": {
+        "log_memory_usage": True,
+        "detect_memory_leaks": True,
+    },
 }
 
 
@@ -49,6 +53,12 @@ EWOKS_EXECUTION = {
         ]
     }
 }
+
+
+EWOKSJOB_OPTIONS = {
+    "log_memory_usage": True,
+    "detect_memory_leaks": True,
+}
 """
 
 _YAML_CONTENT = """
@@ -70,6 +80,9 @@ ewoks_execution:
         arguments:
           - name: "url"
             value: "redis://localhost:6379/2"
+ewoksjob_options:
+  log_memory_usage: true
+  detect_memory_leaks: true
 """
 
 

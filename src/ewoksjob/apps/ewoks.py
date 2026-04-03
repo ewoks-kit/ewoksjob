@@ -10,12 +10,15 @@ from ..worker.options import add_options
 from ._decorators import ewoks_config
 from ._decorators import ewoks_job_id
 from ._decorators import ewoks_tasks
+from ._decorators import memory
 
 app = celery.Celery("ewoks")
 add_options(app)
 
 
 @app.task(bind=True)
+@memory.log_memory_usage
+@memory.log_memory_leaks
 @ewoks_job_id.ensure_ewoks_job_id
 @ewoks_config.merge_execute_arguments
 @ewoks_tasks.ewoks_task
