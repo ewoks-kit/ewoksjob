@@ -3,16 +3,23 @@
 # Start a Celery worker pool (processes by default) that serves the ewoks application.
 #
 # scripts/runjobs.sh --redis
+# scripts/runjobs.sh --sql
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [[ $1 == "--redis" ]];then
     echo "RUN REDIS JOBS"
     export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_redis.py
-else
+elif [[ $1 == "--sql" ]];then
     echo "RUN SQL JOBS"
     export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_sql.py
+else
+    echo "UNKNOWN argument $1"
+    exit 1
 fi
+
+echo "RUN demo workflow"
+ewoksjob submit demo --test --wait 10
 
 echo "RUN example_with_events.py"
 python $SCRIPT_DIR/example_with_events.py

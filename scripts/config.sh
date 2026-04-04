@@ -2,11 +2,10 @@
 #
 # Start a Celery worker pool (processes by default) that serves the ewoks application.
 #
-# rm -rf scripts/results;scripts/worker.sh --redis --pool=process --loglevel=info
-# rm -rf scripts/results;scripts/worker.sh --sql --pool=process --loglevel=info
+# source scripts/config.sh --redis
+# source scripts/config.sh --sql
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export CELERY_LOADER=ewoksjob.config.EwoksLoader
 
 if [[ $1 == "--redis" ]];then
     export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_redis.py
@@ -17,4 +16,4 @@ else
     exit 1
 fi
 
-(cd $SCRIPT_DIR; ewoksjob worker "${@:2}")
+echo "EWOKS_CONFIG_URI=$EWOKS_CONFIG_URI"
