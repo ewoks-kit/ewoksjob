@@ -19,3 +19,8 @@ EWOKS_EXECUTION = {
         ]
     }
 }
+
+EWOKSJOB_OPTIONS = {
+    "log_memory_usage": True,
+    "detect_memory_leaks": True,
+}

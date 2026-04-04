@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add ewoksjob options under `EWOKSJOB_OPTIONS`: ``log_memory_usage`` and ``detect_memory_leaks``.
+
 ## [1.5.0] - 2026-03-30
 
 ### Added
