@@ -10,8 +10,11 @@ export CELERY_LOADER=ewoksjob.config.EwoksLoader
 
 if [[ $1 == "--redis" ]];then
     export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_redis.py
-else
+elif [[ $1 == "--sql" ]];then
     export EWOKS_CONFIG_URI=$SCRIPT_DIR/celeryconfig_sql.py
+else
+    echo "UNKNOWN argument $1"
+    exit 1
 fi
 
 (cd $SCRIPT_DIR; ewoksjob worker "${@:2}")
