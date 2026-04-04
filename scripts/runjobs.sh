@@ -18,6 +18,9 @@ else
     exit 1
 fi
 
+echo "RUN demo workflow"
+ewoksjob submit demo --test --wait 10
+
 echo "RUN example_with_events.py"
 python $SCRIPT_DIR/example_with_events.py
 if [[ $? -ne 0 ]] ; then

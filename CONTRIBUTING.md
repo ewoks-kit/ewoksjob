@@ -24,10 +24,17 @@ Start worker
 scripts/worker.sh --sql --pool=process --loglevel=info
 ```
 
-Run jobs
+Run examples
 
 ```bash
 scripts/runjobs.sh --sql
+```
+
+Submit Ewoks workflow
+
+```bash
+source scripts/config.sh --redis
+ewoksjob submit demo --test --wait inf
 ```
 
 ## Examples: redis
@@ -56,8 +63,15 @@ Start monitor (optional)
 scripts/monitor.sh --redis
 ```
 
-Run jobs
+Run examples
 
 ```bash
 scripts/runjobs.sh --redis
+```
+
+Submit Ewoks workflow
+
+```bash
+source scripts/config.sh --redis
+ewoksjob submit demo --test --wait inf
 ```
