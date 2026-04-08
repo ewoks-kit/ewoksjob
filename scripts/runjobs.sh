@@ -3,6 +3,7 @@
 # Start a Celery worker pool (processes by default) that serves the ewoks application.
 #
 # scripts/runjobs.sh --redis
+# Or
 # scripts/runjobs.sh --sql
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
