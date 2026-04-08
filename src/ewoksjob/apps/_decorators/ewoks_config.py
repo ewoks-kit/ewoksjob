@@ -1,10 +1,26 @@
+from functools import wraps
 from typing import Any
+from typing import Callable
 from typing import Dict
 from typing import Mapping
 from typing import Optional
 
 
-def merge_execute_arguments(
+def merge_execute_arguments(celery_task: Callable) -> Callable:
+    """Inject ewoks execution parameters from the worker configuration."""
+
+    @wraps(celery_task)
+    def new_celery_task(self, *args, **client_execute_arguments) -> Any:
+        worker_execute_arguments = self.app.conf.get("ewoks_execution")
+        kwargs = _merge_execute_arguments(
+            client_execute_arguments, worker_execute_arguments
+        )
+        return celery_task(self, *args, **kwargs)
+
+    return new_celery_task
+
+
+def _merge_execute_arguments(
     client_execute_arguments: Optional[Dict[str, Any]],
     worker_execute_arguments: Optional[Dict[str, Any]],
 ) -> Dict[str, Any]:
