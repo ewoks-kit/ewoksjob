@@ -33,7 +33,7 @@ scripts/runjobs.sh --sql
 Submit Ewoks workflow
 
 ```bash
-source scripts/config.sh --redis
+source scripts/config.sh --sql
 ewoksjob submit demo --test --wait inf
 ```
 
