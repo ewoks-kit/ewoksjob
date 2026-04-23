@@ -67,9 +67,13 @@ def _object_growth(enable: bool):
             increases = {k: v for k, v in diff.items() if v > 0}
 
             if increases:
-                lst = sorted(increases.items(), key=lambda x: -x[1])
-                lst = [f" {obj_type}: +{count}" for obj_type, count in lst[:10]]
-                logger.warning("[MEM] Top 10 object growth:\n %s", "\n ".join(lst))
+                sorted_increases = sorted(increases.items(), key=lambda x: -x[1])
+                top_ten = [
+                    f" {obj_type}: +{count}"
+                    for obj_type, count in sorted_increases[:10]
+                ]
+
+                logger.warning("[MEM] Top 10 object growth:\n %s", "\n ".join(top_ten))
 
 
 @contextmanager
