@@ -57,6 +57,7 @@ jobs:
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+        -W "ignore:Field name \"pk\" in \"EmbeddedJsonModel\" shadows an attribute in parent \"JsonModel\":UserWarning"
         ${{ matrix.extra-pytest-warnings }}
 
   test-3-12-windows:
@@ -121,7 +122,9 @@ jobs:
           python-version: "3.12"
           install-extras: "test"
       - run: redis-server &
-      - run: pytest -v -ra $PYTEST_WARNINGS
+      - run: >-
+          pytest -v -ra $PYTEST_WARNINGS
+          -W "ignore:Field name \"pk\" in \"EmbeddedJsonModel\" shadows an attribute in parent \"JsonModel\":UserWarning"
 
   test-3-12-redis-slurm:
     needs: build
