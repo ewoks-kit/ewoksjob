@@ -47,7 +47,7 @@ slurm = [
     "gevent",
 ]
 beacon = [
-    "blissdata",
+    "blissdata[beacon]",
 ]
 blissclient = [
     "ewoksjob[redis]",
