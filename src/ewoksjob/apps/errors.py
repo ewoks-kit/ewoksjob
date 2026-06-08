@@ -11,6 +11,7 @@ _CLIENT_EXCEPTION_MODULES = (
     "ewoksjob",
     "gevent",
     "greenlet",
+    "ewoksutils",
 )
 
 
