@@ -34,7 +34,7 @@ def test_submit_exit_code(ewoks_worker) -> str:
     result = runner.invoke(submit, argv)
     assert result.exit_code == 0, result.stdout
 
-    argv = ["demo", "--test", "--wait", "60", "-p", "a='wrong_type'"]
+    argv = ["demo", "--test", "--wait", "60", "-ps", "a='wrong_type'"]
     result = runner.invoke(submit, argv)
     assert result.exit_code == 1, result.stdout
 
@@ -48,7 +48,7 @@ def test_cancel(ewoks_worker) -> str:
         pytest.skip("fails with the Redis broker and gevent patching")
     runner = click.testing.CliRunner()
 
-    argv = ["demo", "--test", "-p", "delay=100"]
+    argv = ["demo", "--test", "-ps", "delay=100"]
     result = runner.invoke(submit, argv)
     if result.exception:
         raise result.exception
