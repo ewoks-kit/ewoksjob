@@ -95,6 +95,7 @@ jobs:
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+        -W "ignore:Field name \"pk\" in \"EmbeddedJsonModel\" shadows an attribute in parent \"JsonModel\":UserWarning"
     steps:
       - uses: actions/checkout@v4
       - uses: ewoks-kit/.github/.github/actions/setup-python-package@main
@@ -138,6 +139,7 @@ jobs:
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
+        -W "ignore:Field name \"pk\" in \"EmbeddedJsonModel\" shadows an attribute in parent \"JsonModel\":UserWarning"
     steps:
       - uses: actions/checkout@v4
       - uses: ewoks-kit/.github/.github/actions/setup-python-package@main
