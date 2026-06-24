@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add ewoksjob options under `EWOKSJOB_OPTIONS`: ``log_memory_usage`` and ``detect_memory_leaks``.
 - Added ability to handle remote ewoksutils exception types on the client side.
 
+### Fixed
+
+- Raise an error when the configuration from `EWOKS_CONFIG_URI` is empty.
+
 ## [1.5.0] - 2026-03-30
 
 ### Added
