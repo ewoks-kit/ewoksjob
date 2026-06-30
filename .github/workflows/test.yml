@@ -101,7 +101,9 @@ jobs:
         with:
           python-version: "3.12"
           install-extras: "test,orange"
-      - run: python -m gevent.monkey --module pytest . -v $PYTEST_WARNINGS
+      - run: >-
+          python -m gevent.monkey --module pytest . -v $PYTEST_WARNINGS
+          -W "ignore:Field name \"pk\" in \"EmbeddedJsonModel\" shadows an attribute in parent \"JsonModel\":UserWarning"
 
   test-3-12-redis:
     needs: build
@@ -145,7 +147,9 @@ jobs:
           python-version: "3.12"
           install-extras: "test,orange"
       - run: redis-server &
-      - run: python -m gevent.monkey --module pytest . -v $PYTEST_WARNINGS
+      - run: >-
+          python -m gevent.monkey --module pytest . -v $PYTEST_WARNINGS
+          -W "ignore:Field name \"pk\" in \"EmbeddedJsonModel\" shadows an attribute in parent \"JsonModel\":UserWarning"
 
   test-3-12-examples-sql:
     needs: build

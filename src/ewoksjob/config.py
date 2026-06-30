@@ -104,6 +104,10 @@ def read_configuration(cfg_uri: str) -> dict:
     if "celery" in config:
         celery_config = config.pop("celery")
         config = {**config, **celery_config}
+
+    if not config:
+        raise ValueError(f"Celery configuration '{cfg_uri}' is empty")
+
     return config
 
 
