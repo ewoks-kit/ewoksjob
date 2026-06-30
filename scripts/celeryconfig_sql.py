@@ -8,8 +8,16 @@ os.makedirs(_DATA_DIR, exist_ok=True)
 CELERY = {
     "broker_url": f"sqla+sqlite:///{os.path.join(_DATA_DIR, 'celery.db')}",
     "result_backend": f"db+sqlite:///{os.path.join(_DATA_DIR, 'celery_results.db')}",
+    "task_serializer": "pickle",
     "result_serializer": "pickle",
-    "accept_content": ["application/json", "application/x-python-serialize"],
+    "accept_content": [
+        "application/json",
+        "application/x-python-serialize",
+    ],
+    "result_accept_content": [
+        "application/json",
+        "application/x-python-serialize",
+    ],
     "result_expires": 600,
     "task_remote_tracebacks": True,
     "broker_connection_retry_on_startup": True,
