@@ -20,8 +20,16 @@ if has_redis():
         return {
             "broker_url": f"{url}/0",
             "result_backend": f"{url}/1",
+            "task_serializer": "pickle",
             "result_serializer": "pickle",
-            "accept_content": ["application/json", "application/x-python-serialize"],
+            "accept_content": [
+                "application/json",
+                "application/x-python-serialize",
+            ],
+            "result_accept_content": [
+                "application/json",
+                "application/x-python-serialize",
+            ],
             "task_remote_tracebacks": True,
             "enable_utc": False,
         }
@@ -35,8 +43,16 @@ else:
             "broker_url": "memory://",
             # "broker_url": f"sqla+sqlite:///{tmpdir / 'celery.db'}",
             "result_backend": f"db+sqlite:///{tmpdir / 'celery_results.db'}",
+            "task_serializer": "pickle",
             "result_serializer": "pickle",
-            "accept_content": ["application/json", "application/x-python-serialize"],
+            "accept_content": [
+                "application/json",
+                "application/x-python-serialize",
+            ],
+            "result_accept_content": [
+                "application/json",
+                "application/x-python-serialize",
+            ],
             "task_remote_tracebacks": True,
             "enable_utc": False,
         }

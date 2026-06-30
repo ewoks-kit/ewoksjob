@@ -8,8 +8,16 @@ from ..config import read_configuration
 EXPECTED = {
     "broker_url": "redis://localhost:6379/3",
     "result_backend": "redis://localhost:6379/4",
+    "task_serializer": "pickle",
     "result_serializer": "pickle",
-    "accept_content": ["application/json", "application/x-python-serialize"],
+    "accept_content": [
+        "application/json",
+        "application/x-python-serialize",
+    ],
+    "result_accept_content": [
+        "application/json",
+        "application/x-python-serialize",
+    ],
     "result_expires": 600,
     "task_remote_tracebacks": True,
     "broker_connection_retry_on_startup": True,
@@ -35,8 +43,16 @@ _PY_CONTENT = """
 CELERY = {
     "broker_url": "redis://localhost:6379/3",
     "result_backend": "redis://localhost:6379/4",
+    "task_serializer": "pickle",
     "result_serializer": "pickle",
-    "accept_content": ["application/json", "application/x-python-serialize"],
+    "accept_content": [
+            "application/json",
+            "application/x-python-serialize",
+    ],
+    "result_accept_content": [
+        "application/json",
+        "application/x-python-serialize",
+    ],
     "result_expires": 600,
     "task_remote_tracebacks": True,
     "broker_connection_retry_on_startup": True,
@@ -63,13 +79,17 @@ EWOKSJOB_OPTIONS = {
 
 _YAML_CONTENT = """
 celery:
+  broker_url: redis://localhost:6379/3
+  result_backend: redis://localhost:6379/4
+  task_serializer: pickle
+  result_serializer: pickle
   accept_content:
   - application/json
   - application/x-python-serialize
-  broker_url: redis://localhost:6379/3
-  result_backend: redis://localhost:6379/4
+  result_accept_content:
+  - application/json
+  - application/x-python-serialize
   result_expires: 600
-  result_serializer: pickle
   task_remote_tracebacks: true
   broker_connection_retry_on_startup: true
   enable_utc: false
