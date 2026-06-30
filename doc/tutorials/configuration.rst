@@ -52,7 +52,7 @@ Sections
 Celery
 ++++++
 
-Both the client and the worker(s) must be configured to use the same
+Both the client(s) and the worker(s) must be configured to use the same
 message broker and result backend.
 
 The **broker** transports task messages from the client to the worker,
