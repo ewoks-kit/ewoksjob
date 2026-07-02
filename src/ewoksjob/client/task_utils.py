@@ -119,12 +119,9 @@ class TaskSubmitter:
             else:
                 return future
         else:
-            try:
-                _local_pool._EWOKS_WORKER_POOL = self._local_executor
+            with _local_pool.active_pool_context(self._local_executor):
                 future = _submit_local(args=(graph,), kwargs=kwargs)
                 if self._task_type == "method":
                     return _MethodLocalFuture(future.uuid)
                 else:
                     return future
-            finally:
-                _local_pool._EWOKS_WORKER_POOL = None

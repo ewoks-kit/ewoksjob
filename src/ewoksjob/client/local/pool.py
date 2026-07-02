@@ -34,6 +34,17 @@ def get_active_pool(raise_on_missing: Optional[bool] = True):
 
 
 @contextmanager
+def active_pool_context(local_pool: "_LocalPool"):
+    global _EWOKS_WORKER_POOL
+    previous_worker_pool = _EWOKS_WORKER_POOL
+    _EWOKS_WORKER_POOL = local_pool
+    try:
+        yield
+    finally:
+        _EWOKS_WORKER_POOL = previous_worker_pool
+
+
+@contextmanager
 def pool_context(*args, **kwargs):
     global _EWOKS_WORKER_POOL
     if _EWOKS_WORKER_POOL is None:
