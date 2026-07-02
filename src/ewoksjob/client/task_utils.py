@@ -60,6 +60,29 @@ class TaskSubmitter:
         execution_mode: Literal["celery", "process", "thread", "slurm"] = "celery",
         **submit_options,
     ):
+        """Wrapper function that execute a task asynchronously when called.
+
+        .. code-block:: python
+
+           submit_max = TaskSubmitter("builtins.max", queue="celery")
+           future = submit_max(1, 2, 3)  # submit asynchronous task execution
+           maximum = future.result()  # wait for the result
+
+        :param task_identifier: The full name of the task to submit
+        :param task_type: The type of the task, if not provided it is guessed from the task_identifier.
+        :param execution_mode:
+
+            - "celery": Submit the task on a remote ewoks worker through celery
+            - "thread": Execute the task in a thread
+            - "process": Execute the task in a different process
+            - "slurm": Execute the task in a session on a SLURM cluster
+
+        :param submit_options: Extra arguments are passed to the choosen task queue/executor.
+            Arguments depend on the `execution_mode`:
+
+            - For "celery", see [celery documentation](https://docs.celeryq.dev/en/stable/reference/celery.app.task.html#celery.app.task.Task.apply_async)
+            - For "slurm", see [pyslumrutils documentation(https://pyslurmutils.readthedocs.io/en/stable/reference/_generated/pyslurmutils.concurrent.rest.SlurmRestExecutor.html#pyslurmutils.concurrent.rest.SlurmRestExecutor)
+        """
         self._task_identifier = task_identifier
         if task_type is None:
             task_type = _guess_task_type(task_identifier)
