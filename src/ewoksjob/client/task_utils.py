@@ -105,6 +105,11 @@ class TaskSubmitter:
     def task_type(self) -> str:
         return self._task_type
 
+    def shutdown(self, **kwargs):
+        """Shutdown local executor, do nothing for remote execution"""
+        if self._local_executor is not None:
+            self._local_executor.shutdown(**kwargs)
+
     def __call__(self, *args, **kwargs) -> FutureInterface:
         graph = {
             "graph": {"id": self._task_identifier},
