@@ -1,14 +1,18 @@
 import re
+from concurrent.futures import Future
 from copy import deepcopy
 from typing import Literal
 from typing import Optional
+from uuid import uuid4
 
+import ewoks
 from ewoksutils.task_utils import task_inputs
 
 from . import celery
 from . import local
 from .futures import FutureInterface
 from .local.pool import _LocalPool
+from .local.pool import active_pool_context
 
 _QUALNAME_RE = re.compile(r"^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$")
 
@@ -54,7 +58,9 @@ class TaskSubmitter:
         self,
         task_identifier: str,
         task_type: Optional[str] = None,
-        execution_mode: Literal["celery", "process", "thread", "slurm"] = "celery",
+        execution_mode: Literal[
+            "celery", "process", "thread", "slurm", "synchronous"
+        ] = "celery",
         **submit_options,
     ):
         """Wrapper function that execute a task asynchronously when called.
@@ -73,6 +79,7 @@ class TaskSubmitter:
             - "thread": Execute the task in a thread
             - "process": Execute the task in a different process
             - "slurm": Execute the task in a session on a SLURM cluster
+            - "synchronous": Execute the task synchronously when called
 
         :param submit_options: Extra arguments are passed to the choosen task queue/executor.
             Arguments depend on the `execution_mode`:
@@ -87,7 +94,7 @@ class TaskSubmitter:
         self._execution_mode = execution_mode
         self._submit_options = deepcopy(submit_options)
 
-        if self._execution_mode == "celery":
+        if self._execution_mode in ("celery", "synchronous"):
             self._local_executor = None
         else:
             self._local_executor = _LocalPool(
@@ -103,7 +110,7 @@ class TaskSubmitter:
         return self._task_type
 
     def shutdown(self, **kwargs):
-        """Shutdown local executor, do nothing for remote execution"""
+        """Shutdown local executor, do nothing for remote and synchronous execution"""
         if self._local_executor is not None:
             self._local_executor.shutdown(**kwargs)
 
@@ -141,8 +148,20 @@ class TaskSubmitter:
                 return _MethodCeleryFuture(future.uuid)
             else:
                 return future
+        elif self._execution_mode == "synchronous":
+            future = Future()
+            try:
+                result = ewoks.execute_graph(graph, **kwargs)
+            except Exception as e:
+                future.set_exception(e)
+            else:
+                future.set_result(result)
+            if self._task_type == "method":
+                return _MethodLocalFuture(str(uuid4()), future)
+            else:
+                return local.Future(str(uuid4()), future)
         else:
-            with local.active_pool_context(self._local_executor):
+            with active_pool_context(self._local_executor):
                 future = local.submit(args=(graph,), kwargs=kwargs)
                 if self._task_type == "method":
                     return _MethodLocalFuture(future.uuid)
