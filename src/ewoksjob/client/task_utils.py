@@ -1,6 +1,5 @@
 import re
 from copy import deepcopy
-from typing import Any
 from typing import Literal
 from typing import Optional
 
@@ -59,8 +58,6 @@ class TaskSubmitter:
         task_identifier: str,
         task_type: Optional[str] = None,
         execution_mode: Literal["celery", "process", "thread", "slurm"] = "celery",
-        environment: Optional[dict] = None,
-        save_options: Optional[dict] = None,
         **submit_options,
     ):
         self._task_identifier = task_identifier
@@ -68,8 +65,6 @@ class TaskSubmitter:
             task_type = _guess_task_type(task_identifier)
         self._task_type = task_type
         self._execution_mode = execution_mode
-        self._environment = deepcopy(environment) if environment else None
-        self._save_options = deepcopy(save_options) if save_options else None
         self._submit_options = deepcopy(submit_options)
 
         if self._execution_mode == "celery":
@@ -88,15 +83,6 @@ class TaskSubmitter:
         return self._task_type
 
     def __call__(self, *args, **kwargs) -> FutureInterface:
-        return self.submit(args, kwargs)
-
-    def submit(
-        self,
-        args,
-        kwargs,
-        convert_destination: Optional[Any] = None,
-        upload_parameters: Optional[dict] = None,
-    ) -> FutureInterface:
         graph = {
             "graph": {"id": self._task_identifier},
             "nodes": [
@@ -123,14 +109,6 @@ class TaskSubmitter:
             "outputs": [{"all": True}],
             "merge_outputs": True,
         }
-        if convert_destination:
-            kwargs["convert_destination"] = convert_destination
-        if upload_parameters:
-            kwargs["upload_parameters"] = upload_parameters
-        if self._environment:
-            kwargs["environment"] = self._environment
-        if self._save_options:
-            kwargs["save_options"] = self._save_options
 
         if self._execution_mode == "celery":
             future = _submit_celery(
