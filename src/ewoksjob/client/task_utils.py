@@ -5,12 +5,9 @@ from typing import Optional
 
 from ewoksutils.task_utils import task_inputs
 
-from .celery import submit as _submit_celery
-from .celery.futures import CeleryFuture
+from . import celery
+from . import local
 from .futures import FutureInterface
-from .local import pool as _local_pool
-from .local import submit as _submit_local
-from .local.futures import LocalFuture
 from .local.pool import _LocalPool
 
 _QUALNAME_RE = re.compile(r"^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$")
@@ -36,7 +33,7 @@ def _guess_task_type(task_identifier: str):
         return "script"
 
 
-class _MethodCeleryFuture(CeleryFuture):
+class _MethodCeleryFuture(celery.Future):
     """Celery future that unwraps method task result"""
 
     def result(self, timeout: Optional[float] = None, interval: Optional[float] = None):
@@ -44,7 +41,7 @@ class _MethodCeleryFuture(CeleryFuture):
         return task_result["return_value"]
 
 
-class _MethodLocalFuture(LocalFuture):
+class _MethodLocalFuture(local.Future):
     """Local future that unwraps method task result"""
 
     def result(self, timeout: Optional[float] = None):
@@ -139,16 +136,14 @@ class TaskSubmitter:
         }
 
         if self._execution_mode == "celery":
-            future = _submit_celery(
-                args=(graph,), kwargs=kwargs, **self._submit_options
-            )
+            future = celery.submit(args=(graph,), kwargs=kwargs, **self._submit_options)
             if self._task_type == "method":
                 return _MethodCeleryFuture(future.uuid)
             else:
                 return future
         else:
-            with _local_pool.active_pool_context(self._local_executor):
-                future = _submit_local(args=(graph,), kwargs=kwargs)
+            with local.active_pool_context(self._local_executor):
+                future = local.submit(args=(graph,), kwargs=kwargs)
                 if self._task_type == "method":
                     return _MethodLocalFuture(future.uuid)
                 else:
