@@ -5,14 +5,28 @@ from typing import Literal
 from typing import Optional
 from uuid import uuid4
 
-import ewoks
 from ewoksutils.task_utils import task_inputs
 
 from . import celery
-from . import local
 from .futures import FutureInterface
-from .local.pool import _LocalPool
-from .local.pool import active_pool_context
+
+# ewoks is optional for celery execution; it is required for: synchronous, thread, process and slurm
+try:
+    import ewoks
+except ImportError:
+    ewoks = None
+else:
+    from . import local
+    from .local.pool import _LocalPool
+    from .local.pool import active_pool_context
+
+    class _MethodLocalFuture(local.Future):
+        """Local future that unwraps method task result"""
+
+        def result(self, timeout: Optional[float] = None):
+            task_result = super().result(timeout)
+            return task_result["return_value"]
+
 
 _QUALNAME_RE = re.compile(r"^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$")
 
@@ -42,14 +56,6 @@ class _MethodCeleryFuture(celery.Future):
 
     def result(self, timeout: Optional[float] = None, interval: Optional[float] = None):
         task_result = super().result(timeout, interval)
-        return task_result["return_value"]
-
-
-class _MethodLocalFuture(local.Future):
-    """Local future that unwraps method task result"""
-
-    def result(self, timeout: Optional[float] = None):
-        task_result = super().result(timeout)
         return task_result["return_value"]
 
 
@@ -87,6 +93,11 @@ class TaskSubmitter:
             - For "celery", see [celery documentation](https://docs.celeryq.dev/en/stable/reference/celery.app.task.html#celery.app.task.Task.apply_async)
             - For "slurm", see [pyslumrutils documentation(https://pyslurmutils.readthedocs.io/en/stable/reference/_generated/pyslurmutils.concurrent.rest.SlurmRestExecutor.html#pyslurmutils.concurrent.rest.SlurmRestExecutor)
         """
+        if ewoks is None and execution_mode != "celery":
+            raise RuntimeError(
+                f"Please install the 'ewoks' package to use the '{execution_mode}' execution mode."
+            )
+
         self._task_identifier = task_identifier
         if task_type is None:
             task_type = _guess_task_type(task_identifier)
