@@ -1,17 +1,32 @@
 import re
+from concurrent.futures import Future
 from copy import deepcopy
 from typing import Literal
 from typing import Optional
+from uuid import uuid4
 
 from ewoksutils.task_utils import task_inputs
 
-from .celery import submit as _submit_celery
-from .celery.futures import CeleryFuture
+from . import celery
 from .futures import FutureInterface
-from .local import pool as _local_pool
-from .local import submit as _submit_local
-from .local.futures import LocalFuture
-from .local.pool import _LocalPool
+
+# ewoks is optional for celery execution; it is required for: synchronous, thread, process and slurm
+try:
+    import ewoks
+except ImportError:
+    ewoks = None
+else:
+    from . import local
+    from .local.pool import _LocalPool
+    from .local.pool import active_pool_context
+
+    class _MethodLocalFuture(local.Future):
+        """Local future that unwraps method task result"""
+
+        def result(self, timeout: Optional[float] = None):
+            task_result = super().result(timeout)
+            return task_result["return_value"]
+
 
 _QUALNAME_RE = re.compile(r"^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$")
 
@@ -36,19 +51,11 @@ def _guess_task_type(task_identifier: str):
         return "script"
 
 
-class _MethodCeleryFuture(CeleryFuture):
+class _MethodCeleryFuture(celery.Future):
     """Celery future that unwraps method task result"""
 
     def result(self, timeout: Optional[float] = None, interval: Optional[float] = None):
         task_result = super().result(timeout, interval)
-        return task_result["return_value"]
-
-
-class _MethodLocalFuture(LocalFuture):
-    """Local future that unwraps method task result"""
-
-    def result(self, timeout: Optional[float] = None):
-        task_result = super().result(timeout)
         return task_result["return_value"]
 
 
@@ -57,7 +64,9 @@ class TaskSubmitter:
         self,
         task_identifier: str,
         task_type: Optional[str] = None,
-        execution_mode: Literal["celery", "process", "thread", "slurm"] = "celery",
+        execution_mode: Literal[
+            "celery", "process", "thread", "slurm", "synchronous"
+        ] = "celery",
         **submit_options,
     ):
         """Wrapper function that execute a task asynchronously when called.
@@ -76,6 +85,7 @@ class TaskSubmitter:
             - "thread": Execute the task in a thread
             - "process": Execute the task in a different process
             - "slurm": Execute the task in a session on a SLURM cluster
+            - "synchronous": Execute the task synchronously when called
 
         :param submit_options: Extra arguments are passed to the choosen task queue/executor.
             Arguments depend on the `execution_mode`:
@@ -83,6 +93,11 @@ class TaskSubmitter:
             - For "celery", see [celery documentation](https://docs.celeryq.dev/en/stable/reference/celery.app.task.html#celery.app.task.Task.apply_async)
             - For "slurm", see [pyslumrutils documentation(https://pyslurmutils.readthedocs.io/en/stable/reference/_generated/pyslurmutils.concurrent.rest.SlurmRestExecutor.html#pyslurmutils.concurrent.rest.SlurmRestExecutor)
         """
+        if ewoks is None and execution_mode != "celery":
+            raise RuntimeError(
+                f"Please install the 'ewoks' package to use the '{execution_mode}' execution mode."
+            )
+
         self._task_identifier = task_identifier
         if task_type is None:
             task_type = _guess_task_type(task_identifier)
@@ -90,7 +105,7 @@ class TaskSubmitter:
         self._execution_mode = execution_mode
         self._submit_options = deepcopy(submit_options)
 
-        if self._execution_mode == "celery":
+        if self._execution_mode in ("celery", "synchronous"):
             self._local_executor = None
         else:
             self._local_executor = _LocalPool(
@@ -106,7 +121,7 @@ class TaskSubmitter:
         return self._task_type
 
     def shutdown(self, **kwargs):
-        """Shutdown local executor, do nothing for remote execution"""
+        """Shutdown local executor, do nothing for remote and synchronous execution"""
         if self._local_executor is not None:
             self._local_executor.shutdown(**kwargs)
 
@@ -139,16 +154,26 @@ class TaskSubmitter:
         }
 
         if self._execution_mode == "celery":
-            future = _submit_celery(
-                args=(graph,), kwargs=kwargs, **self._submit_options
-            )
+            future = celery.submit(args=(graph,), kwargs=kwargs, **self._submit_options)
             if self._task_type == "method":
                 return _MethodCeleryFuture(future.uuid)
             else:
                 return future
+        elif self._execution_mode == "synchronous":
+            future = Future()
+            try:
+                result = ewoks.execute_graph(graph, **kwargs)
+            except Exception as e:
+                future.set_exception(e)
+            else:
+                future.set_result(result)
+            if self._task_type == "method":
+                return _MethodLocalFuture(str(uuid4()), future)
+            else:
+                return local.Future(str(uuid4()), future)
         else:
-            with _local_pool.active_pool_context(self._local_executor):
-                future = _submit_local(args=(graph,), kwargs=kwargs)
+            with active_pool_context(self._local_executor):
+                future = local.submit(args=(graph,), kwargs=kwargs)
                 if self._task_type == "method":
                     return _MethodLocalFuture(future.uuid)
                 else:
