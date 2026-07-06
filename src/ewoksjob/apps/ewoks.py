@@ -44,3 +44,17 @@ def discover_tasks_from_modules(*args, **kwargs) -> List[dict]:
 @ewoks_tasks.ewoks_task
 def discover_all_tasks(*args, **kwargs) -> List[dict]:
     return ewoks_tasks.get_native_ewoks_task("discover_all_tasks")(*args, **kwargs)
+
+
+@app.task(bind=False)
+@ewoks_tasks.ewoks_task
+def discover_workflows_from_modules(*args, **kwargs) -> List[dict]:
+    return ewoks_tasks.get_native_ewoks_task("discover_workflows_from_modules")(
+        *args, **kwargs
+    )
+
+
+@app.task(bind=False)
+@ewoks_tasks.ewoks_task
+def discover_all_workflows(*args, **kwargs) -> List[dict]:
+    return ewoks_tasks.get_native_ewoks_task("discover_all_workflows")(*args, **kwargs)

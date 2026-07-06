@@ -3,6 +3,7 @@ import os
 
 import pytest
 from ewokscore import events
+from ewokscore import workflow_discovery
 
 from ewoksjob.events.readers import read_ewoks_events
 from ewoksjob.worker import options as worker_options
@@ -128,6 +129,24 @@ def local_ewoks_worker(slurm_client_kwargs):
                 pass
 
             assert len(pool._tasks) == 0, str(list(pool._tasks.values()))
+
+
+@pytest.fixture
+def local_patched_ewoks_worker(monkeypatch):
+    monkeypatch.setattr(workflow_discovery, "entry_points", _mock_entry_points)
+
+    with local.pool_context(pool_type="thread"):
+        yield
+
+
+class _MockEntryPoint:
+    def __init__(self, name):
+        self.name = name
+
+
+def _mock_entry_points(group):
+    assert group == "ewoks.workflows"
+    return [_MockEntryPoint("ewoksjob.tests._loadtest.*")]
 
 
 @pytest.fixture()

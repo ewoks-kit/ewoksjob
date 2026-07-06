@@ -6,6 +6,7 @@ from uuid import uuid4
 
 import ewoks
 from ewokscore import task_discovery
+from ewokscore import workflow_discovery
 
 from ..dummy_workflow import dummy_workflow
 from .futures import LocalFuture
@@ -18,6 +19,8 @@ __all__ = [
     "convert_workflow",
     "discover_tasks_from_modules",
     "discover_all_tasks",
+    "discover_workflows_from_modules",
+    "discover_all_workflows",
 ]
 
 
@@ -74,3 +77,21 @@ def discover_all_tasks(
 ) -> LocalFuture:
     pool = get_active_pool()
     return pool.submit(task_discovery.discover_all_tasks, args=args, kwargs=kwargs)
+
+
+def discover_workflows_from_modules(
+    args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
+) -> LocalFuture:
+    pool = get_active_pool()
+    return pool.submit(
+        workflow_discovery.discover_workflows_from_modules, args=args, kwargs=kwargs
+    )
+
+
+def discover_all_workflows(
+    args: Optional[Tuple] = tuple(), kwargs: Optional[Mapping] = None
+) -> LocalFuture:
+    pool = get_active_pool()
+    return pool.submit(
+        workflow_discovery.discover_all_workflows, args=args, kwargs=kwargs
+    )

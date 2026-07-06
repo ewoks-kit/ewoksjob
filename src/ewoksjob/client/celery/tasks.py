@@ -12,6 +12,8 @@ __all__ = [
     "convert_workflow",
     "discover_tasks_from_modules",
     "discover_all_tasks",
+    "discover_workflows_from_modules",
+    "discover_all_workflows",
 ]
 
 
@@ -54,4 +56,16 @@ def discover_tasks_from_modules(**kw) -> CeleryFuture:
 
 def discover_all_tasks(**kw) -> CeleryFuture:
     async_result = send_task("ewoksjob.apps.ewoks.discover_all_tasks", **kw)
+    return CeleryFuture(async_result.id, async_result)
+
+
+def discover_workflows_from_modules(**kw) -> CeleryFuture:
+    async_result = send_task(
+        "ewoksjob.apps.ewoks.discover_workflows_from_modules", **kw
+    )
+    return CeleryFuture(async_result.id, async_result)
+
+
+def discover_all_workflows(**kw) -> CeleryFuture:
+    async_result = send_task("ewoksjob.apps.ewoks.discover_all_workflows", **kw)
     return CeleryFuture(async_result.id, async_result)
