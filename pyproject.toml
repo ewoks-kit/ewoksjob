@@ -30,7 +30,7 @@ Changelog = "https://github.com/ewoks-kit/ewoksjob/-/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 worker = [
-    "ewoks >=4.0.0",
+    "ewoks >=6.0.0",
     "objgraph",
 ]
 redis = [
@@ -94,6 +94,9 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json"]
 
 [tool.coverage.run]
 omit = ['*/tests/*']

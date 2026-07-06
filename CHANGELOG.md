@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add ewoksjob options under `EWOKSJOB_OPTIONS`: ``log_memory_usage`` and ``detect_memory_leaks``.
 - Added ability to handle remote ewoksutils exception types on the client side.
 - Add `client.task_utils.TaskSubmitter` helper to execute a single task.
+- Added worker tasks `discover_workflows_from_modules` and `discover_all_workflows`.
 
 ### Fixed
 

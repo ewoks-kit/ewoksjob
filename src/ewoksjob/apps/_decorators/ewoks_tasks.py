@@ -5,6 +5,7 @@ from typing import Dict
 
 import ewoks
 from ewokscore import task_discovery
+from ewokscore import workflow_discovery
 
 from ...worker.executor import get_execute_method
 from ..errors import replace_exception_for_client
@@ -49,6 +50,8 @@ _TASK_MAPPING: Dict[Callable, Callable] = {
     "convert_graph": ewoks.convert_graph,
     "discover_tasks_from_modules": task_discovery.discover_tasks_from_modules,
     "discover_all_tasks": task_discovery.discover_all_tasks,
+    "discover_workflows_from_modules": workflow_discovery.discover_workflows_from_modules,
+    "discover_all_workflows": workflow_discovery.discover_all_workflows,
 }
 
 _BOUND_TASKS = {"execute_graph"}
