@@ -35,6 +35,7 @@ class RedisEwoksEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
         self._redis_url = url
         self._ttl = ttl
         self._timeout = timeout
+        self._connection = None
 
     def _connect(self) -> None:
         """This is called when no connection exists."""
@@ -49,6 +50,10 @@ class RedisEwoksEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
     def _disconnect(self) -> None:
         """This is called when a connection exists and is connected."""
         self._connection.close()
+        self._connection = None
+
+    def _connected(self) -> bool:
+        return self._connection is not None
 
     def _serialize_record(self, record: logging.LogRecord) -> Optional[RedisRecordType]:
         """Convert a record to something that can be given to the connection."""
