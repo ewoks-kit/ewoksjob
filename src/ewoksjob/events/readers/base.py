@@ -1,4 +1,5 @@
 import json
+import logging
 import time
 from datetime import datetime
 from threading import Event
@@ -15,6 +16,7 @@ try:
 except ImportError:
     Variable = VariableContainer = None
 
+logger = logging.getLogger(__name__)
 
 EventType = Dict[str, str]
 
@@ -54,20 +56,32 @@ class EwoksEventReader:
             interval = max(interval, 0.001)
         start = time.time()
         n = 0
+        exception = None
         while True:
             try:
                 events = list(self.get_events(**filters))
-            except Exception as e:
-                if "no such table" not in str(e):
+            except Exception as ex:
+                if not self._retry_get_events_exception(ex):
                     raise
+                if exception is None:
+                    logger.warning("Reading events failed (keep retrying): %s", ex)
+                exception = ex
             else:
+                exception = None
                 events = events[n:]
                 n += len(events)
                 yield from events
-            if timeout is not None and (time.time() - start) > timeout:
+
+            timed_out = timeout is not None and (time.time() - start) > timeout
+            stopped = stop_event is not None and stop_event.is_set()
+            if timed_out or stopped:
+                if exception is not None:
+                    logger.error(
+                        "Stop polling events (last attempt failed)",
+                        exc_info=exception,
+                    )
                 return
-            if stop_event is not None and stop_event.is_set():
-                return
+
             time.sleep(interval)
 
     def get_events(self, **filters) -> Iterator[EventType]:
@@ -168,3 +182,7 @@ class EwoksEventReader:
             raise TypeError("starttime needs to be a datetime object")
         post_filter = {"starttime": starttime, "endtime": endtime}
         return is_equal_filter, post_filter
+
+    @staticmethod
+    def _retry_get_events_exception(ex: Exception) -> bool:
+        return True
