@@ -9,9 +9,15 @@ from .base import EwoksEventReader
 
 
 class Sqlite3EwoksEventReader(EwoksEventReader):
-    def __init__(self, uri: str, **_) -> None:
+    def __init__(self, uri: str, timeout: float = 10) -> None:
+        """
+        :param uri: for example "file:/path/to/ewoks_events.db" or "file:///path/to/ewoks_events.db".
+        :param timeout: native sqlite3 busy timeout: the maximum time to wait
+                        for database locks to be released by other connections.
+        """
         super().__init__()
         self._uri = uri
+        self._timeout = timeout
         self.__connection = None
         self.__sql_types = sqlite3_utils.python_to_sql_types(FIELD_TYPES)
 
@@ -24,7 +30,9 @@ class Sqlite3EwoksEventReader(EwoksEventReader):
     @property
     def _connection(self):
         if self.__connection is None:
-            self.__connection = sqlite3.connect(self._uri, uri=True)
+            self.__connection = sqlite3.connect(
+                self._uri, uri=True, timeout=self._timeout
+            )
         return self.__connection
 
     def wait_events(self, **kwargs) -> Iterator[EventType]:
@@ -38,3 +46,16 @@ class Sqlite3EwoksEventReader(EwoksEventReader):
             sql_types=self.__sql_types,
             **filters,
         )
+
+    @staticmethod
+    def _retry_get_events_exception(ex: Exception) -> bool:
+        if not isinstance(ex, sqlite3.OperationalError):
+            return False
+        error_message = str(ex)
+        if "no such table" in error_message:
+            # no event was published yet.
+            return True
+        if "database is locked" in error_message:
+            # transient lock by another connection.
+            return True
+        return False

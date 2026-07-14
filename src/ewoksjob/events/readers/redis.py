@@ -10,10 +10,20 @@ from .base import EwoksEventReader
 
 
 class RedisEwoksEventReader(EwoksEventReader):
-    def __init__(self, url: str, **_):
-        client_name = f"ewoks:reader:{socket.gethostname()}:{os.getpid()}"
-        self._proxy = redis.Redis.from_url(url, client_name=client_name)
+    def __init__(self, url: str, timeout: float = 10):
+        """
+        :param url: for example "redis://localhost:10003?db=2".
+        :param timeout: native redis socket timeout: the maximum time to wait
+                        for connecting and for command replies.
+        """
         super().__init__()
+        client_name = f"ewoks:reader:{socket.gethostname()}:{os.getpid()}"
+        self._proxy = redis.Redis.from_url(
+            url,
+            client_name=client_name,
+            socket_connect_timeout=timeout,
+            socket_timeout=timeout,
+        )
 
     def wait_events(self, **kwargs) -> Iterator[EventType]:
         yield from self.poll_events(**kwargs)
