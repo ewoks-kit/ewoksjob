@@ -16,22 +16,44 @@ RedisRecordType = Tuple[str, Dict[str, str]]
 class RedisEwoksEventHandler(EwoksEventHandlerMixIn, ConnectionHandler):
     # TODO: https://redisql.redbeardlab.com/blog/python/using-redisql-with-python/
 
-    def __init__(self, url: str, ttl=None):
-        """An example url is "redis://localhost:10003?db=2"."""
+    def __init__(
+        self,
+        url: str,
+        ttl: Optional[int] = None,
+        timeout: float = 10,
+        disconnect_on_error: bool = False,
+    ):
+        """
+        :param url: for example "redis://localhost:10003?db=2".
+        :param ttl: time-to-live in seconds of the record keys.
+        :param timeout: native redis socket timeout: the maximum time to wait
+                        for connecting and for command replies.
+                        A record is dropped when the timeout is reached.
+        :param disconnect_on_error: disconnect when emitting a record failed.
+        """
+        super().__init__(disconnect_on_error=disconnect_on_error)
         self._redis_url = url
         self._ttl = ttl
-        super().__init__()
+        self._timeout = timeout
+        self._connection = None
 
-    def _connect(self, timeout=1) -> None:
+    def _connect(self) -> None:
         """This is called when no connection exists."""
         client_name = f"ewoks:writer:{socket.gethostname()}:{os.getpid()}"
         self._connection = redis.Redis.from_url(
-            self._redis_url, client_name=client_name
+            self._redis_url,
+            client_name=client_name,
+            socket_connect_timeout=self._timeout,
+            socket_timeout=self._timeout,
         )
 
     def _disconnect(self) -> None:
         """This is called when a connection exists and is connected."""
         self._connection.close()
+        self._connection = None
+
+    def _connected(self) -> bool:
+        return self._connection is not None
 
     def _serialize_record(self, record: logging.LogRecord) -> Optional[RedisRecordType]:
         """Convert a record to something that can be given to the connection."""
