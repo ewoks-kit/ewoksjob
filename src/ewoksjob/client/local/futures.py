@@ -25,7 +25,6 @@ from ..futures import TimeoutError
 
 
 class LocalFuture(FutureInterface):
-
     def __init__(self, uuid: str, future: Optional[NATIVE_FUTURE_TYPES] = None) -> None:
         if future is None:
             from .pool import get_active_pool

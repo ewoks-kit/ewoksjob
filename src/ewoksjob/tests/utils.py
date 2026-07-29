@@ -1,4 +1,5 @@
 import logging
+import shutil
 import subprocess
 import time
 from types import ModuleType
@@ -15,9 +16,13 @@ def has_redis() -> bool:
 
 
 def _check_redis_server() -> bool:
+    redis_server = shutil.which("redis-server")
+    if redis_server is None:
+        logger.debug("Unable to find 'redis-server' executable.'")
+        return False
     try:
-        result = subprocess.run(
-            ["redis-server", "--version"], capture_output=True, text=True, check=True
+        result = subprocess.run(  # noqa: S603 (resolved via shutil.which)
+            [redis_server, "--version"], capture_output=True, text=True, check=True
         )
         return bool(result.stdout.strip())
     except Exception:

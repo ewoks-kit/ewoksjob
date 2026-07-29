@@ -76,9 +76,7 @@ test = [
 ]
 dev = [
     "ewoksjob[test]",
-    "black >=25",
-    "flake8 >=4",
-    "isort",
+    "ruff>=0.16.0",
 ]
 doc = [
     "ewoksjob[worker]",
@@ -111,6 +109,25 @@ cancel = "ewoksjob.cli_utils.cancel:cancel"
 [tool.pytest.ini_options]
 timeout = 120
 
-[tool.isort]
-profile = "black"
-force_single_line = "True"
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle errors
+    "F", # pyflakes
+    "I", # isort
+    "S", # flake8-bandit
+]
+ignore = [
+    "E501", # line too long
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/ewoksjob/tests/*.py" = [
+    "S101"  # allow asserts
+]
+"scripts/*.py" = [
+    "S101"  # allow asserts
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+known-first-party = ["ewoksjob"]

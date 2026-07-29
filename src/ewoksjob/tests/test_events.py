@@ -4,6 +4,7 @@ import threading
 import pytest
 from ewokscore import events
 
+from ..events.readers.redis import _escape_glob
 from .utils import has_redis
 
 
@@ -88,3 +89,16 @@ def assert_stop_event(reader):
     stop_event.set()
     thread.join(timeout=3)
     assert not thread.is_alive()
+
+
+@pytest.mark.parametrize(
+    "job_id,expected",
+    [
+        ("plainid", "plainid"),
+        ("has*star", "has\\*star"),
+        ("has?mark", "has\\?mark"),
+        ("has[bracket]", "has\\[bracket\\]"),
+    ],
+)
+def test_redis_escape_glob(job_id, expected):
+    assert _escape_glob(job_id) == expected

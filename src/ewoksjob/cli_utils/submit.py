@@ -15,10 +15,10 @@ from ..bindings import submit_graph
 
 
 @click.command("submit")
-@add_click_options(cli_submit_utils.submit_arguments(shell=True))
+@add_click_options(cli_submit_utils.submit_arguments(shell=True))  # noqa: S604
 def submit(cli_args: Namespace) -> Union[List[dict], Literal[0, 1]]:
     """Submit an Ewoks workflow."""
-    result = command_submit(cli_args, shell=True)
+    result = command_submit(cli_args, shell=True)  # noqa: S604
     if result:
         click.get_current_context().exit(result)
 
