@@ -18,6 +18,7 @@ def has_redis() -> bool:
 def _check_redis_server() -> bool:
     redis_server = shutil.which("redis-server")
     if redis_server is None:
+        logger.debug("Unable to find 'redis-server' executable.'")
         return False
     try:
         result = subprocess.run(  # noqa: S603 (resolved via shutil.which)
