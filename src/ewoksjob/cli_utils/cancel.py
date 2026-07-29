@@ -10,10 +10,10 @@ from .. import client
 
 
 @click.command("cancel")
-@add_click_options(cli_cancel_utils.cancel_arguments(shell=True))
+@add_click_options(cli_cancel_utils.cancel_arguments(shell=True))  # noqa: S604
 def cancel(cli_args: Namespace) -> Optional[Literal[0, 1]]:
     """Abort an Ewoks job."""
-    result = command_cancel(cli_args, shell=True)
+    result = command_cancel(cli_args, shell=True)  # noqa: S604
     if result:
         click.get_current_context().exit(result)
 

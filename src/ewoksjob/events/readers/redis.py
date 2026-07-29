@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import socket
 from typing import Iterator
 
@@ -22,7 +23,7 @@ class RedisEwoksEventReader(EwoksEventReader):
         is_equal_filter, post_filter = self.split_filter(**filters)
 
         if job_id:
-            pattern = f"ewoks:{job_id}:*"
+            pattern = f"ewoks:{_escape_glob(job_id)}:*"
         else:
             pattern = "ewoks:*"
         keys = sorted(
@@ -36,3 +37,11 @@ class RedisEwoksEventReader(EwoksEventReader):
             ):
                 continue
             yield event
+
+
+# Escape glob-special characters so `job_id` is matched literally in a SCAN pattern.
+_GLOB_SPECIAL_RE = re.compile(r"([\\*?\[\]])")
+
+
+def _escape_glob(value: str) -> str:
+    return _GLOB_SPECIAL_RE.sub(r"\\\1", value)
