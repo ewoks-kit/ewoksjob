@@ -7,17 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- `RedisEwoksEventHandler`: add `disconnect_on_error` and `timeout` argument.
-- `RedisEwoksEventReader`: add `timeout` argument and do not allow unknown arguments.
-- `Sqlite3EwoksEventReader`: add `timeout` argument and do not allow unknown arguments.
-
-### Fixed
-
-`EwoksEventReader`: log error when last attempt failed when polling for events.
-
-## [1.6.0rc1] - 2026-07-13
+## [1.6.0rc2] - 2026-08-02
 
 ### Added
 
@@ -25,10 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added ability to handle remote ewoksutils exception types on the client side.
 - Add `client.task_utils.TaskSubmitter` helper to execute a single task.
 - Added worker tasks `discover_workflows_from_modules` and `discover_all_workflows`.
+- `RedisEwoksEventHandler`: add `disconnect_on_error` and `timeout` argument.
+- `RedisEwoksEventReader`: add `timeout` argument and do not allow unknown arguments.
+- `Sqlite3EwoksEventReader`: add `timeout` argument and do not allow unknown arguments.
 
 ### Fixed
 
 - Raise an error when the configuration from `EWOKS_CONFIG_URI` is empty.
+`EwoksEventReader`: log error when last attempt failed when polling for events.
 
 ## [1.5.0] - 2026-03-30
 
@@ -255,8 +249,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - task discovery
 - Redis handler for ewoks events
 
-[unreleased]: https://github.com/ewoks-kit/ewoksjob/compare/1.6.0rc1...HEAD
-[1.6.0rc1]: https://github.com/ewoks-kit/ewoksjob/compare/v1.5.0...1.6.0rc1
+[unreleased]: https://github.com/ewoks-kit/ewoksjob/compare/1.6.0rc2...HEAD
+[1.6.0rc2]: https://github.com/ewoks-kit/ewoksjob/compare/v1.5.0...1.6.0rc2
 [1.5.0]: https://github.com/ewoks-kit/ewoksjob/compare/v1.1.0...v1.5.0
 [1.4.0]: https://github.com/ewoks-kit/ewoksjob/compare/v1.3.4...v1.4.0
 [1.3.4]: https://github.com/ewoks-kit/ewoksjob/compare/v1.3.3...v1.3.4
