@@ -1,5 +1,6 @@
 import gc
 import os
+from typing import Optional
 
 import pytest
 from ewokscore import events
@@ -155,12 +156,27 @@ def sqlite3_ewoks_events(tmp_path):
     handlers = [
         {
             "class": "ewokscore.events.handlers.Sqlite3EwoksEventHandler",
-            "arguments": [{"name": "uri", "value": uri}],
+            "arguments": [
+                {"name": "uri", "value": uri},
+                {"name": "retry_period", "value": _sqlite3_retry_period()},
+            ],
         }
     ]
     with read_ewoks_events(uri) as reader:
         yield handlers, reader
         events.cleanup()
+
+
+def _sqlite3_retry_period() -> Optional[float]:
+    """Sqlite3Handler's native busy timeout blocks without yielding, which
+    can deadlock a cooperative event loop (e.g. gevent) when the lock holder
+    runs in another greenlet. Retry at the python level instead in that case.
+    """
+    try:
+        from gevent.monkey import is_module_patched
+    except ImportError:
+        return None
+    return 0.1 if is_module_patched("threading") else None
 
 
 @pytest.fixture()

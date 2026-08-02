@@ -17,7 +17,7 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
     "celery[tblib] >= 5.5",
-    "ewoksutils[full] >=1.10.0rc1",
+    "ewoksutils[full] >=2.0.0rc2",
     "pyyaml",
 ]
 
@@ -30,7 +30,7 @@ Changelog = "https://github.com/ewoks-kit/ewoksjob/-/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 worker = [
-    "ewoks >=6.0.0",
+    "ewoks >=7.0.0rc1",
     "objgraph",
 ]
 redis = [

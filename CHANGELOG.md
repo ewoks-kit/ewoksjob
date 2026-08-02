@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `RedisEwoksEventHandler`: add `disconnect_on_error` and `timeout` argument.
+- `RedisEwoksEventReader`: add `timeout` argument and do not allow unknown arguments.
+- `Sqlite3EwoksEventReader`: add `timeout` argument and do not allow unknown arguments.
+
+### Fixed
+
+`EwoksEventReader`: log error when last attempt failed when polling for events.
+
 ## [1.6.0rc1] - 2026-07-13
 
 ### Added
