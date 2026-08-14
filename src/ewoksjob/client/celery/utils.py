@@ -19,6 +19,7 @@ __all__ = [
     "get_not_finished_futures",
     "get_queues",
     "get_workers",
+    "get_worker_concurrencies",
 ]
 
 
@@ -97,3 +98,15 @@ def get_queues() -> List[str]:
             queues.add(queue_info["name"])
 
     return list(queues)
+
+
+def get_worker_concurrencies() -> Dict[str, int]:
+    """Number of tasks each connected worker can run in parallel, keyed by worker name."""
+    worker_stats: Optional[Dict[str, dict]] = current_app.control.inspect().stats()
+    if worker_stats is None:
+        return dict()
+
+    return {
+        worker: info.get("pool", {}).get("max-concurrency", 1)
+        for worker, info in worker_stats.items()
+    }

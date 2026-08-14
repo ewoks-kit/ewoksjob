@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `ewoksjob.client`: Add `get_worker_concurrencies` to retrieve Celery worker concurrency per worker.
+
 ## [1.6.0rc2] - 2026-08-02
 
 ### Added
