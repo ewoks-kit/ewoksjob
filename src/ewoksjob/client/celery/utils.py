@@ -107,6 +107,8 @@ def get_worker_concurrencies() -> Dict[str, int]:
         return dict()
 
     return {
-        worker: info.get("pool", {}).get("max-concurrency", 1)
+        worker: info.get("autoscaler", {}).get(
+            "max", info.get("pool", {}).get("max-concurrency", 1)
+        )
         for worker, info in worker_stats.items()
     }
