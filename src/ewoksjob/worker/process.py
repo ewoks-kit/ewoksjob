@@ -235,6 +235,10 @@ def process_initializer(*args):
         signal.signal(signal.SIGINT, signal.SIG_IGN)
     except AttributeError:
         pass
+    # billiard's SIGTERM handler falls back to SIG_DFL after the first signal,
+    # so revoking a second job in the same (reused) child would kill it and
+    # break the executor.
+    signal.signal(signal.SIGTERM, _terminate_sighandler)
 
 
 def subprocess_main(
@@ -285,6 +289,10 @@ class ApplyResult:
 
     def terminate(self, signum):
         raise NotImplementedError
+
+
+def _terminate_sighandler(signum, frame):
+    raise SystemExit(-(256 - signum))
 
 
 def soft_timeout_sighandler(signum, frame):

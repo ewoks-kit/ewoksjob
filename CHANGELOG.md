@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `ewoksjob.client`: Add `get_worker_concurrencies` to retrieve Celery worker concurrency per worker.
 
+### Fixed
+
+- `process` pool: cancelling a second job in the same child process no longer breaks the pool.
+
 ## [1.6.0rc2] - 2026-08-02
 
 ### Added
