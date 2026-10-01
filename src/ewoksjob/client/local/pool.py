@@ -1,10 +1,13 @@
 import multiprocessing
+import signal
 import sys
 import weakref
 from concurrent.futures import Future as NativeFuture
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
+from typing import Any
+from typing import Callable
 from typing import Mapping
 from typing import Optional
 from typing import Tuple
@@ -76,6 +79,11 @@ class _LocalPool:
                     kwargs["mp_context"] = multiprocessing.get_context(context)
                 else:
                     multiprocessing.set_start_method(context, force=True)
+            kwargs["initargs"] = (
+                kwargs.get("initializer"),
+                tuple(kwargs.get("initargs", ())),
+            )
+            kwargs["initializer"] = _process_initializer
             self._executor = ProcessPoolExecutor(*args, **kwargs)
         elif pool_type == "thread":
             self._executor = ThreadPoolExecutor(*args, **kwargs)
@@ -114,7 +122,12 @@ class _LocalPool:
             kwargs = dict()
         if uuid is None:
             uuid = str(uuid4())
-        native_future = self._executor.submit(func, *args, **kwargs)
+        if self._pool_type == "process":
+            native_future = self._executor.submit(
+                _interruptible_call, func, args, kwargs
+            )
+        else:
+            native_future = self._executor.submit(func, *args, **kwargs)
         future = LocalFuture(uuid, native_future)
         self._tasks[uuid] = future
         return future
@@ -131,3 +144,19 @@ class _LocalPool:
 
     def get_unfinished_uuids(self) -> list:
         return [uuid for uuid, future in self._tasks.items() if not future.done()]
+
+
+def _process_initializer(initializer: Optional[Callable], initargs: Tuple) -> None:
+    # Ctrl+C is sent to the whole process group. Idle workers ignore it
+    # because the parent shuts down the pool.
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    if initializer is not None:
+        initializer(*initargs)
+
+
+def _interruptible_call(func: Callable, args: Tuple, kwargs: Mapping) -> Any:
+    signal.signal(signal.SIGINT, signal.default_int_handler)
+    try:
+        return func(*args, **kwargs)
+    finally:
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
