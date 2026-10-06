@@ -1,8 +1,8 @@
-import sqlite3
 from typing import Iterator
 
 from ewoksutils import sqlite3_utils
 from ewoksutils.event_utils import FIELD_TYPES
+from ewoksutils.sqlite3_utils import sqlite3
 
 from .base import EventType
 from .base import EwoksEventReader
