@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `process` pool: cancelling a second job in the same child process no longer breaks the pool.
+- Local `process` pool: Ctrl+C no longer prints a `KeyboardInterrupt` traceback for each worker process.
 
 ## [1.6.0rc2] - 2026-08-02
 
