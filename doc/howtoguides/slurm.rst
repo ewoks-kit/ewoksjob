@@ -55,6 +55,20 @@ Slurm job environment variables can be provided separately with ``-se <name>[=<v
 the variables is loaded from the local environment. In addition enviroment variables ``SLURM_ENV_HELLO=world``
 are loaded by `pyslurmutils` and send to slurm as ``HELLO=world``.
 
+Slurm-side execution environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Slurm job runs the native Ewoks function ``ewoks.execute_graph``; it does not run the Celery
+application. Therefore, the Python environment used by each Slurm job needs ``ewoks`` and any
+packages required by the workflow's task implementations. It does not need ``ewoksjob``, Celery,
+or ``pyslurmutils``. Those are used by the submitting worker, which sends the job through the
+generic Python command configured for Slurm.
+
+Make sure that this environment provides the Python executable named by ``--slurm-python-cmd``.
+For example, if the activated environment or Apptainer image exposes ``python``, configure
+``--slurm-python-cmd=python``. The pre-script can load modules or activate the environment (including
+an Apptainer-based environment) before the job is launched.
+
 Environment variables
 ^^^^^^^^^^^^^^^^^^^^^
 
