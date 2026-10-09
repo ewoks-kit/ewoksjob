@@ -19,6 +19,7 @@ dependencies = [
     "celery[tblib] >= 5.5, != 5.7.0a1",  # Redis result backend hangs with gevent: https://github.com/celery/celery/pull/10715
     "ewoksutils[full] >=2.0.0rc2",
     "pyyaml",
+    "psutil",
 ]
 
 [project.urls]
