@@ -1,8 +1,8 @@
-import sqlite3
 import threading
 import time
 
 from ewokscore import events
+from ewoksutils.sqlite3_utils import sqlite3
 
 from ..events.readers.sqlite3 import Sqlite3EwoksEventReader
 
