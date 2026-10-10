@@ -56,6 +56,7 @@ jobs:
         -W ignore::DeprecationWarning:kombu.utils.compat
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::DeprecationWarning:celery.backends.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
         -W "ignore:Field name \"pk\" in \"EmbeddedJsonModel\" shadows an attribute in parent \"JsonModel\":UserWarning"
         ${{ matrix.extra-pytest-warnings }}
@@ -70,6 +71,7 @@ jobs:
         -W ignore::DeprecationWarning:kombu.utils.compat
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::DeprecationWarning:celery.backends.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
         -W ignore::RuntimeWarning:networkx.utils.backends
     steps:
@@ -94,6 +96,7 @@ jobs:
         -W ignore::DeprecationWarning:kombu.utils.compat
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::DeprecationWarning:celery.backends.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
     steps:
       - uses: actions/checkout@v4
@@ -116,6 +119,7 @@ jobs:
         -W ignore::DeprecationWarning:kombu.utils.compat
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::DeprecationWarning:celery.backends.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
     steps:
       - uses: actions/checkout@v4
@@ -139,6 +143,7 @@ jobs:
         -W ignore::DeprecationWarning:kombu.utils.compat
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::DeprecationWarning:celery.backends.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
     steps:
       - uses: actions/checkout@v4
@@ -161,6 +166,7 @@ jobs:
         -W ignore::DeprecationWarning:kombu.utils.compat
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::DeprecationWarning:celery.backends.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
     steps:
       - uses: actions/checkout@v4
@@ -193,6 +199,7 @@ jobs:
         -W ignore::DeprecationWarning:kombu.utils.compat
         -W ignore::DeprecationWarning:celery.utils.imports
         -W ignore::DeprecationWarning:kombu.transport.redis
+        -W ignore::DeprecationWarning:celery.backends.redis
         -W ignore::pydantic.warnings.PydanticDeprecatedSince20
     steps:
       - uses: actions/checkout@v4
