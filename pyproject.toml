@@ -20,6 +20,7 @@ dependencies = [
     "ewoksutils[full] >=2.0.0rc2",
     "pyyaml",
     "numpy",  # see https://github.com/ewoks-kit/ewoksjob/issues/35
+    "psutil",
 ]
 
 [project.urls]
