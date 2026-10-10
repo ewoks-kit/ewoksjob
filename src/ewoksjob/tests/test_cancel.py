@@ -42,7 +42,9 @@ def test_cancel(ewoks_worker, slurm_tmp_path):
         # Cancelling a Celery job on Windows does not work.
         # https://docs.celeryq.dev/en/stable/faq.html#does-celery-support-windows
 
-        if CELERY_VERSION >= Version("5.6.2"):
+        if Version("5.6.2") <= CELERY_VERSION < Version("5.7.0a1"):
+            # Celery bug: a revoke overwrites a finished result with REVOKED.
+            # https://github.com/celery/celery/pull/10679
             _assert_cancelled_but_completes(celery, slurm_tmp_path)
         else:
             _assert_cannot_be_cancelled(celery, slurm_tmp_path)
