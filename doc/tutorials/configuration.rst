@@ -61,10 +61,16 @@ retrieval by the client.
 
 .. code-block:: python
 
-    # SQLite
+    # SQL database: SQLite files (no server needed)
     CELERY = {
         "broker_url": "sqla+sqlite:///path/to/celery.db",
         "result_backend": "db+sqlite:///path/to/celery_results.db",
+    }
+
+    # SQL database: PostgreSQL (or any other database supported by SQLAlchemy)
+    CELERY = {
+        "broker_url": "sqla+postgresql://user:password@host/dbname",
+        "result_backend": "db+postgresql://user:password@host/dbname",
     }
 
     # Redis
@@ -79,6 +85,8 @@ retrieval by the client.
         "result_backend": "rpc://",
         "result_persistent": True,
     }
+
+An SQL database used as message broker does not support job monitoring or cancelling.
 
 Celery supports many other broker and result backend implementations,
 including MongoDB and Memcached.

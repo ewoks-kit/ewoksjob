@@ -20,6 +20,8 @@ Install on the monitor side
     pip install ewoksjob[monitor,redis,sql]
 
 The `redis` and `sql` options are needed for the Celery message broker and result backend.
+The `sql` option installs SQLAlchemy, which is enough for SQLite. Other SQL databases also
+need their Python driver, for example `psycopg2` for PostgreSQL.
 
 Install Celery brokers
 ----------------------
