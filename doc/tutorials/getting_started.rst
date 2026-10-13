@@ -3,8 +3,8 @@ Getting started
 
 Job scheduling involves several components
 
-- Message broker: for submitting jobs (*Redis* or *RabbitMQ* or *Sqlite3*)
-- Result backend: for storing job return values (*Redis* or *Sqlite3*)
+- Message broker: for submitting jobs (*Redis*, *RabbitMQ* or an SQL database)
+- Result backend: for storing job return values (*Redis* or an SQL database)
 - Client: submits jobs
 - Worker: executes jobs
 - Monitor: monitors job execution
@@ -17,9 +17,10 @@ Currently these job schedulers are supported
 `celery <https://docs.celeryq.dev>`_
 ++++++++++++++++++++++++++++++++++++
 
-This is the default job scheduler used in production. *Redis* or *RabbitMQ* or *Sqlite3*
-can be used for the Celery message broker. *Redis* or *Sqlite3* can be used for the Celery
-result backend.
+This is the default job scheduler used in production. *Redis*, *RabbitMQ* or an SQL database
+can be used for the Celery message broker. *Redis* or an SQL database can be used for the Celery
+result backend. SQL databases are supported through `SQLAlchemy <https://www.sqlalchemy.org>`_,
+for example *PostgreSQL*, *MySQL*/*MariaDB* or *SQLite*.
 
 Workers can handle several jobs concurrently by using one of these pools
 
