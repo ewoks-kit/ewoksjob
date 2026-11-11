@@ -37,6 +37,7 @@ worker = [
 ]
 redis = [
     "redis !=5.3.0b1,!=5.3.0b3",
+    "kombu[redis]",  # kombu declares its redis version bounds only in this extra
 ]
 sql = [
     "sqlalchemy",

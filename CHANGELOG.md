@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `redis` extra: install a `kombu` compatible with the installed `redis`.
 - `process` pool: cancelling a second job in the same child process no longer breaks the pool.
 - Local `process` pool: Ctrl+C no longer prints a `KeyboardInterrupt` traceback for each worker process.
 
