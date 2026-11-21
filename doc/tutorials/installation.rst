@@ -7,6 +7,12 @@ Install on the client side
 
     pip install ewoksjob[redis,sql]
 
+Install ``ewoks`` as well to load workflows and their sub-workflows on the client
+
+.. code-block:: bash
+
+    pip install ewoksjob[redis,sql] ewoks
+
 Install on the worker side
 
 .. code-block:: bash
