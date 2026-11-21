@@ -11,10 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `ewoksjob.client`: Add `get_worker_concurrencies` to retrieve Celery worker concurrency per worker.
 
+### Changed
+
+- `submit_graph`: send the content of a JSON or YAML workflow file on the client instead of loading it on the client.
+
+### Deprecated
+
+- `submit_graph`: the `_convert_graph` argument is ignored.
+
 ### Fixed
 
-- `submit_graph`: use the `_convert_graph` argument.
-- `submit_graph`: load workflow dictionaries, and workflow files with load options, on the client side.
 - `redis` extra: install a `kombu` compatible with the installed `redis`.
 - `process` pool: cancelling a second job in the same child process no longer breaks the pool.
 - Local `process` pool: Ctrl+C no longer prints a `KeyboardInterrupt` traceback for each worker process.

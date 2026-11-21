@@ -33,6 +33,7 @@ Changelog = "https://github.com/ewoks-kit/ewoksjob/-/blob/main/CHANGELOG.md"
 [project.optional-dependencies]
 worker = [
     "ewoks >=7.0.0rc1",
+    "ewokscore >=5.1.0rc9",
     "objgraph",
 ]
 redis = [
