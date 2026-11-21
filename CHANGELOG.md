@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `ewoksjob.client`: Add `get_worker_concurrencies` to retrieve Celery worker concurrency per worker.
 
+### Changed
+
+- `submit_graph`: send the content of a JSON or YAML workflow file on the client instead of loading it on the client.
+
+### Deprecated
+
+- `submit_graph`: the `_convert_graph` argument is ignored.
+
 ### Fixed
 
 - `redis` extra: install a `kombu` compatible with the installed `redis`.
