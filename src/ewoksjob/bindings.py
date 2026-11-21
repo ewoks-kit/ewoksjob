@@ -1,5 +1,6 @@
 import json
 import logging
+from collections.abc import Mapping
 from typing import Any
 from typing import Callable
 from typing import Optional
@@ -35,7 +36,7 @@ def submit_graph(
         if _convert_graph is None:
             _convert_graph = _load_graph
         try:
-            deserialized_graph = _load_graph(graph, load_options=load_options)
+            deserialized_graph = _convert_graph(graph, load_options=load_options)
             ex = None
         except Exception as e:
             ex = e
@@ -60,12 +61,14 @@ def submit_graph(
 
 
 def _load_graph(graph, load_options: Optional[dict] = None) -> Any:
+    if isinstance(graph, Mapping):
+        return graph
     if not isinstance(graph, str):
         return
     if not graph.endswith((".json", ".yml", ".yaml")):
         return
     with open(graph, "r") as f:
         if graph.endswith(".json"):
-            return json.load(f, **load_options)
+            return json.load(f)
         else:
-            return yaml.safe_load(f, **load_options)
+            return yaml.safe_load(f)
