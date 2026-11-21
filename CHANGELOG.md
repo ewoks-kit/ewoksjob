@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `submit_graph`: send the content of a JSON or YAML workflow file on the client instead of loading it on the client.
+- `submit_graph`: load the workflow with `ewoks` on the client when `ewoks` is installed.
+- `submit_graph`: without `ewoks` on the client, send the content of a local JSON or YAML workflow file instead of loading it on the client.
 
 ### Deprecated
 
