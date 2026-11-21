@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `ewoksjob.client.task_utils`: Add `TaskSubmitter` to execute a single task, function or task class.
 - `ewoksjob.client`: Add `get_worker_concurrencies` to retrieve Celery worker concurrency per worker.
 
 ### Fixed
