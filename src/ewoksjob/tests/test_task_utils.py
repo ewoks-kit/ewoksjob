@@ -1,6 +1,6 @@
 import pytest
 
-from ..client.task_utils import TaskSubmitter
+from ..client._task_utils import TaskSubmitter
 
 TASK_TESTS = [
     ("ewokscore.tests.examples.tasks.addfunc.addfunc", (), {"arg": 2}, 3),
