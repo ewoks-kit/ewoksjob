@@ -1,10 +1,13 @@
 import pytest
+from ewokscore.tests.examples.tasks.sumtask import SumTask
 
-from ..client._task_utils import TaskSubmitter
+from ..client.task_utils import TaskSubmitter
 
 TASK_TESTS = [
     ("ewokscore.tests.examples.tasks.addfunc.addfunc", (), {"arg": 2}, 3),
     ("builtins.max", (1, 2, -1), {}, 2),
+    (max, (1, 2, -1), {}, 2),
+    (SumTask, (), {"a": 1, "b": 2}, {"result": 3}),
     (
         "ewokscore.tests.examples.tasks.sumtask.SumTask",
         (),
