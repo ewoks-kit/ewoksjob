@@ -21,6 +21,7 @@ dependencies = [
     "pyyaml",
     "numpy",  # see https://github.com/ewoks-kit/ewoksjob/issues/35
     "psutil",
+    "packaging",
 ]
 
 [project.urls]
@@ -75,7 +76,6 @@ test = [
     "pytest-mock",
     "tzdata",
     "pytest-timeout",
-    "packaging",
 ]
 dev = [
     "ewoksjob[test]",

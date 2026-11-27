@@ -16,6 +16,7 @@ from celery.bin import worker
 from celery.bin.base import CeleryOption
 from click import Choice
 
+from ._prefork import patch_prefork_pool
 from .process import TaskPool as ProcessTaskPool
 from .slurm import TaskPool as SlurmTaskPool
 
@@ -29,6 +30,8 @@ concurrency.ALIASES["process"] = (
 )
 concurrency.ALIASES["slurm"] = f"{SlurmTaskPool.__module__}:{SlurmTaskPool.__name__}"
 worker.WORKERS_POOL.choices = list(worker.WORKERS_POOL.choices) + ["process", "slurm"]
+
+patch_prefork_pool()
 
 
 def add_options(app: Celery) -> None:

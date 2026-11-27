@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `redis` extra: install a `kombu` compatible with the installed `redis`.
 - `process` pool: cancelling a second job in the same child process no longer breaks the pool.
 - Local `process` pool: Ctrl+C no longer prints a `KeyboardInterrupt` traceback for each worker process.
+- `prefork` pool: tasks no longer fail on macOS with Celery older than 5.7 and billiard 4.3 or later.
 
 ## [1.6.0rc2] - 2026-08-02
 
