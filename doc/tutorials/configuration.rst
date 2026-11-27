@@ -46,6 +46,28 @@ On the worker side, the configuration URI can also be provided as a CLI argument
 
     For more information, see the :ref:`Ewoksjob commands reference <cli>`
 
+Lookup order
+++++++++++++
+
+A configuration URI is a Python module (``myproject.config``), a Python file (``/tmp/ewoks/config.py``),
+a YAML file (``/tmp/ewoks/config.yml``) or a Beacon YAML file (``beacon://id22:25000/ewoks/config.yml``).
+
+The client and the worker each select their configuration source.
+They use the first environment variable in this list that is set and not empty:
+
+1. ``EWOKS_CONFIG_URI``: a configuration URI.
+2. ``CELERY_CONFIG_URI``: a configuration URI.
+3. ``BEACON_HOST``: a Beacon host, for example ``hostname:25000``.
+   The configuration is the file ``/ewoks/config.yml`` on this Beacon server.
+4. ``CELERY_CONFIG_MODULE``: a configuration URI.
+   The CLI argument ``--config`` sets this variable.
+
+When the configuration cannot be loaded, an error is raised. The next source is not used.
+
+When no variable is set, Celery imports the Python module ``celeryconfig``.
+The current working directory is on the Python path.
+When this module does not exist, Celery uses its default settings.
+
 Sections
 --------
 
